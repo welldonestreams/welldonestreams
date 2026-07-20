@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>WDS Admin</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    :root { --bg:#0f1114; --surface:#191c21; --surface2:#22262d; --text:#f2f4f7; --dim:#9aa4b2; --border:#2b2f37; --accent:#e5a00d; --ok:#2fae66; --err:#e2483d; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; padding:16px; max-width:640px; margin:0 auto; }
+    h1 { font-size:1.4rem; margin-bottom:2px; }
+    h1 span { color:var(--accent); }
+    .sub { color:var(--dim); font-size:.85rem; margin-bottom:20px; }
+    h2 { font-size:1.05rem; margin:26px 0 10px; display:flex; align-items:center; gap:8px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:14px; }
+    input { width:100%; padding:14px; border-radius:10px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:16px; font-family:inherit; margin-bottom:10px; }
+    input:focus { outline:2px solid var(--accent); border-color:transparent; }
+    button { border:none; border-radius:10px; padding:14px 18px; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit; }
+    .btn { background:var(--accent); color:#10130f; width:100%; }
+    .btn:active { transform:translateY(1px); }
+    .btn:disabled { opacity:.5; }
+    .row { display:flex; gap:8px; align-items:center; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px; }
+    .row .who { flex:1; min-width:0; }
+    .row .who .nm { font-weight:600; }
+    .row .who .em { color:var(--dim); font-size:.85rem; word-break:break-all; }
+    .row .acts { display:flex; gap:6px; flex-shrink:0; }
+    .mini { padding:10px 14px; font-size:14px; border-radius:9px; }
+    .invite { background:var(--ok); color:#08140c; }
+    .dismiss { background:var(--surface); color:var(--dim); border:1px solid var(--border); }
+    .msg { font-size:.9rem; margin-top:8px; min-height:1.2em; }
+    .msg.ok { color:var(--ok); } .msg.err { color:var(--err); }
+    .empty { color:var(--dim); font-size:.9rem; text-align:center; padding:14px; }
+    .gate { margin-top:40px; }
+    .poll-opt { display:flex; gap:8px; margin-bottom:8px; align-items:center; }
+    .poll-opt input { margin-bottom:0; }
+    .poll-opt img { width:30px; height:45px; object-fit:cover; border-radius:4px; }
+    .poll-opt button.rm { background:var(--err); color:#fff; padding:0 16px; }
+    .poll-opt .votes { width:64px; text-align:center; }
+    .poll-opt .plus { background:var(--ok); color:#08140c; padding:0 12px; }
+    .poll-opt .vwrap { display:flex; gap:4px; align-items:center; }
+    .poll-opt .vwrap label { font-size:.7rem; color:var(--dim); }
+    .addopt { background:var(--surface2); color:var(--text); border:1px solid var(--border); width:100%; margin-bottom:10px; }
+    .movie-search { display:flex; gap:8px; margin-bottom:10px; }
+    .movie-search input { flex:1; margin-bottom:0; }
+    .hide { display:none; }
+    .pill { font-size:.7rem; background:var(--surface2); color:var(--dim); padding:2px 8px; border-radius:99px; border:1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <h1>Well Done <span>Streams</span> â€” Admin</h1>
+  <div class="sub">Invite people to Plex &amp; manage the poll.</div>
+
+  <!-- LOGIN GATE -->
+  <div id="gate" class="gate">
+    <div class="card">
+      <h2>ðŸ”’ Enter admin token</h2>
+      <input type="password" id="token" placeholder="Admin token" autocomplete="current-password" />
+      <button class="btn" id="unlock">Unlock</button>
+      <div class="msg" id="gateMsg"></div>
+    </div>
+  </div>
+
+  <!-- PANEL -->
+  <div id="panel" class="hide">
+    <!-- MANUAL INVITE -->
+    <h2>âž• Invite by email</h2>
+    <div class="card">
+      <input type="email" id="manualEmail" placeholder="their-plex-email@example.com" />
+      <button class="btn" id="manualInvite">Send Plex Invite</button>
+      <div class="msg" id="manualMsg"></div>
+    </div>
+
+    <!-- PENDING REQUESTS -->
+    <h2>ðŸ“¥ Pending requests <span class="pill" id="pendingCount">0</span></h2>
+    <div class="card" id="pendingWrap">
+      <div class="empty">Loadingâ€¦</div>
+    </div>
+
+    <!-- POLL MANAGEMENT -->
+    <h2>ðŸ—³ï¸ Poll options</h2>
+    <div class="card">
+      <!-- Search for movie poster -->
+      <div class="movie-search">
+        <input type="text" id="movieQuery" placeholder="Search movie for posterâ€¦" />
+        <button class="mini" id="searchMovie" style="width:80px;">Lookup</button>
+      </div>
+      <div id="pollOpts"></div>
+      <button class="addopt" id="addOpt">+ Add plain option</button>
+      <button class="btn" id="savePoll">Save Poll (resets votes)</button>
+      <div class="msg" id="pollMsg"></div>
+    </div>
+
+    <button class="dismiss mini" id="logout" style="width:100%;margin-top:10px;">Lock admin</button>
+  </div>
+
+<script>
+  const API = "/api";
+  let TOKEN = sessionStorage.getItem('wds-admin-token') || '';
+
+  const $ = id => document.getElementById(id);
+  const authHeaders = () => ({ 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' });
+
+  async function api(pathName, opts = {}) {
+    const res = await fetch(API + pathName, { ...opts, headers: { ...authHeaders(), ...(opts.headers||{}) } });
+    let data = null;
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('application/json')) data = await res.json().catch(()=>null);
+    else data = { message: await res.text().catch(()=>'') };
+    return { ok: res.ok, status: res.status, data };
+  }
+
+  // ---------- gate ----------
+  $('unlock').addEventListener('click', tryUnlock);
+  $('token').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+  async function tryUnlock() {
+    const t = $('token').value.trim();
+    if (!t) return;
+    TOKEN = t;
+    const r = await api('/admin/pending');
+    if (r.ok) {
+      sessionStorage.setItem('wds-admin-token', TOKEN);
+      $('gate').classList.add('hide');
+      $('panel').classList.remove('hide');
+      renderPending(r.data.pending || []);
+      loadPoll();
+    } else {
+      $('gateMsg').className = 'msg err';
+      $('gateMsg').textContent = r.status === 401 ? 'Wrong token.' : ('Error: ' + (r.data?.error || r.status));
+      TOKEN = '';
+    }
+  }
+  $('logout').addEventListener('click', () => {
+    sessionStorage.removeItem('wds-admin-token'); TOKEN='';
+    $('panel').classList.add('hide'); $('gate').classList.remove('hide');
+    $('token').value=''; $('gateMsg').textContent='';
+  });
+
+  // ---------- pending ----------
+  function renderPending(list) {
+    $('pendingCount').textContent = list.length;
+    const wrap = $('pendingWrap');
+    if (!list.length) { wrap.innerHTML = '<div class="empty">No pending requests ðŸŽ‰</div>'; return; }
+    wrap.innerHTML = '';
+    list.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `<div class="who"><div class="nm"></div><div class="em"></div></div>
+        <div class="acts">
+          <button class="mini invite">Invite</button>
+          <button class="mini dismiss">âœ•</button>
+        </div>`;
+      row.querySelector('.nm').textContent = p.name;
+      row.querySelector('.em').textContent = p.email;
+      row.querySelector('.invite').addEventListener('click', async (e) => {
+        const btn = e.target; btn.disabled = true; btn.textContent = 'â€¦';
+        const r = await api('/admin/invite', { method:'POST', body: JSON.stringify({ email: p.email, id: p.id }) });
+        if (r.ok) { row.style.opacity = .4; row.querySelector('.acts').innerHTML = '<span class="pill">'+(r.data.already?'already shared':'invited âœ“')+'</span>'; refreshPending(); }
+        else { btn.disabled = false; btn.textContent = 'Invite'; alert(r.data?.error || 'Failed'); }
+      });
+      row.querySelector('.dismiss').addEventListener('click', async () => {
+        if (!confirm('Remove '+p.email+' without inviting?')) return;
+        await api('/admin/dismiss', { method:'POST', body: JSON.stringify({ id: p.id }) });
+        refreshPending();
+      });
+      wrap.appendChild(row);
+    });
+  }
+  async function refreshPending() {
+    const r = await api('/admin/pending');
+    if (r.ok) renderPending(r.data.pending || []);
+  }
+
+  // ---------- manual invite ----------
+  $('manualInvite').addEventListener('click', async () => {
+    const email = $('manualEmail').value.trim();
+    const m = $('manualMsg');
+    if (!email) { m.className='msg err'; m.textContent='Enter an email.'; return; }
+    const btn = $('manualInvite'); btn.disabled = true; btn.textContent='Sendingâ€¦';
+    const r = await api('/admin/invite', { method:'POST', body: JSON.stringify({ email }) });
+    if (r.ok) { m.className='msg ok'; m.textContent = r.data.already ? 'Already shared with that account.' : 'Invite sent!'; $('manualEmail').value=''; }
+    else { m.className='msg err'; m.textContent = r.data?.error || ('Failed ('+r.status+')'); }
+    btn.disabled=false; btn.textContent='Send Plex Invite';
+  });
+
+  // ---------- poll ----------
+  let currentOptions = []; // {name, poster}
+
+  let currentCounts = {};
+  function pollRow(opt) {
+    const div = document.createElement('div');
+    div.className = 'poll-opt';
+    const name = typeof opt === 'string' ? opt : opt.name;
+    const poster = opt && opt.poster;
+    const votes = currentCounts[name] || 0;
+    const ph = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2230%22 height=%2245%22%3E%3Crect width=%2230%22 height=%2245%22 fill=%22%23333%22/%3E%3C/svg%3E';
+    div.innerHTML = `<img src="${poster || ph}" alt="" data-poster="${escapeHtml(poster||'')}" />`
+      + `<input type="text" class="nm" value="${escapeHtml(name)}" placeholder="Option" />`
+      + `<div class="vwrap"><input type="number" class="votes" min="0" value="${votes}" title="Vote count" /><button class="plus" title="+1 vote">+1</button></div>`
+      + `<button class="rm">âœ•</button>`;
+    div.querySelector('.rm').addEventListener('click', () => div.remove());
+    div.querySelector('.plus').addEventListener('click', () => {
+      const vi = div.querySelector('.votes');
+      vi.value = (parseInt(vi.value || '0', 10) + 1);
+    });
+    return div;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  async function loadPoll() {
+    const res = await fetch(API + '/poll'); const data = await res.json();
+    currentCounts = data.counts || {};
+    const c = $('pollOpts'); c.innerHTML = '';
+    currentOptions = [];
+    (data.options || []).forEach(o => {
+      currentOptions.push(o);
+      c.appendChild(pollRow(o));
+    });
+    if (!currentOptions.length) { c.appendChild(pollRow('')); currentOptions.push({name:''}); }
+  }
+
+  $('addOpt').addEventListener('click', () => {
+    const c = $('pollOpts');
+    c.appendChild(pollRow(''));
+    currentOptions.push({name:''});
+  });
+
+  // ---- Movie search and add with poster ----
+  $('searchMovie').addEventListener('click', async () => {
+    const query = $('movieQuery').value.trim();
+    if (!query) return;
+    const btn = $('searchMovie'); btn.disabled = true; btn.textContent = 'â€¦';
+    try {
+      const r = await api('/poll/lookup', { method:'POST', body: JSON.stringify({ query }) });
+      if (r.ok && r.data.name) {
+        let poster = r.data.poster;
+        if (!poster) {
+          poster = prompt('No poster found automatically. Paste a poster image URL (e.g. https://www.themoviedb.org/t/p/w600_and_h900_face/....jpg), or leave blank:', '') || null;
+        }
+        const newOpt = { name: r.data.name, poster };
+        currentOptions.push(newOpt);
+        const c = $('pollOpts');
+        if (currentOptions.length > 1 && currentOptions[currentOptions.length-2] && currentOptions[currentOptions.length-2].name === '') {
+          currentOptions.pop();
+          c.lastChild.remove();
+        }
+        c.appendChild(pollRow(newOpt));
+        $('movieQuery').value = '';
+      } else {
+        // Lookup failed entirely - let admin add by hand with a manual poster
+        const manualPoster = prompt('Lookup failed. Paste a poster image URL for "' + query + '" (or leave blank for no poster):', '') || null;
+        const newOpt = { name: query, poster: manualPoster };
+        currentOptions.push(newOpt);
+        $('pollOpts').appendChild(pollRow(newOpt));
+        $('movieQuery').value = '';
+      }
+    } catch(e) { alert('Lookup failed'); }
+    btn.disabled = false; btn.textContent = 'Lookup';
+  });
+
+  $('savePoll').addEventListener('click', async () => {
+    const rows = [...$('pollOpts').querySelectorAll('.poll-opt')];
+    const built = rows.map(row => {
+      const name = row.querySelector('.nm').value.trim();
+      const poster = row.querySelector('img').dataset.poster || null;
+      const votes = parseInt(row.querySelector('.votes').value || '0', 10);
+      return { name, poster, votes };
+    }).filter(o => o.name);
+    if (!built.length) { $('pollMsg').className='msg err'; $('pollMsg').textContent='Add at least one option.'; return; }
+
+    // 1) Save options (this resets counts to 0 on the server)
+    const merged = built.map(o => ({ name: o.name, poster: o.poster }));
+    const r = await api('/poll/admin', { method:'PUT', body: JSON.stringify({ options: merged }) });
+    if (!r.ok) { $('pollMsg').className='msg err'; $('pollMsg').textContent = r.data?.error || 'Failed.'; return; }
+
+    // 2) Apply any manual vote counts (>0) via set-votes
+    for (const o of built) {
+      if (o.votes > 0) {
+        await api('/admin/set-votes', { method:'POST', body: JSON.stringify({ name: o.name, count: o.votes }) });
+      }
+    }
+    $('pollMsg').className='msg ok'; $('pollMsg').textContent='Poll saved.'; loadPoll();
+  });
+
+  // auto-unlock if token stored
+  if (TOKEN) { $('token').value = TOKEN; tryUnlock(); }
+</script>
+</body>
+</html>
