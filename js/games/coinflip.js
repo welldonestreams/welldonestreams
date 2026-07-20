@@ -1,35 +1,50 @@
 window.Games.coinflip = function() {
   const stage = document.getElementById('game-stage');
   stage.innerHTML = `
-    <div class="game-card">
-      <h2>🪙 Coin Flip</h2>
-      <div id="coin-display" style="font-size: 3rem; margin: 20px 0;">🪙</div>
+    <div class="table-felt">
+      <h2>🪙 High-Stakes Flip</h2>
+
+      <div class="coin-box">
+        <div class="coin" id="coin">
+          <div class="side heads">👤</div>
+          <div class="side tails">🦅</div>
+        </div>
+      </div>
+
       <input type="number" id="coin-bet" class="bet-input" value="50" min="10" />
       <br>
-      <button class="pill" id="flip-heads">Heads</button>
-      <button class="pill secondary" id="flip-tails">Tails</button>
-      <p id="coin-msg" style="margin-top: 12px; font-weight: bold;"></p>
+      <button class="pill" id="flip-h">Heads</button>
+      <button class="pill secondary" id="flip-t">Tails</button>
+      <p id="coin-msg" style="margin-top: 14px; font-weight: bold; min-height: 24px;"></p>
     </div>
   `;
 
-  const flip = async (choice) => {
+  const flipCoin = async (choice) => {
     let bet = parseInt(document.getElementById('coin-bet').value, 10) || 50;
     let bal = await window.GameAPI.getBalance();
     if (bet > bal) { alert("Insufficient chips!"); return; }
 
-    let outcome = Math.random() < 0.5 ? 'heads' : 'tails';
-    document.getElementById('coin-display').textContent = outcome === 'heads' ? '👤 Heads' : '🦅 Tails';
-    const msg = document.getElementById('coin-msg');
+    const coin = document.getElementById('coin');
+    coin.className = 'coin'; 
 
-    if (choice === outcome) {
-      await window.GameAPI.setBalance(bal + bet);
-      msg.textContent = `Correct! Won +${bet} chips!`;
-    } else {
-      await window.GameAPI.setBalance(bal - bet);
-      msg.textContent = `Flipped ${outcome}. Lost -${bet} chips.`;
-    }
+    let outcome = Math.random() < 0.5 ? 'heads' : 'tails';
+    
+    setTimeout(() => {
+      coin.classList.add(outcome === 'heads' ? 'flip-heads' : 'flip-tails');
+    }, 50);
+
+    setTimeout(async () => {
+      const msg = document.getElementById('coin-msg');
+      if (choice === outcome) {
+        await window.GameAPI.setBalance(bal + bet);
+        msg.textContent = `🎉 Flipped ${outcome.toUpperCase()}! Won +${bet} chips!`;
+      } else {
+        await window.GameAPI.setBalance(bal - bet);
+        msg.textContent = `Flipped ${outcome.toUpperCase()}. Lost -${bet} chips.`;
+      }
+    }, 2050);
   };
 
-  document.getElementById('flip-heads').addEventListener('click', () => flip('heads'));
-  document.getElementById('flip-tails').addEventListener('click', () => flip('tails'));
+  document.getElementById('flip-h').addEventListener('click', () => flipCoin('heads'));
+  document.getElementById('flip-t').addEventListener('click', () => flipCoin('tails'));
 };
