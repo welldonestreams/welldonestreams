@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>FakeStake | Well Done Streams</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body data-mode="dark" data-palette="gold">
+  
+  <div class="topbar">
+    <div class="brand">Fake<span>Stake</span></div>
+    <div class="controls">
+      <div class="balance-badge">
+        <span id="global-balance">---</span> <span class="chip-icon">🪙</span>
+      </div>
+      <button class="pill" id="dailyClaimBtn">Claim Daily</button>
+      <a href="/" class="pill secondary">Exit</a>
+    </div>
+  </div>
+
+  <div class="casino-layout">
+    <aside class="sidebar">
+      <nav class="game-nav" id="gameNav">
+        <button class="nav-btn active" data-game="slots">🎰 Slots</button>
+        <button class="nav-btn" data-game="roulette">🎡 Roulette</button>
+        <button class="nav-btn" data-game="blackjack">🃏 Blackjack</button>
+        <button class="nav-btn" data-game="coinflip">🪙 Coin Flip</button>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <section id="game-stage">
+        <div class="welcome-message">
+          <h2>Loading engine...</h2>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/games/slots.js"></script>
+  <script src="js/games/roulette.js"></script>
+  <script src="js/games/blackjack.js"></script>
+  <!-- Added the missing coinflip script here -->
+  <script src="js/games/coinflip.js"></script>
+</body>
+</html>
