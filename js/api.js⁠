@@ -1,38 +1,69 @@
+// GameAPI — talks to the Worker at /api/casino/*. Server owns all balances now.
+// Each device picks a nickname once (stored locally) so people get their own wallet.
 window.GameAPI = {
-  // Fetch balance from browser storage, default to 10,000 if new
-  getBalance: async function() {
-    let bal = localStorage.getItem('fakestake_balance');
-    if (bal === null) {
-      bal = 10000;
-      localStorage.setItem('fakestake_balance', bal);
+  BASE: '/api/casino',
+  cachedBalance: null,
+
+  getUserId() {
+    let u = null;
+    try { u = localStorage.getItem('wds-casino-user'); } catch (e) {}
+    if (!u) {
+      u = (prompt('Pick a nickname for your chips (saved on this device):') || '').trim();
+      u = u.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 24);
+      if (!u) u = 'guest-' + Math.random().toString(36).slice(2, 8);
+      try { localStorage.setItem('wds-casino-user', u); } catch (e) {}
     }
-    return parseInt(bal, 10);
+    return u;
   },
 
-  // Save new balance and update the topbar UI
-  setBalance: async function(newBal) {
-    localStorage.setItem('fakestake_balance', newBal);
-    const uiBalance = document.getElementById('global-balance');
-    if (uiBalance) uiBalance.textContent = window.CasinoShared.formatAmt(newBal);
-    return newBal;
+  async request(path, opts = {}) {
+    const sep = path.includes('?') ? '&' : '?';
+    const res = await fetch(`${this.BASE}${path}${sep}user=${encodeURIComponent(this.getUserId())}`, opts);
+    let data = {};
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+    return data;
+  },
+
+  async getBalance() {
+    try {
+      const d = await this.request('/balance');
+      this.cachedBalance = d.balance;
+    } catch (e) {
+      if (this.cachedBalance == null) this.cachedBalance = 0;
+      console.error('Balance fetch failed:', e.message);
+    }
+    this.updateBalanceUI();
+    return this.cachedBalance;
+  },
+
+  async claimDaily() {
+    const d = await this.request('/claim', { method: 'POST' }); // throws if already claimed today
+    this.cachedBalance = d.balance;
+    this.updateBalanceUI();
+    return d;
+  },
+
+  // payload examples:
+  //  { game:'slots', bet:50 }
+  //  { game:'coinflip', bet:50, choice:'heads' }
+  //  { game:'roulette', bets:[{choice:'red',amt:100},{choice:'number',number:17,amt:10}] }
+  //  { game:'blackjack', netWin:-150, resultMsg:'You lost 150 chips.' }
+  async play(payload) {
+    const d = await this.request('/play', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (typeof d.newBalance === 'number') {
+      this.cachedBalance = d.newBalance;
+      this.updateBalanceUI();
+    }
+    return d;
+  },
+
+  updateBalanceUI() {
+    const el = document.getElementById('global-balance');
+    if (el && this.cachedBalance != null) el.textContent = this.cachedBalance.toLocaleString();
   }
 };
-
-// Auto-load the money into the top bar when the page opens
-document.addEventListener('DOMContentLoaded', async () => {
-  const startingMoney = await window.GameAPI.getBalance();
-  const uiBalance = document.getElementById('global-balance');
-  if (uiBalance) uiBalance.textContent = window.CasinoShared ? window.CasinoShared.formatAmt(startingMoney) : startingMoney;
-});
-
-// Daily Claim Button Logic
-document.addEventListener('DOMContentLoaded', () => {
-  const claimBtn = document.getElementById('dailyClaimBtn');
-  if (claimBtn) {
-    claimBtn.onclick = async () => {
-      let current = await window.GameAPI.getBalance();
-      await window.GameAPI.setBalance(current + 1000);
-      alert("Claimed 1,000 daily chips!");
-    };
-  }
-});
