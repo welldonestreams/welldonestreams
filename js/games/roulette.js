@@ -10,7 +10,7 @@ const RED_NUMS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 
 window.Games.roulette = function() {
   const stage = document.getElementById('game-stage');
-  
+
   let boardHtml = `<div class="spot s-green s-0" data-bet="number" data-val="0">0</div>`;
   const rows = [ [3,6,9,12,15,18,21,24,27,30,33,36], [2,5,8,11,14,17,20,23,26,29,32,35], [1,4,7,10,13,16,19,22,25,28,31,34] ];
   rows.forEach((row, rIdx) => {
@@ -61,11 +61,11 @@ window.Games.roulette = function() {
     </div>
   `;
 
-  let bets = []; let selectedChipAmt = 10; let dragState = { amt: 10, sourceBet: null }; 
+  let bets = []; let selectedChipAmt = 10; let dragState = { amt: 10, sourceBet: null };
   const msgEl = document.getElementById('r-msg');
   const spinBtn = document.getElementById('btn-spin');
   const clearBtn = document.getElementById('btn-clear');
-  
+
   document.querySelectorAll('.rack-chip').forEach(chip => {
     chip.addEventListener('click', (e) => {
       document.querySelectorAll('.rack-chip').forEach(c => c.classList.remove('selected'));
@@ -89,14 +89,14 @@ window.Games.roulette = function() {
     if (betObj.chips) betObj.chips.forEach(c => c.remove());
     updateTotalMsg();
   }
-  
+
   function renderChipVisual(betObj, newAmt) {
     if (!betObj.chips) betObj.chips = [];
     const chipEl = document.createElement('div');
     chipEl.draggable = true;
     chipEl.className = `placed-chip ${CasinoShared.getChipClass(newAmt)}`;
-    chipEl.setAttribute('data-text', CasinoShared.formatAmt(newAmt));
-    
+    chipEl.setAttribute('data-text', CasinoShared.formatAmt(betObj.amt));
+
     const offset = Math.random() * 6 - 3;
     chipEl.style.transform = `translate(${offset}px, ${offset - (betObj.chips.length * 2)}px)`;
     chipEl.style.zIndex = betObj.chips.length + 2;
@@ -114,9 +114,9 @@ window.Games.roulette = function() {
     if (spinBtn.disabled) return;
     const choice = spotEl.dataset.bet;
     const val = spotEl.dataset.val ? parseInt(spotEl.dataset.val) : undefined;
-    
+
     let existingBet = bets.find(b => b.choice === choice && b.val === val);
-    if (existingBet) { existingBet.amt += amt; renderChipVisual(existingBet, amt); } 
+    if (existingBet) { existingBet.amt += amt; renderChipVisual(existingBet, amt); }
     else { let newBet = { spotEl, choice, val, amt, chips: [] }; bets.push(newBet); renderChipVisual(newBet, amt); }
     CasinoShared.playSound('chip');
     updateTotalMsg();
@@ -149,82 +149,83 @@ window.Games.roulette = function() {
   function drawWheel(wheelAngle, bAngle, bRad) {
     ctx.clearRect(0, 0, 400, 400);
     ctx.save(); ctx.translate(200, 200); ctx.rotate(wheelAngle);
-    
-    // 3D Metallic Rim
+
     let rimGrad = ctx.createLinearGradient(0, -200, 0, 200);
     rimGrad.addColorStop(0, '#555'); rimGrad.addColorStop(0.5, '#bbb'); rimGrad.addColorStop(1, '#555');
     ctx.beginPath(); ctx.arc(0, 0, 195, 0, 2*Math.PI); ctx.fillStyle = rimGrad; ctx.fill();
     ctx.beginPath(); ctx.arc(0, 0, 190, 0, 2*Math.PI); ctx.fillStyle = '#1c110a'; ctx.fill();
-    
+
     for (let i = 0; i < POCKETS.length; i++) {
       let a = i * arc;
       ctx.beginPath(); ctx.arc(0, 0, 180, a, a + arc); ctx.lineTo(0, 0);
       ctx.fillStyle = POCKETS[i].c === 'red' ? '#b91c1c' : (POCKETS[i].c === 'black' ? '#1f2937' : '#15803d');
-      ctx.fill(); 
-      ctx.strokeStyle = 'rgba(255,215,0,0.5)'; ctx.lineWidth = 1; ctx.stroke(); // Pocket Dividers
-      
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,215,0,0.5)'; ctx.lineWidth = 1; ctx.stroke();
+
       ctx.save(); ctx.rotate(a + arc/2); ctx.textAlign = 'center'; ctx.fillStyle = '#fff';
       ctx.font = 'bold 15px sans-serif'; ctx.fillText(POCKETS[i].n, 155, 5); ctx.restore();
     }
-    // 3D Chrome Spindle
     let spinGrad = ctx.createRadialGradient(0, 0, 5, 0, 0, 40);
     spinGrad.addColorStop(0, '#fff'); spinGrad.addColorStop(0.8, '#d4af37'); spinGrad.addColorStop(1, '#aa7f17');
-    ctx.beginPath(); ctx.arc(0, 0, 40, 0, 2*Math.PI); ctx.fillStyle = spinGrad; ctx.fill(); 
+    ctx.beginPath(); ctx.arc(0, 0, 40, 0, 2*Math.PI); ctx.fillStyle = spinGrad; ctx.fill();
     ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.stroke();
     ctx.restore();
-    
-    // Ball with drop shadow
+
     ctx.save(); ctx.translate(200, 200); ctx.rotate(bAngle);
-    ctx.beginPath(); ctx.arc(bRad, 0, 8, 0, 2*Math.PI); 
-    ctx.fillStyle = '#fff'; ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowOffsetY = 4; ctx.fill(); 
+    ctx.beginPath(); ctx.arc(bRad, 0, 8, 0, 2*Math.PI);
+    ctx.fillStyle = '#fff'; ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowOffsetY = 4; ctx.fill();
     ctx.restore();
   }
-  
+
   drawWheel(0, 0, 190);
 
   spinBtn.onclick = async () => {
-    if (bets.length === 0) return alert("Place a bet first!");
-    let bal = await window.GameAPI.getBalance();
+    if (bets.length === 0) { msgEl.textContent = 'Place a bet first!'; return; }
     const totalBet = bets.reduce((sum, b) => sum + b.amt, 0);
-    if (totalBet > bal) return alert("Insufficient chips for all bets!");
-    
+    if (window.GameAPI.cachedBalance != null && totalBet > window.GameAPI.cachedBalance) {
+      msgEl.textContent = 'Not enough chips for all bets!'; return;
+    }
+
     document.querySelectorAll('.winner-glow').forEach(el => el.classList.remove('winner-glow'));
     spinBtn.disabled = true; clearBtn.disabled = true;
     msgEl.textContent = "No more bets...";
     CasinoShared.playSound('spin');
-    
+
     try {
+      // The SERVER decides the outcome and settles all bets in one call.
       const payloadBets = bets.map(b => ({ amt: b.amt, choice: b.choice, number: b.val }));
-      // DUMMY API LOGIC FOR DEMO (Replace with your actual API endpoint to secure it)
-      const winIdx = Math.floor(Math.random() * POCKETS.length);
-      const winNum = POCKETS[winIdx].n;
-      
+      const d = await window.GameAPI.play({ game: 'roulette', bets: payloadBets });
+
+      // Animate the wheel to land on the server's spin result.
+      const winNum = d.spin;
+      const winIdx = POCKETS.findIndex(p => p.n === winNum);
+
       const startW = currentWheelAngle;
       const targetPocketAngle = winIdx * arc + (arc/2);
       const totalW = (4 * 2 * Math.PI) + (Math.random() * Math.PI * 2) - (startW % (2 * Math.PI));
       const finalWheelAngle = startW + totalW;
       const finalPocketPhysicalAngle = finalWheelAngle + targetPocketAngle;
-      
+
       let nStartB = currentBallAngle % (2 * Math.PI); if (nStartB < 0) nStartB += 2 * Math.PI;
       let nEndB = finalPocketPhysicalAngle % (2 * Math.PI); if (nEndB < 0) nEndB += 2 * Math.PI;
-      let diff = nStartB - nEndB; if (diff < 0) diff += 2 * Math.PI; 
-      
-      const totalB = -diff - (3 * 2 * Math.PI); 
+      let diff = nStartB - nEndB; if (diff < 0) diff += 2 * Math.PI;
+
+      const totalB = -diff - (3 * 2 * Math.PI);
       const startT = performance.now();
-      
+
       function anim(t) {
         let p = Math.min((t - startT) / 5500, 1);
         let ease = 1 - Math.pow(1 - p, 3);
         currentWheelAngle = startW + (totalW * ease);
         let bAngle = currentBallAngle + (totalB * ease);
-        
-        let bRad = 190; 
-        if (p > 0.6) { 
+
+        let bRad = 190;
+        if (p > 0.6) {
           let dropP = (p - 0.6) / 0.4;
           let bounce = Math.abs(Math.sin(dropP * Math.PI * 4)) * (1 - dropP);
-          bRad = 190 - (65 * dropP) + (15 * bounce); 
+          bRad = 190 - (65 * dropP) + (15 * bounce);
         }
-        
+
         drawWheel(currentWheelAngle, bAngle, bRad);
         if (p < 1) requestAnimationFrame(anim);
         else {
@@ -232,13 +233,16 @@ window.Games.roulette = function() {
           drawWheel(finalWheelAngle, finalPocketPhysicalAngle, 125);
           const winSpot = document.querySelector(`.spot[data-bet="number"][data-val="${winNum}"]`);
           if (winSpot) winSpot.classList.add('winner-glow');
-          
-          CasinoShared.playSound('win');
-          msgEl.textContent = `Landed on ${winNum}`;
+
+          if (d.netWin >= 0) CasinoShared.playSound('win');
+          msgEl.textContent = d.result; // e.g. "Landed on 17 (black). You won 350 chips."
           spinBtn.disabled = false; clearBtn.disabled = false;
         }
       }
       requestAnimationFrame(anim);
-    } catch(err) { msgEl.textContent = err.message; spinBtn.disabled = false; clearBtn.disabled = false; }
+    } catch (err) {
+      msgEl.textContent = err.message;
+      spinBtn.disabled = false; clearBtn.disabled = false;
+    }
   };
 };
