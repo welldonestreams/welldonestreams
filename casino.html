@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>FakeStake | Well Done Streams</title>
-  <link rel="stylesheet" href="css/main.css?v=2.0">
-  <link rel="stylesheet" href="css/games.css?v=2.0">
+  <link rel="stylesheet" href="css/main.css?v=3.1">
+  <link rel="stylesheet" href="css/games.css?v=3.1">
 </head>
 <body data-mode="dark" data-palette="gold">
-  
+
   <div class="topbar">
     <div class="brand">Fake<span>Stake</span></div>
     <div class="controls">
@@ -19,7 +19,6 @@
       <a href="/" class="pill secondary">Exit</a>
     </div>
   </div>
-
   <div class="casino-layout">
     <aside class="sidebar">
       <nav class="game-nav" id="gameNav">
@@ -29,7 +28,6 @@
         <button class="nav-btn" data-game="coinflip">🪙 Coin Flip</button>
       </nav>
     </aside>
-
     <main class="main-content">
       <section id="game-stage">
         <div class="welcome-message">
@@ -39,14 +37,13 @@
     </main>
   </div>
 
- <script src="js/shared.js?v=3.0"></script>
-<script src="js/api.js?v=3.0"></script>
-<script src="js/games/slots.js?v=3.0"></script>
-<script src="js/games/roulette.js?v=3.0"></script>
-<script src="js/games/blackjack.js?v=3.0"></script>
-<script src="js/games/coinflip.js?v=3.0"></script>
-<script src="js/ui.js?v=3.0"></script>
-  
-  <script src="js/games/coinflip.js?v=2.0"></script>
+  <!-- ORDER MATTERS: shared first (defines window.Games), games in the middle, ui last -->
+  <script src="js/shared.js?v=3.1"></script>
+  <script src="js/api.js?v=3.1"></script>
+  <script src="js/games/slots.js?v=3.1"></script>
+  <script src="js/games/roulette.js?v=3.1"></script>
+  <script src="js/games/blackjack.js?v=3.1"></script>
+  <script src="js/games/coinflip.js?v=3.1"></script>
+  <script src="js/ui.js?v=3.1"></script>
 </body>
 </html>
