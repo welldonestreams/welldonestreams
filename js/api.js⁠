@@ -1,27 +1,38 @@
-const API = "https://welldonestreams-api.chanceweldon11.workers.dev/api";
-
-const GameAPI = {
-  async getBalance() {
-    let bal = parseInt(localStorage.getItem('fake_stake_balance') || '1000', 10);
-    return bal;
-  },
-  async setBalance(amount) {
-    localStorage.setItem('fake_stake_balance', amount);
-    if (window.UI) window.UI.updateBalance(amount);
-    return amount;
-  },
-  async claimDaily() {
-    let last = localStorage.getItem('fake_stake_daily') || 0;
-    let now = Date.now();
-    if (now - last < 86400000) {
-      alert("Daily reward already claimed! Check back tomorrow.");
-      return;
+window.GameAPI = {
+  // Fetch balance from browser storage, default to 10,000 if new
+  getBalance: async function() {
+    let bal = localStorage.getItem('fakestake_balance');
+    if (bal === null) {
+      bal = 10000;
+      localStorage.setItem('fakestake_balance', bal);
     }
-    let current = await this.getBalance();
-    let nextBal = current + 250;
-    localStorage.setItem('fake_stake_daily', now);
-    await this.setBalance(nextBal);
-    alert("Claimed +250 daily chips!");
+    return parseInt(bal, 10);
+  },
+
+  // Save new balance and update the topbar UI
+  setBalance: async function(newBal) {
+    localStorage.setItem('fakestake_balance', newBal);
+    const uiBalance = document.getElementById('global-balance');
+    if (uiBalance) uiBalance.textContent = window.CasinoShared.formatAmt(newBal);
+    return newBal;
   }
 };
-window.GameAPI = GameAPI;
+
+// Auto-load the money into the top bar when the page opens
+document.addEventListener('DOMContentLoaded', async () => {
+  const startingMoney = await window.GameAPI.getBalance();
+  const uiBalance = document.getElementById('global-balance');
+  if (uiBalance) uiBalance.textContent = window.CasinoShared ? window.CasinoShared.formatAmt(startingMoney) : startingMoney;
+});
+
+// Daily Claim Button Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const claimBtn = document.getElementById('dailyClaimBtn');
+  if (claimBtn) {
+    claimBtn.onclick = async () => {
+      let current = await window.GameAPI.getBalance();
+      await window.GameAPI.setBalance(current + 1000);
+      alert("Claimed 1,000 daily chips!");
+    };
+  }
+});
