@@ -32,9 +32,9 @@
     .msg.ok { color:var(--ok); } .msg.err { color:var(--err); }
     .empty { color:var(--dim); font-size:.9rem; text-align:center; padding:14px; }
     .gate { margin-top:40px; }
-    .poll-opt { display:flex; gap:8px; margin-bottom:8px; align-items:center; }
+    .poll-opt { display:flex; gap:8px; margin-bottom:12px; align-items:center; }
     .poll-opt input { margin-bottom:0; }
-    .poll-opt img { width:30px; height:45px; object-fit:cover; border-radius:4px; }
+    .poll-opt img { width:40px; height:60px; object-fit:cover; border-radius:6px; background:#333; }
     .poll-opt button.rm { background:var(--err); color:#fff; padding:0 16px; }
     .poll-opt .votes { width:64px; text-align:center; }
     .poll-opt .plus { background:var(--ok); color:#08140c; padding:0 12px; }
@@ -45,16 +45,19 @@
     .movie-search input { flex:1; margin-bottom:0; }
     .hide { display:none; }
     .pill { font-size:.7rem; background:var(--surface2); color:var(--dim); padding:2px 8px; border-radius:99px; border:1px solid var(--border); }
+    
+    /* Added to structure the new dual-input layout cleanly */
+    .poll-inputs { display: flex; flex-direction: column; gap: 6px; flex: 1; }
   </style>
 </head>
 <body>
-  <h1>Well Done <span>Streams</span> â€” Admin</h1>
+  <h1>Well Done <span>Streams</span> — Admin</h1>
   <div class="sub">Invite people to Plex &amp; manage the poll.</div>
 
   <!-- LOGIN GATE -->
   <div id="gate" class="gate">
     <div class="card">
-      <h2>ðŸ”’ Enter admin token</h2>
+      <h2>🔒 Enter admin token</h2>
       <input type="password" id="token" placeholder="Admin token" autocomplete="current-password" />
       <button class="btn" id="unlock">Unlock</button>
       <div class="msg" id="gateMsg"></div>
@@ -64,7 +67,7 @@
   <!-- PANEL -->
   <div id="panel" class="hide">
     <!-- MANUAL INVITE -->
-    <h2>âž• Invite by email</h2>
+    <h2>➕ Invite by email</h2>
     <div class="card">
       <input type="email" id="manualEmail" placeholder="their-plex-email@example.com" />
       <button class="btn" id="manualInvite">Send Plex Invite</button>
@@ -72,17 +75,17 @@
     </div>
 
     <!-- PENDING REQUESTS -->
-    <h2>ðŸ“¥ Pending requests <span class="pill" id="pendingCount">0</span></h2>
+    <h2>📥 Pending requests <span class="pill" id="pendingCount">0</span></h2>
     <div class="card" id="pendingWrap">
-      <div class="empty">Loadingâ€¦</div>
+      <div class="empty">Loading…</div>
     </div>
 
     <!-- POLL MANAGEMENT -->
-    <h2>ðŸ—³ï¸ Poll options</h2>
+    <h2>🗳️ Poll options</h2>
     <div class="card">
       <!-- Search for movie poster -->
       <div class="movie-search">
-        <input type="text" id="movieQuery" placeholder="Search movie for posterâ€¦" />
+        <input type="text" id="movieQuery" placeholder="Search movie for poster…" />
         <button class="mini" id="searchMovie" style="width:80px;">Lookup</button>
       </div>
       <div id="pollOpts"></div>
@@ -140,7 +143,7 @@
   function renderPending(list) {
     $('pendingCount').textContent = list.length;
     const wrap = $('pendingWrap');
-    if (!list.length) { wrap.innerHTML = '<div class="empty">No pending requests ðŸŽ‰</div>'; return; }
+    if (!list.length) { wrap.innerHTML = '<div class="empty">No pending requests 🎉</div>'; return; }
     wrap.innerHTML = '';
     list.forEach(p => {
       const row = document.createElement('div');
@@ -148,14 +151,14 @@
       row.innerHTML = `<div class="who"><div class="nm"></div><div class="em"></div></div>
         <div class="acts">
           <button class="mini invite">Invite</button>
-          <button class="mini dismiss">âœ•</button>
+          <button class="mini dismiss">✖</button>
         </div>`;
       row.querySelector('.nm').textContent = p.name;
       row.querySelector('.em').textContent = p.email;
       row.querySelector('.invite').addEventListener('click', async (e) => {
-        const btn = e.target; btn.disabled = true; btn.textContent = 'â€¦';
+        const btn = e.target; btn.disabled = true; btn.textContent = '…';
         const r = await api('/admin/invite', { method:'POST', body: JSON.stringify({ email: p.email, id: p.id }) });
-        if (r.ok) { row.style.opacity = .4; row.querySelector('.acts').innerHTML = '<span class="pill">'+(r.data.already?'already shared':'invited âœ“')+'</span>'; refreshPending(); }
+        if (r.ok) { row.style.opacity = .4; row.querySelector('.acts').innerHTML = '<span class="pill">'+(r.data.already?'already shared':'invited ✓')+'</span>'; refreshPending(); }
         else { btn.disabled = false; btn.textContent = 'Invite'; alert(r.data?.error || 'Failed'); }
       });
       row.querySelector('.dismiss').addEventListener('click', async () => {
@@ -176,7 +179,7 @@
     const email = $('manualEmail').value.trim();
     const m = $('manualMsg');
     if (!email) { m.className='msg err'; m.textContent='Enter an email.'; return; }
-    const btn = $('manualInvite'); btn.disabled = true; btn.textContent='Sendingâ€¦';
+    const btn = $('manualInvite'); btn.disabled = true; btn.textContent='Sending…';
     const r = await api('/admin/invite', { method:'POST', body: JSON.stringify({ email }) });
     if (r.ok) { m.className='msg ok'; m.textContent = r.data.already ? 'Already shared with that account.' : 'Invite sent!'; $('manualEmail').value=''; }
     else { m.className='msg err'; m.textContent = r.data?.error || ('Failed ('+r.status+')'); }
@@ -185,8 +188,8 @@
 
   // ---------- poll ----------
   let currentOptions = []; // {name, poster}
-
   let currentCounts = {};
+  
   function pollRow(opt) {
     const div = document.createElement('div');
     div.className = 'poll-opt';
@@ -194,15 +197,27 @@
     const poster = opt && opt.poster;
     const votes = currentCounts[name] || 0;
     const ph = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2230%22 height=%2245%22%3E%3Crect width=%2230%22 height=%2245%22 fill=%22%23333%22/%3E%3C/svg%3E';
-    div.innerHTML = `<img src="${poster || ph}" alt="" data-poster="${escapeHtml(poster||'')}" />`
-      + `<input type="text" class="nm" value="${escapeHtml(name)}" placeholder="Option" />`
+    
+    // UPGRADED: Added an explicit visible input for the poster URL so you can edit it directly
+    div.innerHTML = `<img src="${poster || ph}" alt="" />`
+      + `<div class="poll-inputs">`
+      +   `<input type="text" class="nm" value="${escapeHtml(name)}" placeholder="Movie/Show Name" />`
+      +   `<input type="text" class="poster-url" value="${escapeHtml(poster||'')}" placeholder="Poster Image URL" style="font-size:0.8rem; padding:8px;" />`
+      + `</div>`
       + `<div class="vwrap"><input type="number" class="votes" min="0" value="${votes}" title="Vote count" /><button class="plus" title="+1 vote">+1</button></div>`
-      + `<button class="rm">âœ•</button>`;
+      + `<button class="rm">✖</button>`;
+      
     div.querySelector('.rm').addEventListener('click', () => div.remove());
     div.querySelector('.plus').addEventListener('click', () => {
       const vi = div.querySelector('.votes');
       vi.value = (parseInt(vi.value || '0', 10) + 1);
     });
+    
+    // Auto-update the image thumbnail when you paste a new URL
+    div.querySelector('.poster-url').addEventListener('input', (e) => {
+        div.querySelector('img').src = e.target.value || ph;
+    });
+    
     return div;
   }
 
@@ -232,13 +247,13 @@
   $('searchMovie').addEventListener('click', async () => {
     const query = $('movieQuery').value.trim();
     if (!query) return;
-    const btn = $('searchMovie'); btn.disabled = true; btn.textContent = 'â€¦';
+    const btn = $('searchMovie'); btn.disabled = true; btn.textContent = '…';
     try {
       const r = await api('/poll/lookup', { method:'POST', body: JSON.stringify({ query }) });
       if (r.ok && r.data.name) {
         let poster = r.data.poster;
         if (!poster) {
-          poster = prompt('No poster found automatically. Paste a poster image URL (e.g. https://www.themoviedb.org/t/p/w600_and_h900_face/....jpg), or leave blank:', '') || null;
+          poster = prompt('No poster found automatically. Paste a poster image URL, or leave blank:', '') || null;
         }
         const newOpt = { name: r.data.name, poster };
         currentOptions.push(newOpt);
@@ -250,7 +265,6 @@
         c.appendChild(pollRow(newOpt));
         $('movieQuery').value = '';
       } else {
-        // Lookup failed entirely - let admin add by hand with a manual poster
         const manualPoster = prompt('Lookup failed. Paste a poster image URL for "' + query + '" (or leave blank for no poster):', '') || null;
         const newOpt = { name: query, poster: manualPoster };
         currentOptions.push(newOpt);
@@ -265,10 +279,12 @@
     const rows = [...$('pollOpts').querySelectorAll('.poll-opt')];
     const built = rows.map(row => {
       const name = row.querySelector('.nm').value.trim();
-      const poster = row.querySelector('img').dataset.poster || null;
+      // UPGRADED: Pulls the poster URL directly from the visible input field
+      const poster = row.querySelector('.poster-url').value.trim() || null;
       const votes = parseInt(row.querySelector('.votes').value || '0', 10);
       return { name, poster, votes };
     }).filter(o => o.name);
+    
     if (!built.length) { $('pollMsg').className='msg err'; $('pollMsg').textContent='Add at least one option.'; return; }
 
     // 1) Save options (this resets counts to 0 on the server)
@@ -282,7 +298,11 @@
         await api('/admin/set-votes', { method:'POST', body: JSON.stringify({ name: o.name, count: o.votes }) });
       }
     }
-    $('pollMsg').className='msg ok'; $('pollMsg').textContent='Poll saved.'; loadPoll();
+    
+    $('pollMsg').className='msg ok'; $('pollMsg').textContent='Poll saved.'; 
+    
+    // UPGRADED: Wait 500ms before reloading to give the backend time to actually write the file
+    setTimeout(() => loadPoll(), 500); 
   });
 
   // auto-unlock if token stored
