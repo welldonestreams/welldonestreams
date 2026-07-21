@@ -76,6 +76,11 @@
     .btn:active { transform:translateY(1px); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 30%, transparent); }
     .btn.secondary { background:var(--surface); color:var(--text); border:1px solid var(--border); box-shadow: var(--shadow-base); }
     .btn.secondary:hover { background:var(--surface-2); box-shadow: var(--shadow-hover); }
+
+    /* Casino chip link — keep the img at a fixed 42px; do NOT give this link the .pill class */
+    .casino-link { display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; padding:0; transition: transform 0.2s; }
+    .casino-link:hover { transform: scale(1.08); }
+    .casino-link img { width:42px; height:42px; border-radius:50%; object-fit:contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
     
     /* Theme Picker */
     .theme-pop { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter: blur(4px); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; opacity: 0; transition: opacity var(--transition-smooth); }
@@ -232,9 +237,9 @@
     <div class="controls">
       <button class="pill" id="modeBtn">Dark</button>
       <button class="pill" id="themeBtn">Change Theme</button>
-      <a href="/casino.html" title="Casino" style="display:inline-flex;align-items:center;justify-content:center; border:none; background:transparent; padding:0; transition: transform 0.2s;">
-  <img src="pokerchipnew.svg" alt="Casino" style="width:42px; height:42px; border-radius:50%; object-fit:contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));" onerror="this.outerHTML='<span style=\'font-size:32px;\'>🪙</span>'">
-</a>
+      <a href="/casino.html" title="Casino" class="casino-link">
+        <img src="pokerchipnew.svg" alt="Casino" onerror="this.outerHTML='<span style=\'font-size:32px;\'>🪙</span>'">
+      </a>
     </div>
   </div>
 
@@ -341,13 +346,17 @@
 
     <footer>
       <p style="text-align:center;color:var(--text-dim);font-size:.9rem; font-weight:500;">
-        <a href="/admin.html" style="color:inherit;text-decoration:none;cursor:pointer;" title="Admin">Well Done Streams</a> &middot; est. 2026 &middot; v1.01
+        <a href="/admin.html" style="color:inherit;text-decoration:none;cursor:pointer;" title="Admin">Well Done Streams</a> &middot; est. 2026 &middot; v56
       </p>
     </footer>
   </div>
 
 <script>
-  // --- FALLBACK MOCK DATA FOR GITHUB PAGES ---
+  // Mock data is ONLY for static previews (GitHub Pages / *.pages.dev).
+  // On welldonestreams.com the real API is used and failures show real errors —
+  // never fake success messages that would silently swallow a real request.
+  const IS_PREVIEW = location.hostname !== 'welldonestreams.com';
+
   const MOCK_RECENT = [
     { title: "Dune: Part Two", poster: "https://image.tmdb.org/t/p/w200/1pdfLvkbY9ohJlCjQH2TDpiB8.jpg" },
     { title: "Civil War", poster: "https://image.tmdb.org/t/p/w200/sh7Rg8Er3tFcN9BpKIPOMvALgZd.jpg" },
@@ -358,7 +367,7 @@
   ];
 
   const MOCK_POLL = {
-    version: '2', // Bumped poll version to clear old votes
+    version: '2',
     options: [
       { name: "Deadpool & Wolverine", poster: "https://image.tmdb.org/t/p/w200/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg" },
       { name: "Inside Out 2", poster: "https://image.tmdb.org/t/p/w200/vpnVM9B6NMmQpWeZvzRxMgG32f.jpg" },
@@ -414,16 +423,14 @@
   themeClose.addEventListener('click',()=>themePop.classList.remove('open'));
   themePop.addEventListener('click',e=>{ if(e.target===themePop) themePop.classList.remove('open'); });
 
-  // --- FORMS ---
+  // --- ACCESS FORM ---
   const form = document.getElementById('accessForm');
   const msg = document.getElementById('formMsg');
   form.addEventListener('submit', async e => {
     e.preventDefault();
     msg.className = 'form-msg'; msg.textContent = '';
-    const nameInput = document.getElementById('name');
-    const emailInput = document.getElementById('email');
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim();
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
 
     if (name.toLowerCase() === 'admin') { window.location.href = '/admin.html'; return; }
     if (!name || !email) { msg.className='form-msg err'; msg.textContent='Please fill in both fields.'; return; }
@@ -437,13 +444,17 @@
       if (r.ok) { msg.className='form-msg ok'; msg.textContent='Got it! '+(r.text||'You will be added within 24 hours.'); form.reset(); }
       else { throw new Error(r.text || ('Server error ('+res.status+')')); }
     } catch (err) {
-      // Fallback for static site
-      msg.className='form-msg ok'; msg.textContent='Request simulated successfully (Backend disabled on static host).';
-      form.reset();
+      if (IS_PREVIEW) {
+        msg.className='form-msg ok'; msg.textContent='Request simulated (preview mode — backend disabled on static host).';
+        form.reset();
+      } else {
+        // PROD: fail loudly so a real request is never silently dropped
+        msg.className='form-msg err'; msg.textContent='Something went wrong: '+err.message+' — or just text me your Plex email.';
+      }
     } finally { btn.disabled=false; btn.textContent='Request Access'; }
   });
 
-  // --- AUTO-SCROLL WHEEL LOGIC ---
+  // --- AUTO-SCROLL WHEEL ---
   let scrollInterval = null; let autoScroll = true; let resumeTimer = null; let isDragging = false;
   let dragStartX = 0; let dragStartScroll = 0; let dragMoved = false;
 
@@ -490,20 +501,23 @@
     container.addEventListener('click', e => { if (dragMoved) { e.preventDefault(); e.stopPropagation(); dragMoved = false; } }, true);
   }
 
-  // --- RECENT ITEMS UPGRADED (WITH MOCK DATA FALLBACK) ---
+  // --- RECENTLY ADDED ---
   async function initRecentScroll() {
     const track = document.getElementById('recent-scroll-track');
     if (!track) return;
     
-    let items = MOCK_RECENT;
+    let items = null;
     try {
       const res = await fetch(`${API}/recent`);
       if (res.ok) items = await res.json();
-    } catch (e) {
-      console.log("Using local mock posters since API is unavailable.");
+    } catch (e) {}
+    if (!Array.isArray(items)) items = IS_PREVIEW ? MOCK_RECENT : null;
+
+    if (!items) {
+      track.innerHTML = '<span class="scroll-item">Could not load recent additions.</span>';
+      return;
     }
-    
-    if (!Array.isArray(items) || items.length === 0) {
+    if (items.length === 0) {
       track.innerHTML = '<span class="scroll-item">Nothing new right now — check back soon!</span>';
       return;
     }
@@ -517,12 +531,11 @@
       html += `<a class="scroll-item" href="${searchUrl}" target="_blank" rel="noopener">${posterHtml}<span>${escapeHtml(item.title)}</span></a>`;
     });
     
-    // Duplicate the HTML for infinite scroll illusion
-    track.innerHTML = html + html + html;
+    track.innerHTML = html + html + html; // duplicate for the infinite-scroll illusion
     requestAnimationFrame(() => startAutoScroll());
   }
 
-  // --- POLL UPGRADED (WITH MOCK DATA FALLBACK) ---
+  // --- POLL ---
   let voted = false;
   let myPick = null;
 
@@ -535,12 +548,14 @@
     const container = document.getElementById('poll-options');
     const msgDiv = document.getElementById('poll-message');
     
-    let data = MOCK_POLL;
+    let data = null;
     try {
       const res = await fetch(`${API}/poll`);
       if (res.ok) data = await res.json();
-    } catch (e) {
-      console.log("Using local mock poll since API is unavailable.");
+    } catch (e) {}
+    if (!data) {
+      if (IS_PREVIEW) data = MOCK_POLL;
+      else { container.className = ''; container.textContent = 'Poll unavailable.'; return; }
     }
 
     if (!data.options || data.options.length === 0) {
@@ -552,13 +567,6 @@
     myPick = readVote(version); voted = !!myPick;
     
     let counts = data.counts || {};
-    // Simulate updating mock data if user voted locally
-    if (voted && !counts[myPick]) counts[myPick] = 0;
-    if (voted && MOCK_POLL.version === version) {
-       // Only visually increment if it's our mock data to reflect local vote
-       counts[myPick]++; 
-    }
-    
     const total = Object.values(counts).reduce((a,b) => a+b, 0);
     container.classList.toggle('poll-results', voted);
 
@@ -597,15 +605,24 @@
           
           try {
             const res = await fetch(`${API}/vote`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ option: opt }) });
-            if (!res.ok) throw new Error();
+            if (!res.ok) {
+              const r = await readResponse(res);
+              throw new Error(r.text || 'Could not record vote.');
+            }
+            msgDiv.className = 'form-msg ok';
+            msgDiv.textContent = 'Thanks for voting!';
+            loadPoll();
           } catch (e) {
-            // Write cookie locally for static host
-            document.cookie = 'pollvote_v' + version + '=' + encodeURIComponent(opt) + '; path=/; max-age=31536000';
+            if (IS_PREVIEW) {
+              document.cookie = 'pollvote_v' + version + '=' + encodeURIComponent(opt) + '; path=/; max-age=31536000';
+              msgDiv.className = 'form-msg ok';
+              msgDiv.textContent = 'Thanks for voting! (preview mode)';
+              loadPoll();
+            } else {
+              msgDiv.className = 'form-msg err';
+              msgDiv.textContent = e.message;
+            }
           }
-          
-          msgDiv.className = 'form-msg ok';
-          msgDiv.textContent = 'Thanks for voting!'; 
-          loadPoll();
         });
       });
     }
@@ -627,8 +644,11 @@
         resultDiv.innerHTML = data.requests.map(r => `<div style="margin-top:6px; font-size:0.95rem;">${escapeHtml(r.title)} - <strong style="color:var(--accent);">${escapeHtml(r.status)}</strong></div>`).join('');
       } else { resultDiv.textContent = 'No requests found for that email.'; }
     } catch (err) { 
-      // Fallback for static deployment
-      resultDiv.innerHTML = '<div style="margin-top:12px; font-size:0.95rem; color:var(--text-dim);">API offline on static host. No requests found.</div>';
+      if (IS_PREVIEW) {
+        resultDiv.innerHTML = '<div style="margin-top:12px; font-size:0.95rem; color:var(--text-dim);">Preview mode — API offline on static host.</div>';
+      } else {
+        resultDiv.textContent = 'Error: ' + err.message;
+      }
     }
   });
 
