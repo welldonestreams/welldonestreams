@@ -1,32 +1,25 @@
+// Shared helpers for FakeStake. LOAD THIS FIRST (before api.js, games, ui.js).
+window.Games = {}; // game registry — games attach themselves to this
+
 window.CasinoShared = {
-  // Centralized Formatting
-  formatAmt(amt) { return amt >= 1000 ? (amt % 1000 === 0 ? (amt/1000)+'k' : (amt/1000).toFixed(1)+'k') : amt; },
-  
-  getChipClass(amt) { 
-    if (amt>=10000) return 'c-10k'; if (amt>=5000) return 'c-5k'; if (amt>=1000) return 'c-1k'; 
-    if (amt>=500) return 'c-500'; if (amt>=100) return 'c-100'; if (amt>=50) return 'c-50'; return 'c-10'; 
+  formatAmt(amt) { return amt >= 1000 ? (amt % 1000 === 0 ? (amt / 1000) + 'k' : (amt / 1000).toFixed(1) + 'k') : amt; },
+
+  getChipClass(amt) {
+    if (amt >= 10000) return 'c-10k'; if (amt >= 5000) return 'c-5k'; if (amt >= 1000) return 'c-1k';
+    if (amt >= 500) return 'c-500'; if (amt >= 100) return 'c-100'; if (amt >= 50) return 'c-50'; return 'c-10';
   },
 
-  // Audio Manager (Ready for real .wav/.mp3 URLs)
   audioEnabled: true,
   playSound(type) {
     if (!this.audioEnabled) return;
-    const sounds = {
-      chip: '',   // Add chip click URL here
-      card: '',   // Add card slide URL here
-      spin: '',   // Add roulette spin URL here
-      win: ''     // Add win chime URL here
-    };
+    const sounds = { chip: '', card: '', spin: '', win: '' }; // add real audio URLs when ready
     if (sounds[type]) {
       const audio = new Audio(sounds[type]);
       audio.volume = 0.5;
-      audio.play().catch(e => console.log('Audio blocked by browser.'));
-    } else {
-      console.log(`[Audio Stub] Played: ${type}`);
+      audio.play().catch(() => {});
     }
   },
 
-  // High-Quality SVG Suits
   getSVG(suit) {
     const svgs = {
       '♥': `<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
