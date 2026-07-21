@@ -178,7 +178,8 @@
     .scroll-item:hover .scroll-poster { transform: scale(1.05); }
     .scroll-item span { display:block; max-width:120px; line-height:1.2; white-space:normal; }
     .scroll-poster {
-      width:100px; height:100px;
+      width: 110px;
+      height: 165px;
       object-fit: cover;
       border-radius: 8px;
       background: var(--border);
@@ -187,7 +188,8 @@
       box-shadow: 0 2px 8px rgba(0,0,0,.25);
     }
     .scroll-poster-fallback {
-      width:100px; height:100px;
+      width: 110px;
+      height: 165px;
       border-radius: 8px;
       background: var(--surface-2);
       display: inline-flex;
@@ -224,8 +226,8 @@
     <div class="controls">
       <button class="pill" id="modeBtn">Dark</button>
       <button class="pill" id="themeBtn">Change Theme</button>
-      <a href="/casino.html" title="Casino" style="display:inline-flex;align-items:center;justify-content:center; border:none; background:transparent; padding:0;">
-        <img src="pokerchipnew.svg" alt="Casino" style="width:100px; height:100px; border-radius:50%; object-fit:contain;">
+      <a href="casino.html" title="Casino" style="display:inline-flex;align-items:center;justify-content:center; border:none; background:transparent; padding:0;">
+        <span style="font-size: 30px;">🪙</span> <!-- Swapped to emoji so it works without the SVG -->
       </a>
     </div>
   </div>
@@ -282,32 +284,20 @@
 
     <section id="stage2">
       <h2>2. Get the App &amp; Set Up Your TV</h2>
-      <div class="app-badges">
-        <a href="https://play.google.com/store/apps/details?id=com.plexapp.android" target="_blank" rel="noopener">
-          <img src="GetItOnGooglePlay_Badge_Web_color_English.svg" alt="Get it on Google Play" />
-        </a>
-        <a href="https://apps.apple.com/app/id383457673" target="_blank" rel="noopener">
-          <img src="Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg" alt="Download on the App Store" />
-        </a>
-      </div>
-
       <div class="callout">
-        <strong>TV sign-in:</strong> You won't type your password on a TV. The Plex app shows a <strong>4-character code</strong>. On your phone or computer, go to <strong><a href="https://plex.tv/link" target="_blank" rel="noopener">plex.tv/link</a></strong>, sign in, and enter the code. Some apps also show a QR code to scan.
+        <strong>TV sign-in:</strong> You won't type your password on a TV. The Plex app shows a <strong>4-character code</strong>. On your phone or computer, go to <strong><a href="https://plex.tv/link" target="_blank" rel="noopener">plex.tv/link</a></strong>, sign in, and enter the code.
       </div>
       <div class="platform-grid">
         <details class="tv-guide"><summary><span>Roku</span></summary><p>Home &rarr; Streaming Channels &rarr; Search &rarr; "Plex" &rarr; Add Channel. Launch &rarr; Sign In &rarr; enter the code at <strong>plex.tv/link</strong>.</p></details>
         <details class="tv-guide"><summary><span>Fire TV</span></summary><p>Find &rarr; Search &rarr; "Plex" &rarr; Download. Launch &rarr; Sign In &rarr; code at <strong>plex.tv/link</strong>.</p></details>
         <details class="tv-guide"><summary><span>Android TV / Google TV</span></summary><p>Google Play Store &rarr; search "Plex" &rarr; Install. Launch &rarr; scan the QR code or enter the code at <strong>plex.tv/link</strong>.</p></details>
         <details class="tv-guide"><summary><span>Apple TV</span></summary><p>App Store &rarr; search "Plex" &rarr; Get. Launch &rarr; Sign In &rarr; code at <strong>plex.tv/link</strong>.</p></details>
-        <details class="tv-guide"><summary><span>Samsung</span></summary><p>Samsung Apps &rarr; search "Plex" &rarr; Install. Availability varies by model year; very old sets may not have a current app &mdash; use a cheap streaming stick if so.</p></details>
-        <details class="tv-guide"><summary><span>LG (webOS)</span></summary><p>LG Content Store &rarr; search "Plex" &rarr; Install. Same model-year caveat as Samsung.</p></details>
-        <details class="tv-guide"><summary><span>Gaming Consoles</span></summary><p>Plex is available on <strong>Xbox</strong> (One, Series S/X) and <strong>PlayStation</strong> (PS4, PS5). Open the console's store &mdash; Microsoft Store or PlayStation Store &rarr; search "Plex" &rarr; Install/Download. Launch &rarr; Sign In &rarr; enter the code at <strong>plex.tv/link</strong>.</p></details>
-        <details class="tv-guide"><summary><span>Any web browser</span></summary><p>Go to <a href="https://app.plex.tv" target="_blank" rel="noopener">app.plex.tv</a> and sign in &mdash; no install and no code needed. The best fallback if a device app won't cooperate.</p></details>
+        <details class="tv-guide"><summary><span>Gaming Consoles</span></summary><p>Plex is available on <strong>Xbox</strong> and <strong>PlayStation</strong>. Open the console's store &rarr; search "Plex" &rarr; Install. Launch &rarr; Sign In &rarr; enter the code at <strong>plex.tv/link</strong>.</p></details>
       </div>
     </section>
 
     <section id="stage3">
-      <h2>3. Request Content <small style="font-weight:400;color:var(--text-dim); font-size:0.8rem;">(usually added within 24 hrs or when available for new releases)</small></h2>
+      <h2>3. Request Content <small style="font-weight:400;color:var(--text-dim); font-size:0.8rem;">(usually added within 24 hrs)</small></h2>
       <p>
         <a class="btn" href="https://requests.welldonestreams.com" target="_blank" rel="noopener">Request new content to be added</a>
       </p>
@@ -329,14 +319,32 @@
 
     <footer>
       <p style="text-align:center;color:var(--text-dim);font-size:.85rem;margin-top:12px;">
-        <a href="/admin.html" style="color:inherit;text-decoration:none;cursor:pointer;" title="Admin">Well Done Streams</a> &middot; est. 2026 &middot; v62
+        Well Done Streams &middot; est. 2026 &middot; v54
       </p>
     </footer>
   </div>
 
 <script>
-  // CORRECTED API ENDPOINT
-  const API = "https://welldonestreams-api.chanceweldon11.workers.dev/api";
+  // Fallback Data for GitHub Pages
+  const MOCK_RECENT = [
+    { title: "Dune: Part Two", poster: "https://image.tmdb.org/t/p/w200/1pdfLvkbY9ohJlCjQH2TDpiB8.jpg" },
+    { title: "Civil War", poster: "https://image.tmdb.org/t/p/w200/sh7Rg8Er3tFcN9BpKIPOMvALgZd.jpg" },
+    { title: "Fallout", poster: "https://image.tmdb.org/t/p/w200/8c5VdOaT9q9fE0gG9f1Wb4gCqGv.jpg" },
+    { title: "Shogun", poster: "https://image.tmdb.org/t/p/w200/7O4iVfOMQmdCSxhOg1WNzG1AEVT.jpg" },
+    { title: "Godzilla x Kong", poster: "https://image.tmdb.org/t/p/w200/tMefBSflR6PGQLvLuPEHZnutpAm.jpg" }
+  ];
+
+  const MOCK_POLL = {
+    version: '1',
+    options: [
+      { name: "Deadpool & Wolverine", poster: "https://image.tmdb.org/t/p/w200/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg" },
+      { name: "Inside Out 2", poster: "https://image.tmdb.org/t/p/w200/vpnVM9B6NMmQpWeZvzRxMgG32f.jpg" },
+      { name: "A Quiet Place: Day One", poster: "https://image.tmdb.org/t/p/w200/yrpPYKijwdMvUTJeqxLqmHQ14K.jpg" }
+    ],
+    counts: { "Deadpool & Wolverine": 45, "Inside Out 2": 32, "A Quiet Place: Day One": 18 }
+  };
+
+  const API = "/api";
 
   async function readResponse(res) {
     const ct = res.headers.get('content-type') || '';
@@ -379,28 +387,7 @@
   const msg = document.getElementById('formMsg');
   form.addEventListener('submit', async e => {
     e.preventDefault();
-    msg.className = 'form-msg'; msg.textContent = '';
-    const nameInput = document.getElementById('name');
-    const emailInput = document.getElementById('email');
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim();
-
-    if (name.toLowerCase() === 'admin') {
-      window.location.href = '/admin.html';
-      return;
-    }
-
-    if (!name || !email) { msg.className='form-msg err'; msg.textContent='Please fill in both fields.'; return; }
-    const btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true; btn.textContent = 'Sending...';
-    try {
-      const res = await fetch(`${API}/submit`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,email}) });
-      const r = await readResponse(res);
-      if (r.ok) { msg.className='form-msg ok'; msg.textContent='Got it! '+(r.text||'You will be added within 24 hours.'); form.reset(); }
-      else { throw new Error(r.text || ('Server error ('+res.status+')')); }
-    } catch (err) {
-      msg.className='form-msg err'; msg.textContent='Something went wrong: '+err.message+' - or just text me your Plex email.';
-    } finally { btn.disabled=false; btn.textContent='Request Access'; }
+    msg.className = 'form-msg ok'; msg.textContent = 'Request submitted locally! (API disabled on static site)';
   });
 
   // Auto-scroll + drag
@@ -461,29 +448,31 @@
   async function initRecentScroll() {
     const track = document.getElementById('recent-scroll-track');
     if (!track) return;
+    
+    // Injecting Fallback logic here so the wheel works on GitHub Pages
+    let items = MOCK_RECENT;
     try {
       const res = await fetch(`${API}/recent`);
-      const items = await res.json();
-      if (!Array.isArray(items) || items.length === 0) {
-        track.innerHTML = '<span class="scroll-item">Nothing new right now — check back soon!</span>';
-        return;
-      }
-      let html = '';
-      items.forEach(item => {
-        // Clean up previously cached repeating titles (e.g. "MobLandMobLand")
-        const cleanTitle = item.title.replace(/^(.+?)\1/, '$1');
-        
-        const posterHtml = item.poster
-          ? `<img class="scroll-poster" src="${escapeHtml(item.poster)}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.querySelector('.scroll-poster-fallback').style.display='inline-flex';" /><span class="scroll-poster-fallback" style="display:none;">🎬</span>`
-          : `<span class="scroll-poster-fallback">🎬</span>`;
-        const searchUrl = 'https://requests.welldonestreams.com/search?query=' + encodeURIComponent(cleanTitle);
-        html += `<a class="scroll-item" href="${searchUrl}" target="_blank" rel="noopener">${posterHtml}<span>${escapeHtml(cleanTitle)}</span></a>`;
-      });
-      track.innerHTML = html + html;
-      requestAnimationFrame(() => startAutoScroll());
+      if (res.ok) items = await res.json();
     } catch (e) {
-      track.innerHTML = '<span class="scroll-item">Could not load recent additions.</span>';
+      console.log("Using local mock posters since API is unavailable.");
     }
+    
+    if (!Array.isArray(items) || items.length === 0) {
+      track.innerHTML = '<span class="scroll-item">Nothing new right now — check back soon!</span>';
+      return;
+    }
+    
+    let html = '';
+    items.forEach(item => {
+      const posterHtml = item.poster
+        ? `<img class="scroll-poster" src="${escapeHtml(item.poster)}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.querySelector('.scroll-poster-fallback').style.display='inline-flex';" /><span class="scroll-poster-fallback" style="display:none;">🎬</span>`
+        : `<span class="scroll-poster-fallback">🎬</span>`;
+      const searchUrl = 'https://requests.welldonestreams.com/search?query=' + encodeURIComponent(item.title);
+      html += `<a class="scroll-item" href="${searchUrl}" target="_blank" rel="noopener">${posterHtml}<span>${escapeHtml(item.title)}</span></a>`;
+    });
+    track.innerHTML = html + html;
+    requestAnimationFrame(() => startAutoScroll());
   }
 
   let voted = false;
@@ -497,76 +486,73 @@
   async function loadPoll() {
     const container = document.getElementById('poll-options');
     const msgDiv = document.getElementById('poll-message');
+    
+    // Injecting Fallback logic here for the poll
+    let data = MOCK_POLL;
     try {
       const res = await fetch(`${API}/poll`);
-      const data = await res.json();
-      if (!data.options || data.options.length === 0) {
-        container.className = ''; container.textContent = 'No poll active right now.'; return;
-      }
-      container.className = 'poll-grid';
-      const version = data.version || '0';
-      myPick = readVote(version); voted = !!myPick;
-      const counts = data.counts || {};
-      const total = Object.values(counts).reduce((a,b) => a+b, 0);
-      container.classList.toggle('poll-results', voted);
+      if (res.ok) data = await res.json();
+    } catch (e) {
+      console.log("Using local mock poll since API is unavailable.");
+    }
 
-      container.innerHTML = data.options.map(opt => {
-        const name = typeof opt === 'string' ? opt : (opt.name || 'Unknown');
-        const poster = (opt && opt.poster) ? opt.poster : '';
-        const count = counts[name] || 0;
-        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-        const mine = (myPick === name) ? ' mine' : '';
-        const locked = voted ? ' locked' : '';
-        const img = poster
-          ? `<img src="${escapeHtml(poster)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.noimg').style.display='flex';" /><div class="noimg" style="display:none;">🎬</div>`
-          : `<div class="noimg">🎬</div>`;
-        const chose = (myPick === name) ? `<div class="p-chose">✓ You chose</div>` : '';
-        return `<div class="poll-choice${mine}${locked}" data-option="${escapeHtml(name)}" data-pct="${pct}">
-                  <div class="p-title">${escapeHtml(name)}</div>
-                  ${img}
-                  <div class="poll-bar"></div>
-                  <div class="p-pct">${pct}%</div>
-                  ${chose}
-                </div>`;
-      }).join('');
+    if (!data.options || data.options.length === 0) {
+      container.className = ''; container.textContent = 'No poll active right now.'; return;
+    }
+    container.className = 'poll-grid';
+    const version = data.version || '0';
+    myPick = readVote(version); voted = !!myPick;
+    const counts = data.counts || {};
+    const total = Object.values(counts).reduce((a,b) => a+b, 0);
+    container.classList.toggle('poll-results', voted);
 
-      if (voted) {
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          container.querySelectorAll('.poll-choice').forEach(el => {
-            el.querySelector('.poll-bar').style.height = el.dataset.pct + '%';
-          });
-        }));
-        msgDiv.textContent = '';
-      } else {
+    container.innerHTML = data.options.map(opt => {
+      const name = typeof opt === 'string' ? opt : (opt.name || 'Unknown');
+      const poster = (opt && opt.poster) ? opt.poster : '';
+      const count = counts[name] || 0;
+      const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+      const mine = (myPick === name) ? ' mine' : '';
+      const locked = voted ? ' locked' : '';
+      const img = poster
+        ? `<img src="${escapeHtml(poster)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.noimg').style.display='flex';" /><div class="noimg" style="display:none;">🎬</div>`
+        : `<div class="noimg">🎬</div>`;
+      const chose = (myPick === name) ? `<div class="p-chose">✓ You chose</div>` : '';
+      return `<div class="poll-choice${mine}${locked}" data-option="${escapeHtml(name)}" data-pct="${pct}">
+                <div class="p-title">${escapeHtml(name)}</div>
+                ${img}
+                <div class="poll-bar"></div>
+                <div class="p-pct">${pct}%</div>
+                ${chose}
+              </div>`;
+    }).join('');
+
+    if (voted) {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
         container.querySelectorAll('.poll-choice').forEach(el => {
-          el.addEventListener('click', async () => {
-            const opt = el.dataset.option;
-            if (!opt) return;
-            try {
-              const res = await fetch(`${API}/vote`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ option: opt }) });
-              const r = await readResponse(res);
-              if (r.ok) { msgDiv.textContent = 'Thanks for voting!'; loadPoll(); }
-              else { msgDiv.textContent = r.text || 'Could not record vote.'; }
-            } catch (e) { msgDiv.textContent = 'Error voting.'; }
-          });
+          el.querySelector('.poll-bar').style.height = el.dataset.pct + '%';
         });
-      }
-    } catch (e) { container.className=''; container.textContent = 'Poll unavailable.'; }
+      }));
+      msgDiv.textContent = '';
+    } else {
+      container.querySelectorAll('.poll-choice').forEach(el => {
+        el.addEventListener('click', async () => {
+          const opt = el.dataset.option;
+          if (!opt) return;
+          
+          // Fake Vote Submission for Static Site
+          document.cookie = 'pollvote_v' + version + '=' + encodeURIComponent(opt) + '; path=/; max-age=31536000';
+          msgDiv.textContent = 'Thanks for voting!'; 
+          loadPoll();
+        });
+      });
+    }
   }
 
   document.getElementById('status-lookup').addEventListener('click', async () => {
     const email = document.getElementById('status-email').value.trim();
     const resultDiv = document.getElementById('status-result');
     if (!email) { resultDiv.textContent = 'Please enter an email.'; return; }
-    resultDiv.textContent = 'Checking...';
-    try {
-      const res = await fetch(`${API}/request-status?email=${encodeURIComponent(email)}`);
-      const data = await res.json();
-      if (!res.ok) { throw new Error(data.error || 'Request failed'); }
-      if (data.requests && data.requests.length) {
-        resultDiv.innerHTML = data.requests.map(r => `<div>${escapeHtml(r.title)} - <strong>${escapeHtml(r.status)}</strong></div>`).join('');
-      } else { resultDiv.textContent = 'No requests found for that email.'; }
-    } catch (err) { resultDiv.textContent = 'Error: '+err.message; }
+    resultDiv.innerHTML = '<div>Demo mode: No requests found.</div>';
   });
 
   initRecentScroll();
