@@ -26,13 +26,17 @@ window.Games.roulette = function() {
     <style>
       .rl-wrap { max-width: 1100px; margin: 0 auto; }
       .rl-msg { text-align:center; font-weight:700; margin:10px 0 14px; min-height:26px; }
-      .rl-board-outer { background:#166534; border:10px solid #78350f; border-radius:18px; padding:20px; overflow-x:auto; }
+      .rl-board-outer { background:#166534; border:8px solid #78350f; border-radius:18px; padding:16px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+      .rl-hint { text-align:center; font-size:.78rem; opacity:.6; margin-top:6px; }
       .rl-grid {
-        display:grid; gap:5px;
-        grid-template-columns: 52px repeat(12, minmax(52px, 1fr)) 52px;
-        grid-template-rows: repeat(3, 56px) 56px 56px;
-        min-width: 880px;
+        display:grid; gap:4px;
+        grid-template-columns: var(--cw) repeat(12, var(--cw)) var(--cw);
+        grid-template-rows: repeat(3, var(--ch)) var(--ch) var(--ch);
+        --cw: 52px; --ch: 56px;
+        width: max-content; margin: 0 auto;
       }
+      @media (max-width: 900px) { .rl-grid { --cw: 42px; --ch: 48px; } .rl-spot { font-size:.9rem; } }
+      @media (max-width: 620px) { .rl-grid { --cw: 34px; --ch: 42px; } .rl-spot { font-size:.78rem; } .rl-board-outer { padding:10px; } }
       .rl-spot {
         display:flex; align-items:center; justify-content:center; position:relative;
         border:1px solid rgba(255,255,255,.5); border-radius:6px;
@@ -85,15 +89,16 @@ window.Games.roulette = function() {
           <div class="rl-spot rl-trans" style="grid-row:5; grid-column:10 / span 2;" data-bet="odd">ODD</div>
           <div class="rl-spot rl-trans" style="grid-row:5; grid-column:12 / span 2;" data-bet="19-36">19 TO 36</div>
         </div>
+        <div class="rl-hint">Tap a chip to select, then tap the board — or drag a chip straight onto a spot. Drag a placed chip off the board to remove it.</div>
         <div class="rl-chiprack" id="rack">
-          <div class="rl-chip rl-c1" draggable="true" data-amt="1">1</div>
-          <div class="rl-chip rl-c10 selected" draggable="true" data-amt="10">10</div>
-          <div class="rl-chip rl-c50" draggable="true" data-amt="50">50</div>
-          <div class="rl-chip rl-c100" draggable="true" data-amt="100">100</div>
-          <div class="rl-chip rl-c500" draggable="true" data-amt="500">500</div>
-          <div class="rl-chip rl-c1k" draggable="true" data-amt="1000">1k</div>
-          <div class="rl-chip rl-c5k" draggable="true" data-amt="5000">5k</div>
-          <div class="rl-chip rl-c10k" draggable="true" data-amt="10000">10k</div>
+          <div class="rl-chip rl-c1" data-amt="1">1</div>
+          <div class="rl-chip rl-c10 selected" data-amt="10">10</div>
+          <div class="rl-chip rl-c50" data-amt="50">50</div>
+          <div class="rl-chip rl-c100" data-amt="100">100</div>
+          <div class="rl-chip rl-c500" data-amt="500">500</div>
+          <div class="rl-chip rl-c1k" data-amt="1000">1k</div>
+          <div class="rl-chip rl-c5k" data-amt="5000">5k</div>
+          <div class="rl-chip rl-c10k" data-amt="10000">10k</div>
         </div>
         <div style="display:flex; gap:12px; margin-top:14px; justify-content:center;">
           <button class="pill secondary" id="btn-clear" style="padding:12px 24px;">Clear Bets</button>
@@ -114,20 +119,19 @@ window.Games.roulette = function() {
     if (amt >= 10) return 'rl-c10'; return 'rl-c1';
   }
 
+  function selectChip(chip) {
+    document.querySelectorAll('.rl-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    selectedChipAmt = parseInt(chip.dataset.amt);
+    CasinoShared.playSound('chip');
+  }
   document.querySelectorAll('.rl-chip').forEach(chip => {
-    chip.addEventListener('click', (e) => {
-      document.querySelectorAll('.rl-chip').forEach(c => c.classList.remove('selected'));
-      e.target.classList.add('selected');
-      selectedChipAmt = parseInt(e.target.dataset.amt);
-      CasinoShared.playSound('chip');
-    });
-    chip.addEventListener('dragstart', (e) => {
-      dragState = { amt: parseInt(e.target.dataset.amt), sourceBet: null };
-      e.dataTransfer.effectAllowed = 'copy';
-      document.querySelectorAll('.rl-chip').forEach(c => c.classList.remove('selected'));
-      e.target.classList.add('selected');
-      selectedChipAmt = dragState.amt;
-      CasinoShared.playSound('chip');
+    CasinoShared.makeDraggable(chip, {
+      targetSelector: '.rl-spot',
+      amount: () => parseInt(chip.dataset.amt),
+      label: () => CasinoShared.formatAmt(parseInt(chip.dataset.amt)),
+      onTap: () => selectChip(chip),
+      onDropTarget: (tgt, amt) => { selectChip(chip); placeBet(tgt, amt); },
     });
   });
 
@@ -147,12 +151,17 @@ window.Games.roulette = function() {
     const offset = Math.random() * 6 - 3;
     chipEl.style.transform = `translate(${offset}px, ${offset - (betObj.chips.length * 2)}px)`;
     chipEl.style.zIndex = betObj.chips.length + 3;
-    chipEl.addEventListener('dragstart', (e) => {
-      e.stopPropagation(); dragState = { amt: betObj.amt, sourceBet: betObj };
-      e.dataTransfer.effectAllowed = 'move'; CasinoShared.playSound('chip');
-      setTimeout(() => betObj.chips.forEach(c => c.style.opacity = '0.5'), 0);
+    CasinoShared.makeDraggable(chipEl, {
+      targetSelector: '.rl-spot',
+      amount: () => betObj.amt,
+      label: () => CasinoShared.formatAmt(betObj.amt),
+      onDropTarget: (tgt, amt) => {
+        if (spinBtn.disabled) return;
+        if (tgt === betObj.spotEl) return;
+        removeBet(betObj); placeBet(tgt, amt); CasinoShared.playSound('chip');
+      },
+      onDropOutside: () => { if (!spinBtn.disabled) { removeBet(betObj); CasinoShared.playSound('chip'); } },
     });
-    chipEl.addEventListener('dragend', () => { if (betObj.chips) betObj.chips.forEach(c => c.style.opacity = '1'); dragState.sourceBet = null; });
     betObj.chips.push(chipEl); betObj.spotEl.appendChild(chipEl);
   }
 
@@ -173,26 +182,8 @@ window.Games.roulette = function() {
   }
 
   document.querySelectorAll('.rl-spot').forEach(spot => {
-    spot.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = dragState.sourceBet ? 'move' : 'copy'; spot.classList.add('drag-over'); });
-    spot.addEventListener('dragleave', () => spot.classList.remove('drag-over'));
-    spot.addEventListener('drop', (e) => {
-      e.preventDefault(); e.stopPropagation(); spot.classList.remove('drag-over');
-      if (dragState.sourceBet) { if (dragState.sourceBet.spotEl === spot) { dragState.sourceBet = null; return; } removeBet(dragState.sourceBet); dragState.sourceBet = null; }
-      placeBet(spot, dragState.amt);
-    });
     spot.addEventListener('click', () => placeBet(spot, selectedChipAmt));
     spot.addEventListener('contextmenu', (e) => { e.preventDefault(); if (spinBtn.disabled) return; const b = bets.find(b => b.choice === spot.dataset.bet && b.val === (spot.dataset.val ? parseInt(spot.dataset.val) : undefined)); if (b) { removeBet(b); CasinoShared.playSound('chip'); } });
-  });
-
-  // Drag a placed stack anywhere off the board = remove that bet
-  stage.addEventListener('dragover', (e) => { if (dragState.sourceBet) e.preventDefault(); });
-  stage.addEventListener('drop', (e) => {
-    if (dragState.sourceBet && !e.target.closest('.rl-spot')) {
-      e.preventDefault();
-      removeBet(dragState.sourceBet);
-      dragState.sourceBet = null;
-      CasinoShared.playSound('chip');
-    }
   });
 
   clearBtn.onclick = () => { [...bets].forEach(b => removeBet(b)); document.querySelectorAll('.winner-glow').forEach(el => el.classList.remove('winner-glow')); };
