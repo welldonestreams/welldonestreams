@@ -64,6 +64,13 @@ window.GameAPI = {
 
   updateBalanceUI() {
     const el = document.getElementById('global-balance');
-    if (el && this.cachedBalance != null) el.textContent = this.cachedBalance.toLocaleString();
+    if (!el || this.cachedBalance == null) return;
+    const prev = el.textContent;
+    const next = this.cachedBalance.toLocaleString();
+    el.textContent = next;
+    if (prev !== next && prev !== '---') {
+      const badge = el.closest('.balance-badge') || el.parentElement;
+      if (badge) { badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
+    }
   }
 };
