@@ -3,7 +3,7 @@ window.Games.trivia = function () {
   stage.innerHTML = `
     <div class="table-felt" style="background: radial-gradient(circle, #14532d 0%, #052e16 100%); max-width: 640px; margin: 0 auto;">
       <h2>🧠 Brain Bets</h2>
-      <p style="opacity:.8; font-size:.9rem; margin-top:-6px;">NEW RULES: 10 seconds per question. Winnings bank into a POT (500, then +50% each streak: 750, 1125...). After each correct answer: CASH OUT — or risk it on the next question. One wrong answer, timeout, or walking away torches the entire pot. Always free to play, even flat broke.</p>
+      <p style="opacity:.8; font-size:.9rem; margin-top:-6px;">10 seconds per question. Winnings bank into a POT. After each correct answer: CASH OUT — or risk it on the next question for 50% MORE coins. One wrong answer, or not answering in time torches the entire pot. Always free to play, even flat broke.</p>
       <div style="display:flex; gap:18px; justify-content:center; margin:10px 0; font-weight:800; font-size:1.05rem;">
         <span id="tv-pot">💰 Pot: 0</span>
         <span id="tv-streak">🔥 Streak: 0</span>
