@@ -75,7 +75,13 @@ window.Games.blackjack = function() {
         display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; text-align:center; padding:20px;
       }
       .bjx-insurance h3 { font-size:1.5rem; }
-      @media (max-width:700px){ .bjx-card{width:64px;height:92px;} .bjx-table{min-height:520px;padding:22px 10px;} }
+      @media (max-width:700px){
+        .bjx-card{width:58px;height:84px;} .bjx-table{min-height:auto;padding:18px 8px 22px;border-radius:28px;border-width:8px;}
+        .bjx-tabletext{font-size:.8rem;line-height:1.5;} .bjx-tabletext span{font-size:.66rem;}
+        .bjx-betzone{width:96px;height:96px;} .bjx-betzone .bjx-betchip{width:64px;height:64px;font-size:.85rem;}
+        .bjx-chip{width:46px;height:46px;font-size:.75rem;border-width:4px;} .bjx-rack{gap:8px;padding:10px;}
+        .bjx-hand{gap:6px;min-height:96px;} .bjx-msg{font-size:1.05rem;}
+      }
     </style>
     <div class="bjx-wrap">
       <div class="bjx-table" id="bjx-table">
@@ -85,20 +91,20 @@ window.Games.blackjack = function() {
         </div>
         <div class="bjx-tabletext">BLACKJACK PAYS 3 TO 2<br><span>DEALER MUST DRAW TO 16 AND STAND ON ALL 17S</span><br>INSURANCE PAYS 2 TO 1</div>
         <div style="display:flex; flex-direction:column; align-items:center;">
-          <div class="bjx-betzone" id="bet-circle" title="Click or drag chips to bet"></div>
+          <div class="bjx-betzone" id="bet-circle" title="Tap a chip then tap here, or drag a chip in"></div>
           <div class="bjx-players" id="plr-area"></div>
         </div>
       </div>
 
       <div class="bjx-rack" id="bj-chips">
-        <div class="bjx-chip bjx-c1" draggable="true" data-amt="1">1</div>
-        <div class="bjx-chip bjx-c10 selected" draggable="true" data-amt="10">10</div>
-        <div class="bjx-chip bjx-c50" draggable="true" data-amt="50">50</div>
-        <div class="bjx-chip bjx-c100" draggable="true" data-amt="100">100</div>
-        <div class="bjx-chip bjx-c500" draggable="true" data-amt="500">500</div>
-        <div class="bjx-chip bjx-c1k" draggable="true" data-amt="1000">1k</div>
-        <div class="bjx-chip bjx-c5k" draggable="true" data-amt="5000">5k</div>
-        <div class="bjx-chip bjx-c10k" draggable="true" data-amt="10000">10k</div>
+        <div class="bjx-chip bjx-c1" data-amt="1">1</div>
+        <div class="bjx-chip bjx-c10 selected" data-amt="10">10</div>
+        <div class="bjx-chip bjx-c50" data-amt="50">50</div>
+        <div class="bjx-chip bjx-c100" data-amt="100">100</div>
+        <div class="bjx-chip bjx-c500" data-amt="500">500</div>
+        <div class="bjx-chip bjx-c1k" data-amt="1000">1k</div>
+        <div class="bjx-chip bjx-c5k" data-amt="5000">5k</div>
+        <div class="bjx-chip bjx-c10k" data-amt="10000">10k</div>
       </div>
 
       <div class="bjx-msg" id="bj-msg">Place your bet!</div>
@@ -190,28 +196,32 @@ window.Games.blackjack = function() {
       const chip = document.createElement('div');
       chip.className = `bjx-betchip ${chipColorClass(betBreakdown[betBreakdown.length - 1] || currentBet)}`;
       chip.textContent = fmt(currentBet);
-      chip.draggable = true;
       chip.title = 'Drag off the circle to clear the bet';
-      chip.addEventListener('dragstart', (e) => { e.dataTransfer.effectAllowed = 'move'; chip.style.opacity = '.5'; window._bjxDraggingBet = true; });
-      chip.addEventListener('dragend', () => { chip.style.opacity = '1'; setTimeout(() => { window._bjxDraggingBet = false; }, 50); });
+      CasinoShared.makeDraggable(chip, {
+        targetSelector: '.bjx-betzone',
+        amount: () => currentBet,
+        label: () => fmt(currentBet),
+        onDropOutside: () => { if (gamePhase === 'BETTING') { currentBet = 0; betBreakdown = []; updateBetVisuals(); CasinoShared.playSound('chip'); } },
+      });
       ui.betCircle.appendChild(chip);
     } else if (gamePhase === 'BETTING') {
       ui.msg.textContent = 'Place your bet!';
     }
   }
 
+  function selectChip(chip) {
+    document.querySelectorAll('.bjx-chip').forEach(c => c.classList.remove('selected'));
+    chip.classList.add('selected');
+    selectedAmt = parseInt(chip.dataset.amt);
+    CasinoShared.playSound('chip');
+  }
   document.querySelectorAll('.bjx-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.bjx-chip').forEach(c => c.classList.remove('selected'));
-      chip.classList.add('selected');
-      selectedAmt = parseInt(chip.dataset.amt);
-      CasinoShared.playSound('chip');
-    });
-    chip.addEventListener('dragstart', (e) => {
-      e.dataTransfer.effectAllowed = 'copy';
-      selectedAmt = parseInt(chip.dataset.amt);
-      document.querySelectorAll('.bjx-chip').forEach(c => c.classList.remove('selected'));
-      chip.classList.add('selected');
+    CasinoShared.makeDraggable(chip, {
+      targetSelector: '.bjx-betzone',
+      amount: () => parseInt(chip.dataset.amt),
+      label: () => CasinoShared.formatAmt(parseInt(chip.dataset.amt)),
+      onTap: () => selectChip(chip),
+      onDropTarget: (tgt, amt) => { selectChip(chip); addToBet(amt); },
     });
   });
 
@@ -223,23 +233,6 @@ window.Games.blackjack = function() {
     CasinoShared.playSound('chip');
     updateBetVisuals();
   });
-  ui.betCircle.addEventListener('dragover', (e) => { e.preventDefault(); ui.betCircle.classList.add('drag-over'); });
-  ui.betCircle.addEventListener('dragleave', () => ui.betCircle.classList.remove('drag-over'));
-  ui.betCircle.addEventListener('drop', (e) => {
-    e.preventDefault(); ui.betCircle.classList.remove('drag-over');
-    if (!window._bjxDraggingBet) addToBet(selectedAmt);
-  });
-  // dropping the bet stack anywhere outside the circle clears the bet
-  stage.addEventListener('dragover', (e) => { if (window._bjxDraggingBet) e.preventDefault(); });
-  stage.addEventListener('drop', (e) => {
-    if (window._bjxDraggingBet && !e.target.closest('.bjx-betzone')) {
-      e.preventDefault();
-      currentBet = 0; betBreakdown = [];
-      updateBetVisuals();
-      CasinoShared.playSound('chip');
-    }
-  });
-
   btns.clear.onclick = () => { if (gamePhase === 'BETTING') { currentBet = 0; betBreakdown = []; updateBetVisuals(); } };
   btns.allin.onclick = () => { if (gamePhase === 'BETTING') { setBetExact(bal()); ui.msg.textContent = `ALL IN: 🪙${fmt(currentBet)} 😤`; } };
 
