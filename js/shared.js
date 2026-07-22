@@ -1,4 +1,4 @@
-// Shared helpers for FakeStake. LOAD THIS FIRST (before api.js, games, ui.js).
+// Shared helpers for WellDoneBets. LOAD THIS FIRST (before api.js, games, ui.js).
 window.Games = {}; // game registry — games attach themselves to this
 
 window.CasinoShared = {
@@ -6,13 +6,53 @@ window.CasinoShared = {
 
   getChipClass(amt) {
     if (amt >= 10000) return 'c-10k'; if (amt >= 5000) return 'c-5k'; if (amt >= 1000) return 'c-1k';
-    if (amt >= 500) return 'c-500'; if (amt >= 100) return 'c-100'; if (amt >= 50) return 'c-50'; return 'c-10';
+    if (amt >= 500) return 'c-500'; if (amt >= 100) return 'c-100'; if (amt >= 50) return 'c-50';
+    if (amt >= 10) return 'c-10'; return 'c-1';
+  },
+
+  // Standard chip denominations, largest first — used for auto-breakdown betting
+  DENOMS: [10000, 5000, 1000, 500, 100, 50, 10, 1],
+
+  // Given a remaining budget, the largest denom that fits (or 0)
+  bestFit(remaining) {
+    for (const d of this.DENOMS) if (d <= remaining) return d;
+    return 0;
+  },
+
+  // Clean bet panel used by slots + coinflip: styled input, +/- steppers, quick picks, All In
+  betPanel(mountEl, opts = {}) {
+    const start = opts.value || 50;
+    mountEl.innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; gap:10px; margin:14px 0;">
+        <div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:999px; padding:6px 10px;">
+          <button type="button" class="wdb-step" data-d="-1" style="width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.12);color:inherit;font-size:1.3rem;font-weight:800;cursor:pointer;">−</button>
+          <input type="number" class="wdb-bet" value="${start}" min="1"
+            style="width:120px; text-align:center; font-size:1.3rem; font-weight:800; background:transparent; border:none; outline:none; color:inherit; -moz-appearance:textfield;" />
+          <button type="button" class="wdb-step" data-d="1" style="width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.12);color:inherit;font-size:1.3rem;font-weight:800;cursor:pointer;">+</button>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+          ${[10, 50, 100, 500, 1000].map(v => `<button type="button" class="wdb-quick" data-v="${v}" style="border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:inherit; border-radius:999px; padding:7px 14px; font-weight:700; cursor:pointer;">${this.formatAmt(v)}</button>`).join('')}
+          <button type="button" class="wdb-quick" data-v="all" style="border:1px solid #eab308; background:rgba(234,179,8,.15); color:#eab308; border-radius:999px; padding:7px 14px; font-weight:800; cursor:pointer;">ALL IN</button>
+        </div>
+      </div>`;
+    const input = mountEl.querySelector('.wdb-bet');
+    const step = (dir) => {
+      const cur = parseInt(input.value, 10) || 0;
+      const stepSize = cur >= 1000 ? 500 : (cur >= 100 ? 50 : 10);
+      input.value = Math.max(1, cur + dir * stepSize);
+    };
+    mountEl.querySelectorAll('.wdb-step').forEach(b => b.addEventListener('click', () => step(parseInt(b.dataset.d, 10))));
+    mountEl.querySelectorAll('.wdb-quick').forEach(b => b.addEventListener('click', () => {
+      if (b.dataset.v === 'all') input.value = Math.max(1, window.GameAPI.cachedBalance || 0);
+      else input.value = b.dataset.v;
+    }));
+    return { get: () => parseInt(input.value, 10) || 0, set: (v) => { input.value = v; } };
   },
 
   audioEnabled: true,
   playSound(type) {
     if (!this.audioEnabled) return;
-    const sounds = { chip: '', card: '', spin: '', win: '' }; // add real audio URLs when ready
+    const sounds = { chip: '', card: '', spin: '', win: '' };
     if (sounds[type]) {
       const audio = new Audio(sounds[type]);
       audio.volume = 0.5;

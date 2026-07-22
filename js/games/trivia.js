@@ -3,16 +3,22 @@ window.Games.trivia = function () {
   stage.innerHTML = `
     <div class="table-felt" style="background: radial-gradient(circle, #14532d 0%, #052e16 100%); max-width: 640px; margin: 0 auto;">
       <h2>🧠 Brain Bets</h2>
-      <p style="opacity:.8; font-size:.9rem; margin-top:-6px;">Answer in 20 seconds. Base 500 chips — each correct in a row pays 50% more. Wrong, slow, or skipping resets the streak.</p>
-      <div id="tv-streak" style="font-weight:800; margin:10px 0; font-size:1.05rem;">🔥 Streak: 0</div>
+      <p style="opacity:.8; font-size:.9rem; margin-top:-6px;">NEW RULES: 10 seconds per question. Winnings bank into a POT (500, then +50% each streak: 750, 1125...). After each correct answer: CASH OUT — or risk it on the next question. One wrong answer, timeout, or walking away torches the entire pot. Always free to play, even flat broke.</p>
+      <div style="display:flex; gap:18px; justify-content:center; margin:10px 0; font-weight:800; font-size:1.05rem;">
+        <span id="tv-pot">💰 Pot: 0</span>
+        <span id="tv-streak">🔥 Streak: 0</span>
+      </div>
       <div id="tv-timerwrap" style="height:10px; background:rgba(255,255,255,.15); border-radius:999px; overflow:hidden; margin:0 0 16px;">
         <div id="tv-timer" style="height:100%; width:100%; background:#eab308; border-radius:999px; transition: width 1s linear;"></div>
       </div>
-      <div id="tv-question" style="font-size:1.35rem; font-weight:700; min-height:60px; margin-bottom:14px;">Ready?</div>
+      <div id="tv-question" style="font-size:1.35rem; font-weight:700; min-height:60px; margin-bottom:14px;">Ready to climb back from zero?</div>
       <input type="text" id="tv-answer" class="bet-input" style="width:min(90%,340px); text-align:center;" placeholder="Your answer" autocomplete="off" />
       <br>
       <button class="pill" id="tv-submit" style="margin-top:12px;">Submit</button>
-      <button class="pill secondary" id="tv-next" style="margin-top:12px;">Start</button>
+      <div style="margin-top:12px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button class="pill" id="tv-cashout" style="display:none;">💰 Cash Out</button>
+        <button class="pill secondary" id="tv-next">Start</button>
+      </div>
       <p id="tv-msg" style="margin-top:14px; font-weight:bold; min-height:48px;"></p>
     </div>
   `;
@@ -21,55 +27,63 @@ window.Games.trivia = function () {
   const ansEl = document.getElementById('tv-answer');
   const submitBtn = document.getElementById('tv-submit');
   const nextBtn = document.getElementById('tv-next');
+  const cashBtn = document.getElementById('tv-cashout');
   const msgEl = document.getElementById('tv-msg');
   const streakEl = document.getElementById('tv-streak');
+  const potEl = document.getElementById('tv-pot');
   const timerEl = document.getElementById('tv-timer');
 
   let timerInt = null;
-  let secondsLeft = 20;
+  let secondsLeft = 10;
   let active = false;
+  let pot = 0;
 
+  function fmt(n) { return Number(n || 0).toLocaleString(); }
   function setStreak(n) { streakEl.textContent = `🔥 Streak: ${n}`; }
-
+  function setPot(n) { pot = n; potEl.textContent = `💰 Pot: ${fmt(n)}`; cashBtn.textContent = `💰 Cash Out ${fmt(n)}`; }
   function stopTimer() { if (timerInt) { clearInterval(timerInt); timerInt = null; } }
 
   function startTimer() {
-    secondsLeft = 20;
+    secondsLeft = 10;
     timerEl.style.transition = 'none';
     timerEl.style.width = '100%';
-    // force reflow so the reset applies before animating
     void timerEl.offsetWidth;
     timerEl.style.transition = 'width 1s linear';
     stopTimer();
     timerInt = setInterval(() => {
       secondsLeft--;
-      timerEl.style.width = Math.max(0, (secondsLeft / 20) * 100) + '%';
+      timerEl.style.width = Math.max(0, (secondsLeft / 10) * 100) + '%';
       if (secondsLeft <= 0) {
         stopTimer();
-        active = false;
-        submitBtn.disabled = true;
-        ansEl.disabled = true;
-        msgEl.style.color = '#f87171';
-        msgEl.textContent = "⏰ Time's up! Streak lost. Grab the next one.";
-        setStreak(0);
-        nextBtn.textContent = 'Next Question';
-        nextBtn.style.display = 'inline-flex';
+        submitAnswer(true); // auto-submit blank -> server settles the forfeit
       }
     }, 1000);
+  }
+
+  function showRoundButtons(state) {
+    // state: 'question' | 'won' | 'lost' | 'idle'
+    submitBtn.style.display = state === 'question' ? 'inline-flex' : 'none';
+    ansEl.style.display = state === 'question' ? 'inline-block' : 'none';
+    cashBtn.style.display = state === 'won' ? 'inline-flex' : 'none';
+    nextBtn.style.display = state === 'question' ? 'none' : 'inline-flex';
+    if (state === 'won') nextBtn.textContent = '▶ Risk It — Next Question';
+    else if (state === 'lost') nextBtn.textContent = 'Start Over';
+    else nextBtn.textContent = 'Start';
   }
 
   async function loadQuestion() {
     stopTimer();
     msgEl.textContent = '';
     ansEl.value = '';
-    ansEl.disabled = true;
-    submitBtn.disabled = true;
-    nextBtn.style.display = 'none';
     qEl.textContent = 'Loading…';
+    showRoundButtons('question');
+    submitBtn.disabled = true;
+    ansEl.disabled = true;
     try {
       const d = await window.GameAPI.request('/trivia-question');
       qEl.textContent = d.question;
       setStreak(d.streak || 0);
+      setPot(d.pot || 0);
       active = true;
       ansEl.disabled = false;
       submitBtn.disabled = false;
@@ -79,15 +93,15 @@ window.Games.trivia = function () {
       qEl.textContent = 'Could not load a question.';
       msgEl.style.color = '#f87171';
       msgEl.textContent = e.message;
+      showRoundButtons('idle');
       nextBtn.textContent = 'Retry';
-      nextBtn.style.display = 'inline-flex';
     }
   }
 
-  async function submitAnswer() {
+  async function submitAnswer(isTimeout) {
     if (!active) return;
-    const answer = ansEl.value.trim();
-    if (!answer) { msgEl.style.color = '#f87171'; msgEl.textContent = 'Type an answer first.'; return; }
+    const answer = isTimeout ? '' : ansEl.value.trim();
+    if (!answer && !isTimeout) { msgEl.style.color = '#f87171'; msgEl.textContent = 'Type an answer first.'; return; }
     active = false;
     stopTimer();
     submitBtn.disabled = true;
@@ -105,25 +119,58 @@ window.Games.trivia = function () {
       setStreak(d.streak || 0);
       if (d.correct) {
         CasinoShared.playSound('win');
+        setPot(d.pot);
         msgEl.style.color = '#4ade80';
-        msgEl.textContent = `✅ Correct! +${d.reward.toLocaleString()} chips (streak ${d.streak})`;
-      } else if (d.timeout) {
-        msgEl.style.color = '#f87171';
-        msgEl.textContent = d.message || "Time's up! Streak reset.";
+        msgEl.textContent = `✅ Correct! +${fmt(d.reward)} banked. Pot is ${fmt(d.pot)} — cash out or risk it?`;
+        showRoundButtons('won');
+        nextBtn.focus();
       } else {
+        const lost = d.lostPot || 0;
+        setPot(0);
         msgEl.style.color = '#f87171';
-        msgEl.textContent = `❌ Nope — the answer was "${d.answer}". Streak reset.`;
+        if (d.timeout) {
+          msgEl.textContent = lost > 0
+            ? `⏰ ${d.message || "Time's up!"} You forfeited a pot of ${fmt(lost)}.`
+            : `⏰ ${d.message || "Time's up!"}${d.answer ? ` The answer was "${d.answer}".` : ''}`;
+        } else {
+          msgEl.textContent = lost > 0
+            ? `❌ Wrong — the answer was "${d.answer}". Pot of ${fmt(lost)} gone.`
+            : `❌ Wrong — the answer was "${d.answer}".`;
+        }
+        showRoundButtons('lost');
       }
     } catch (e) {
       msgEl.style.color = '#f87171';
       msgEl.textContent = e.message;
+      showRoundButtons('idle');
     }
-    nextBtn.textContent = 'Next Question';
-    nextBtn.style.display = 'inline-flex';
-    nextBtn.focus();
   }
 
-  submitBtn.addEventListener('click', submitAnswer);
-  ansEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAnswer(); });
+  async function cashOut() {
+    cashBtn.disabled = true;
+    try {
+      const d = await window.GameAPI.request('/trivia-cashout', { method: 'POST' });
+      window.GameAPI.cachedBalance = d.newBalance;
+      window.GameAPI.updateBalanceUI();
+      CasinoShared.playSound('win');
+      setPot(0);
+      setStreak(0);
+      msgEl.style.color = '#4ade80';
+      msgEl.textContent = `💰 Cashed out ${fmt(d.cashedOut)} chips!`;
+      showRoundButtons('idle');
+      nextBtn.textContent = 'Play Again';
+    } catch (e) {
+      msgEl.style.color = '#f87171';
+      msgEl.textContent = e.message;
+    } finally {
+      cashBtn.disabled = false;
+    }
+  }
+
+  submitBtn.addEventListener('click', () => submitAnswer(false));
+  ansEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAnswer(false); });
   nextBtn.addEventListener('click', loadQuestion);
+  cashBtn.addEventListener('click', cashOut);
+
+  showRoundButtons('idle');
 };
