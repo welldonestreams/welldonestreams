@@ -130,3 +130,23 @@ window.CasinoShared = {
     return svgs[suit] || suit;
   }
 };
+
+
+CasinoShared.addGameInfo = function addGameInfo(target, content) {
+  if (!target || !content) return null;
+
+  const details = document.createElement('details');
+  details.className = 'game-info';
+
+  const summary = document.createElement('summary');
+  summary.textContent = content.title || 'More info';
+
+  const body = document.createElement('div');
+  body.className = 'game-info-body';
+  body.innerHTML = content.html || '';
+
+  details.append(summary, body);
+  target.appendChild(details);
+
+  return details;
+};
