@@ -106,4 +106,6 @@ window.Games.baccarat = function () {
       dealBtn.disabled = false;
     }
   });
+
+  CasinoShared.addGameInfo(stage, { title: 'More info', html: `<p>Choose Player, Banker, or Tie. Cards are dealt automatically using standard punto banco drawing rules.</p><p>Aces count as 1, 2–9 use face value, and 10/J/Q/K count as 0. Only the last digit of the total matters.</p><table class="game-info-table"><thead><tr><th>Bet</th><th>Profit payout</th></tr></thead><tbody><tr><td>Player</td><td>1:1</td></tr><tr><td>Banker</td><td>0.95:1</td></tr><tr><td>Tie</td><td>8:1</td></tr></tbody></table><p class="game-info-note">Player and Banker bets push when the result is a tie.</p>` });
 };
