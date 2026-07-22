@@ -19,20 +19,19 @@ window.CasinoShared = {
     return 0;
   },
 
-  // Clean bet panel used by slots + coinflip: styled input, +/- steppers, quick picks, All In
+  // Bet controls used by slots / coinflip / craps / baccarat. Styling lives in games.css.
   betPanel(mountEl, opts = {}) {
     const start = opts.value || 50;
     mountEl.innerHTML = `
-      <div style="display:flex; flex-direction:column; align-items:center; gap:10px; margin:14px 0;">
-        <div style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15); border-radius:999px; padding:6px 10px;">
-          <button type="button" class="wdb-step" data-d="-1" style="width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.12);color:inherit;font-size:1.3rem;font-weight:800;cursor:pointer;">−</button>
-          <input type="number" class="wdb-bet" value="${start}" min="1"
-            style="width:120px; text-align:center; font-size:1.3rem; font-weight:800; background:transparent; border:none; outline:none; color:inherit; -moz-appearance:textfield;" />
-          <button type="button" class="wdb-step" data-d="1" style="width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.12);color:inherit;font-size:1.3rem;font-weight:800;cursor:pointer;">+</button>
+      <div class="wdb-panel">
+        <div class="wdb-stepper">
+          <button type="button" class="wdb-step" data-d="-1" aria-label="Lower bet">−</button>
+          <input type="number" class="wdb-bet" value="${start}" min="1" aria-label="Bet amount" />
+          <button type="button" class="wdb-step" data-d="1" aria-label="Raise bet">+</button>
         </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
-          ${[10, 50, 100, 500, 1000].map(v => `<button type="button" class="wdb-quick" data-v="${v}" style="border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:inherit; border-radius:999px; padding:7px 14px; font-weight:700; cursor:pointer;">${this.formatAmt(v)}</button>`).join('')}
-          <button type="button" class="wdb-quick" data-v="all" style="border:1px solid #eab308; background:rgba(234,179,8,.15); color:#eab308; border-radius:999px; padding:7px 14px; font-weight:800; cursor:pointer;">ALL IN</button>
+        <div class="wdb-quicks">
+          ${[10, 50, 100, 500, 1000].map(v => `<button type="button" class="wdb-quick" data-v="${v}">${this.formatAmt(v)}</button>`).join('')}
+          <button type="button" class="wdb-quick allin" data-v="all">ALL IN</button>
         </div>
       </div>`;
     const input = mountEl.querySelector('.wdb-bet');
@@ -79,6 +78,7 @@ window.CasinoShared = {
         moved = true;
         ghost = document.createElement('div');
         ghost.textContent = opts.label ? opts.label() : '';
+        ghost.className = 'wdb-ghost';
         ghost.style.cssText = 'position:fixed;z-index:9999;width:46px;height:46px;border-radius:50%;border:5px dashed #fff;display:flex;align-items:center;justify-content:center;font-weight:900;color:#111;font-size:.75rem;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.6);opacity:.92;';
         ghost.style.background = getComputedStyle(el).backgroundColor || '#e5e7eb';
         document.body.appendChild(ghost);
