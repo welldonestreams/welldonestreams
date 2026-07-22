@@ -49,6 +49,66 @@ window.CasinoShared = {
     return { get: () => parseInt(input.value, 10) || 0, set: (v) => { input.value = v; } };
   },
 
+
+  // ---- Touch-capable drag/drop. HTML5 dragstart never fires on mobile, so we use
+  // Pointer Events with a floating ghost and hit-test the drop target ourselves.
+  // sources: elements you can pick a chip up from. targets: valid drop zones.
+  makeDraggable(el, opts) {
+    // opts: { amount(), label(), onDropTarget(targetEl, amount), onDropOutside(amount), targetSelector, container }
+    let ghost = null, dragging = false, startX = 0, startY = 0, moved = false, lastTarget = null;
+    const TH = 6;
+
+    const cleanup = () => {
+      if (ghost) { ghost.remove(); ghost = null; }
+      if (lastTarget) { lastTarget.classList.remove('drag-over'); lastTarget = null; }
+      dragging = false; moved = false;
+    };
+
+    el.addEventListener('pointerdown', (e) => {
+      if (e.button != null && e.button !== 0) return;
+      dragging = true; moved = false;
+      startX = e.clientX; startY = e.clientY;
+      try { el.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+
+    el.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX, dy = e.clientY - startY;
+      if (!moved && Math.hypot(dx, dy) < TH) return;
+      if (!moved) {
+        moved = true;
+        ghost = document.createElement('div');
+        ghost.textContent = opts.label ? opts.label() : '';
+        ghost.style.cssText = 'position:fixed;z-index:9999;width:46px;height:46px;border-radius:50%;border:5px dashed #fff;display:flex;align-items:center;justify-content:center;font-weight:900;color:#111;font-size:.75rem;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.6);opacity:.92;';
+        ghost.style.background = getComputedStyle(el).backgroundColor || '#e5e7eb';
+        document.body.appendChild(ghost);
+      }
+      e.preventDefault();
+      ghost.style.left = (e.clientX - 23) + 'px';
+      ghost.style.top = (e.clientY - 23) + 'px';
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      const tgt = under ? under.closest(opts.targetSelector) : null;
+      if (tgt !== lastTarget) {
+        if (lastTarget) lastTarget.classList.remove('drag-over');
+        if (tgt) tgt.classList.add('drag-over');
+        lastTarget = tgt;
+      }
+    });
+
+    const finish = (e) => {
+      if (!dragging) return;
+      const wasMoved = moved;
+      const tgt = lastTarget;
+      const amt = opts.amount ? opts.amount() : 0;
+      cleanup();
+      if (!wasMoved) { if (opts.onTap) opts.onTap(); return; }
+      if (tgt) { if (opts.onDropTarget) opts.onDropTarget(tgt, amt); }
+      else if (opts.onDropOutside) opts.onDropOutside(amt);
+    };
+    el.addEventListener('pointerup', finish);
+    el.addEventListener('pointercancel', () => cleanup());
+  },
+
   audioEnabled: true,
   playSound(type) {
     if (!this.audioEnabled) return;
