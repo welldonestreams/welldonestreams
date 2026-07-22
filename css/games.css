@@ -137,3 +137,88 @@
 /* --------------------------------------------------------------- loading */
 .stage-notice { text-align: center; padding: 40px 20px; color: var(--text-dim); }
 .stage-notice h2 { color: var(--text); margin-bottom: 10px; }
+
+/* -------------------------------------------------------- game information */
+.game-info {
+  width: min(680px, 100%);
+  margin: 24px auto 0;
+  text-align: left;
+  background: rgba(0, 0, 0, .25);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.game-info summary {
+  min-height: 50px;
+  padding: 14px 17px;
+  color: var(--ember);
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  user-select: none;
+}
+
+.game-info summary::-webkit-details-marker {
+  display: none;
+}
+
+.game-info summary::after {
+  content: "+";
+  flex: 0 0 auto;
+  font-family: var(--money);
+  font-size: 1.25rem;
+}
+
+.game-info[open] summary::after {
+  content: "−";
+}
+
+.game-info-body {
+  padding: 0 17px 17px;
+  color: rgba(255, 255, 255, .84);
+  font-size: .92rem;
+  line-height: 1.6;
+}
+
+.game-info-body p + p {
+  margin-top: 12px;
+}
+
+.game-info-body ul {
+  margin: 10px 0 0 20px;
+}
+
+.game-info-body li + li {
+  margin-top: 6px;
+}
+
+.game-info-table {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+  font-family: var(--money);
+  font-size: .82rem;
+}
+
+.game-info-table th,
+.game-info-table td {
+  padding: 9px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+  text-align: left;
+  vertical-align: top;
+}
+
+.game-info-table th {
+  color: var(--ember);
+}
+
+.game-info-note {
+  margin-top: 12px;
+  color: var(--text-dim);
+  font-size: .84rem;
+}
