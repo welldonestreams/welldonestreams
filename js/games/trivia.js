@@ -3,7 +3,7 @@ window.Games.trivia = function () {
   stage.innerHTML = `
     <div class="table-felt" style="background: radial-gradient(circle, #14532d 0%, #052e16 100%); max-width: 640px; margin: 0 auto;">
       <h2>🧠 Brain Bets</h2>
-      <p style="opacity:.8; font-size:.9rem; margin-top:-6px;">10 seconds per question. Winnings bank into a POT. After each correct answer: CASH OUT — or risk it on the next question for 50% MORE coins. One wrong answer, or not answering in time torches the entire pot. Always free to play, even flat broke.</p>
+      <p id="tv-intro" style="opacity:.8; font-size:.9rem; margin-top:-6px;">15 seconds per question. Winnings bank into a POT. After each correct answer: CASH OUT — or risk it on the next question for 50% MORE coins. One wrong answer, or not answering in time torches the entire pot. Always free to play, even flat broke.</p>
       <div style="display:flex; gap:18px; justify-content:center; margin:10px 0; font-weight:800; font-size:1.05rem;">
         <span id="tv-pot">💰 Pot: 0</span>
         <span id="tv-streak">🔥 Streak: 0</span>
@@ -34,7 +34,8 @@ window.Games.trivia = function () {
   const timerEl = document.getElementById('tv-timer');
 
   let timerInt = null;
-  let secondsLeft = 10;
+  const ROUND_SECONDS = 15;
+  let secondsLeft = ROUND_SECONDS;
   let active = false;
   let pot = 0;
 
@@ -44,7 +45,7 @@ window.Games.trivia = function () {
   function stopTimer() { if (timerInt) { clearInterval(timerInt); timerInt = null; } }
 
   function startTimer() {
-    secondsLeft = 10;
+    secondsLeft = ROUND_SECONDS;
     timerEl.style.transition = 'none';
     timerEl.style.width = '100%';
     void timerEl.offsetWidth;
@@ -52,7 +53,7 @@ window.Games.trivia = function () {
     stopTimer();
     timerInt = setInterval(() => {
       secondsLeft--;
-      timerEl.style.width = Math.max(0, (secondsLeft / 10) * 100) + '%';
+      timerEl.style.width = Math.max(0, (secondsLeft / ROUND_SECONDS) * 100) + '%';
       if (secondsLeft <= 0) {
         stopTimer();
         submitAnswer(true); // auto-submit blank -> server settles the forfeit
@@ -72,6 +73,8 @@ window.Games.trivia = function () {
   }
 
   async function loadQuestion() {
+    const intro = document.getElementById('tv-intro');
+    if (intro) intro.remove();   // rules disappear once you're actually playing
     stopTimer();
     msgEl.textContent = '';
     ansEl.value = '';
