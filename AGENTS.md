@@ -76,5 +76,9 @@ this file concise and durable. Use the current user request, `git status`, and
 - Do not commit or push unless the user requests it.
 - If a decision has lasting context that the diff cannot explain, add a short
   newest-first entry to `WORKLOG.md` before committing it with the change.
+- Silently update `WORKLOG.md` after important architecture, deployment,
+  security, troubleshooting, or behavior decisions. Do not log routine work.
+- Keep user-facing updates and final responses as concise as the task permits.
+  Do not narrate routine worklog maintenance unless asked.
 - Prefer `git log` and the code itself over an old worklog entry when they
   disagree.
