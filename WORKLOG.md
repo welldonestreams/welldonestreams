@@ -6,6 +6,11 @@ commit an entry with the change it describes.
 
 ## Entries
 
+- 2026-07-23 — Homelab: migrated Homepage secrets to environment variables,
+  repaired Renewals ownership/orchestration, added ZFS snapshot schedules,
+  deployed LAN-only trusted HTTPS names, and hardened OPNsense administration.
+  See `HOMELAB-HANDOFF.md` for verified state and follow-ups.
+
 - 2026-07-22 — Keep shared handoff context current after important decisions,
   while minimizing routine narration and token use.
 - 2026-07-22 — Added shared agent guidance. Verified that commit `4510bdc`
