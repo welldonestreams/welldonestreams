@@ -20,6 +20,21 @@ this file concise and durable. Use the current user request, `git status`, and
   `welldonestreams/welldonestreams-worker`. Do not add backend behavior here or
   edit another checkout unless the user explicitly includes it in scope.
 
+## Shared homelab context
+
+The repository also stores durable cross-agent homelab notes because Codex and
+Claude both assist with the user's TrueNAS and network environment.
+
+- Read `HOMELAB-HANDOFF.md` for the last verified state.
+- Read `HOMELAB-GAMEPLAN.md` for the prioritized remaining setup plan, known
+  TrueNAS paths, application recommendations, and definition of done.
+- These documents are context and operations notes, not website runtime files.
+- Keep them free of passwords, API keys, tokens, cookies, and certificate
+  secrets.
+- Do not invent qBittorrent or `/downloads` paths. The known download client is
+  NZBGet and the known Usenet mapping is host `/mnt/tank/data/usenet` to
+  container `/data/usenet`.
+
 ## Before editing
 
 1. Run `git status --short --branch` and `git log --oneline -15`.
