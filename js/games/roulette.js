@@ -275,4 +275,6 @@ window.Games.roulette = function() {
       spinBtn.disabled = false; clearBtn.disabled = false;
     }
   };
+
+  CasinoShared.addGameInfo(stage, { title: 'More info', html: `<p>Place one or more chips, then spin. Every chip is settled independently.</p><table class="game-info-table"><thead><tr><th>Bet</th><th>Profit payout</th></tr></thead><tbody><tr><td>Single number</td><td>35:1</td></tr><tr><td>Red/black, odd/even, low/high</td><td>1:1</td></tr><tr><td>Dozen or column</td><td>2:1</td></tr></tbody></table><p class="game-info-note">Zero loses all outside bets and only wins a straight-up bet on 0.</p>` });
 };
