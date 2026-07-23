@@ -5,262 +5,162 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Well Done Streams</title>
   <style>
-    /* --- UPGRADED STYLES & THEMING --- */
-  .hero {
-  margin-bottom: 18px;
-}
-
-#stage1 {
-  margin-top: 0;
-}
-
-@media (max-width: 700px) {
-  .hero {
-    margin-bottom: 10px;
-  }
-}
-   
-         :root { 
-      --radius: 16px; 
+    :root {
+      --radius: 16px;
       --shadow-sm: 0 2px 4px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.1);
       --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.05);
       --shadow-lg: 0 12px 24px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.08);
-      --transition-fast: 0.15s ease-out;
-      --transition-smooth: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-    
-    [data-mode="light"] {
-      --bg: #fdfdfd; --surface: #ffffff; --surface-2: #f3f4f6;
-      --text: #111827; --text-dim: #6b7280; --border: #e5e7eb;
-      --accent-text-on: #ffffff;
-      --shadow-base: var(--shadow-sm);
-      --shadow-hover: var(--shadow-md);
-    }
-    
-    [data-mode="dark"] {
-      --bg: #09090b; --surface: #18181b; --surface-2: #27272a;
-      --text: #f8fafc; --text-dim: #94a3b8; --border: #334155;
-      --accent-text-on: #ffffff;
-      --shadow-base: 0 4px 12px rgba(0,0,0,.4);
-      --shadow-hover: 0 8px 24px rgba(0,0,0,.6);
+      --transition-fast: .15s ease-out;
+      --transition-smooth: .3s cubic-bezier(.2,.8,.2,1);
     }
 
-    [data-palette="gold"]    { --accent: #eab308; --accent-hover: #ca8a04; }
-    [data-palette="emerald"] { --accent: #10b981; --accent-hover: #059669; }
-    [data-palette="ocean"]   { --accent: #3b82f6; --accent-hover: #2563eb; }
-    [data-palette="purple"]  { --accent: #8b5cf6; --accent-hover: #7c3aed; }
-    [data-palette="crimson"] { --accent: #ef4444; --accent-hover: #dc2626; }
-    [data-palette="rose"]    { --accent: #f43f5e; --accent-hover: #e11d48; }
-    [data-palette="teal"]    { --accent: #14b8a6; --accent-hover: #0d9488; }
-    [data-palette="slate"]   { --accent: #64748b; --accent-hover: #475569; }
+    [data-mode="light"] {
+      --bg:#fdfdfd; --surface:#fff; --surface-2:#f3f4f6;
+      --text:#111827; --text-dim:#6b7280; --border:#e5e7eb;
+      --accent-text-on:#fff; --shadow-base:var(--shadow-sm); --shadow-hover:var(--shadow-md);
+    }
+    [data-mode="dark"] {
+      --bg:#09090b; --surface:#18181b; --surface-2:#27272a;
+      --text:#f8fafc; --text-dim:#94a3b8; --border:#334155;
+      --accent-text-on:#fff; --shadow-base:0 4px 12px rgba(0,0,0,.4); --shadow-hover:0 8px 24px rgba(0,0,0,.6);
+    }
+
+    [data-palette="gold"] { --accent:#eab308; --accent-hover:#ca8a04; }
+    [data-palette="emerald"] { --accent:#10b981; --accent-hover:#059669; }
+    [data-palette="ocean"] { --accent:#3b82f6; --accent-hover:#2563eb; }
+    [data-palette="purple"] { --accent:#8b5cf6; --accent-hover:#7c3aed; }
+    [data-palette="crimson"] { --accent:#ef4444; --accent-hover:#dc2626; }
+    [data-palette="rose"] { --accent:#f43f5e; --accent-hover:#e11d48; }
+    [data-palette="teal"] { --accent:#14b8a6; --accent-hover:#0d9488; }
+    [data-palette="slate"] { --accent:#64748b; --accent-hover:#475569; }
 
     * { box-sizing:border-box; margin:0; padding:0; }
     html { scroll-behavior:smooth; }
-    body { 
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; 
-      background:var(--bg); color:var(--text); line-height:1.6; 
-      transition: background var(--transition-smooth), color var(--transition-smooth); 
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg); color:var(--text); line-height:1.6;
+      transition:background var(--transition-smooth),color var(--transition-smooth);
     }
-    
-    /* --- LAYOUT & COMPONENTS --- */
+    a { color:var(--accent); text-decoration:none; font-weight:600; }
+    a:hover { color:var(--accent-hover); text-decoration:underline; }
+
     .wrap { max-width:820px; margin:0 auto; padding:0 20px 80px; }
     .topbar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:24px 20px; max-width:820px; margin:0 auto; flex-wrap:wrap; }
     .brand { font-weight:800; font-size:1.3rem; letter-spacing:-.03em; }
-    .brand span { color:var(--accent); transition: color var(--transition-smooth); }
+    .brand span { color:var(--accent); }
     .controls { display:flex; gap:12px; align-items:center; }
-    
-    /* Sleeker Buttons */
-    .pill { 
-      background:var(--surface); border:1px solid var(--border); color:var(--text); 
-      border-radius:999px; padding:8px 16px; cursor:pointer; font-size:.85rem; font-weight:600; 
-      display:inline-flex; align-items:center; gap:6px; 
-      transition: all var(--transition-fast); box-shadow: var(--shadow-sm);
-    }
-    .pill:hover { background:var(--surface-2); transform: translateY(-1px); box-shadow: var(--shadow-md); }
-    .pill:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
-    
-    .btn { 
-      display:inline-flex; align-items:center; gap:8px; text-decoration:none; 
-      background:var(--accent); color:var(--accent-text-on); font-weight:700; font-size:1rem; 
-      padding:14px 28px; border-radius:999px; 
-      transition: all var(--transition-fast); border:none; cursor:pointer; 
-      box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 40%, transparent);
-    }
-    .btn:hover { background:var(--accent-hover); transform:translateY(-2px); box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 50%, transparent); }
-    .btn:active { transform:translateY(1px); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 30%, transparent); }
-    .btn.secondary { background:var(--surface); color:var(--text); border:1px solid var(--border); box-shadow: var(--shadow-base); }
-    .btn.secondary:hover { background:var(--surface-2); box-shadow: var(--shadow-hover); }
 
-    /* Casino chip link — keep the img at a fixed 42px; do NOT give this link the .pill class */
-    .casino-link { display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; padding:0; transition: transform 0.2s; }
-    .casino-link:hover { transform: scale(1.08); }
-    .casino-link img { width:64px; height:64px; border-radius:50%; object-fit:contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
-    
-    /* Theme Picker */
-    .theme-pop { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter: blur(4px); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; opacity: 0; transition: opacity var(--transition-smooth); }
-    .theme-pop.open { display:flex; opacity: 1; }
-    .theme-panel { background:var(--surface); border:1px solid var(--border); border-radius:24px; box-shadow:var(--shadow-lg); padding:32px; max-width:400px; width:100%; transform: scale(0.95); transition: transform var(--transition-smooth); }
-    .theme-pop.open .theme-panel { transform: scale(1); }
-    .theme-panel h3 { font-size:1.3rem; margin-bottom:6px; letter-spacing:-.02em; }
-    .theme-panel p { color:var(--text-dim); font-size:.95rem; margin-bottom:24px; }
-    .swatches { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
-    .swatch { width:100%; aspect-ratio:1; border-radius:50%; cursor:pointer; border:3px solid transparent; display:grid; place-items:center; transition: all var(--transition-fast); }
-    .swatch:hover { transform:scale(1.15); box-shadow: var(--shadow-md); }
-    .swatch.active { border-color:var(--text); transform:scale(1.1); }
-    .swatch.active::after { content:"\2713"; color:#fff; font-weight:800; font-size:1.2rem; text-shadow:0 1px 2px rgba(0,0,0,.4); }
-    .swatch-label { text-align:center; font-size:.75rem; color:var(--text-dim); margin-top:8px; font-weight: 500; }
-    .swatch-wrap { display:flex; flex-direction:column; align-items:center; }
-    .theme-close { margin-top:28px; width:100%; background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:999px; padding:14px; font-weight:700; font-size:1rem; cursor:pointer; transition: all var(--transition-fast); }
-    .theme-close:hover { background: var(--text); color: var(--bg); }
+    .pill,.btn {
+      border-radius:999px; cursor:pointer; font-weight:700; border:none;
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      transition:all var(--transition-fast);
+    }
+    .pill { background:var(--surface); border:1px solid var(--border); color:var(--text); padding:8px 16px; font-size:.85rem; box-shadow:var(--shadow-sm); }
+    .pill:hover { background:var(--surface-2); transform:translateY(-1px); box-shadow:var(--shadow-md); }
+    .btn { background:var(--accent); color:var(--accent-text-on); font-size:1rem; padding:14px 28px; box-shadow:0 4px 14px color-mix(in srgb,var(--accent) 40%,transparent); }
+    .btn:hover { background:var(--accent-hover); color:var(--accent-text-on); text-decoration:none; transform:translateY(-2px); }
+    .btn.secondary { background:var(--surface); color:var(--text); border:1px solid var(--border); box-shadow:var(--shadow-base); }
+    button:disabled { opacity:.6; cursor:not-allowed; transform:none!important; }
 
-    /* Typography & Core Layout */
-    .hero { text-align:center; padding:50px 0 40px; }
-    .hero h1 { font-size:3rem; letter-spacing:-.04em; line-height:1.1; margin-bottom:16px; font-weight: 800; }
+    .casino-link { display:inline-flex; align-items:center; justify-content:center; border:0; background:transparent; padding:0; margin-left:-4px; transition:transform .2s; }
+    .casino-link:hover { transform:scale(1.08); text-decoration:none; }
+    .casino-link img { width:104px; height:104px; border-radius:50%; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.2)); }
+
+    .hero { text-align:center; padding:50px 0 24px; margin-bottom:18px; }
+    .hero h1 { font-size:3rem; letter-spacing:-.04em; line-height:1.1; margin-bottom:16px; font-weight:800; }
     .hero h1 span { color:var(--accent); }
-    .hero p { font-size:1.15rem; color:var(--text-dim); max-width:600px; margin:0 auto 30px; }
-    .cta-row { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
-    
+    .hero > p { font-size:1.15rem; color:var(--text-dim); max-width:600px; margin:16px auto 6px; }
+    #stage1 { margin-top:0; }
     section { margin-top:56px; }
     h2 { font-size:1.6rem; font-weight:800; letter-spacing:-.03em; margin-bottom:12px; display:flex; align-items:baseline; gap:10px; }
-    section > p { color:var(--text-dim); margin-bottom:20px; font-size: 1.05rem; }
-    
-    /* Upgraded Cards */
-    .card, .widget-card { 
-      background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); 
-      padding:28px; box-shadow:var(--shadow-base); transition: box-shadow var(--transition-smooth), transform var(--transition-smooth);
-    }
-    .card:hover, .widget-card:hover { box-shadow:var(--shadow-hover); transform: translateY(-2px); }
-    .widget-card h3 { font-size:1.15rem; margin-bottom:8px; font-weight: 700; }
-    
-    /* Stages Section */
-    .stages { display:flex; align-items:center; justify-content:center; gap:1.5rem; flex-wrap:wrap; margin:2.5rem 0; }
-    .stage { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem 1.5rem; text-align:center; min-width:160px; box-shadow: var(--shadow-base); transition: transform var(--transition-fast); }
-    .stage:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
-    .stage h3 { font-size:1.05rem; font-weight: 700; margin: 8px 0 2px; }
-    .stage-num { display:inline-flex; width:2.5rem; height:2.5rem; align-items:center; justify-content:center; border-radius:50%; background:color-mix(in srgb, var(--accent) 15%, transparent); color:var(--accent); font-weight:800; font-size: 1.1rem; }
-    .stage-when { color:var(--text-dim); font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; font-weight: 600; }
-    .stage-arrow { color:var(--text-dim); font-size:1.5rem; opacity: 0.5; }
-    @media (max-width:640px) { .stages { flex-direction: column; } .stage-arrow { transform:rotate(90deg); } }
-    
-    /* Forms & Inputs */
-    input[type=text], input[type=email] { 
-      width:100%; padding:14px 16px; border-radius:12px; border:1px solid var(--border); 
-      background:var(--surface-2); color:var(--text); font-size:1rem; font-family:inherit; 
-      margin-bottom:12px; transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
-    }
-    input:focus { outline:none; border-color:var(--accent); background: var(--surface); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
-    .form-msg { font-size:.95rem; margin-top:8px; min-height:1.2em; font-weight: 500; }
+    section > p { color:var(--text-dim); margin-bottom:20px; font-size:1.05rem; }
+
+    .card,.widget-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow-base); transition:box-shadow var(--transition-smooth),transform var(--transition-smooth); }
+    .card:hover,.widget-card:hover { box-shadow:var(--shadow-hover); transform:translateY(-2px); }
+    .widget-card h3 { font-size:1.15rem; margin-bottom:8px; }
+    .widget-row { display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
+
+    input[type=text],input[type=email] { width:100%; padding:14px 16px; border-radius:12px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font-size:1rem; font-family:inherit; margin-bottom:12px; }
+    input:focus { outline:none; border-color:var(--accent); background:var(--surface); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent); }
+    .form-msg { font-size:.95rem; margin-top:8px; min-height:1.2em; font-weight:500; }
     .form-msg.ok { color:#10b981; }
     .form-msg.err { color:#ef4444; }
-    .s1-actions { display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top: 8px; }
+    .s1-actions { display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:8px; }
     .s1-hint { font-size:.85rem; color:var(--text-dim); max-width:280px; line-height:1.4; }
-    
-    /* TV Guide */
-    .platform-grid { display:grid; grid-template-columns:1fr; gap:10px; margin:1.5rem 0; }
-    .tv-guide { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; transition: box-shadow var(--transition-fast); }
-    .tv-guide summary { display:flex; align-items:center; gap:.75rem; cursor:pointer; padding:1rem 1.25rem; font-weight:600; font-size: 1.05rem; user-select: none; }
-    .tv-guide[open] { box-shadow:var(--shadow-md); border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
-    .tv-guide p { padding:0 1.25rem 1.25rem 1.25rem; color:var(--text-dim); font-size:.95rem; line-height: 1.6; }
-    
-    /* Polished Poll Grid */
-    .poll-grid { display:grid; gap:16px; margin-top:16px; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); }
-    .poll-choice {
-      position:relative; border-radius:12px; overflow:hidden; cursor:pointer;
-      aspect-ratio:2/3; background:var(--surface-2); border:2px solid transparent;
-      transition:transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, opacity 0.3s ease, box-shadow 0.2s ease;
-      box-shadow: var(--shadow-base);
-    }
-    .poll-choice img { width:100%; height:100%; object-fit:cover; display:block; transition: transform 0.5s ease; }
-    .poll-choice .noimg { display:flex; align-items:center; justify-content:center; height:100%; font-size:2.5rem; color:var(--text-dim); }
-    .poll-choice.locked { cursor:default; }
-    .poll-choice:not(.locked):hover { transform:translateY(-6px); border-color:var(--accent); box-shadow: var(--shadow-lg); }
-    .poll-choice:not(.locked):hover img { transform: scale(1.05); }
-    .poll-choice .p-title {
-      position:absolute; left:0; right:0; top:0; padding:10px; z-index:3;
-      font-size:.85rem; font-weight:700; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.9);
-      background:linear-gradient(to bottom, rgba(0,0,0,.8), transparent);
-    }
-    .poll-bar {
-      position:absolute; left:0; right:0; bottom:0; height:0%; z-index:2;
-      background:linear-gradient(to top, color-mix(in srgb, var(--accent) 90%, transparent), color-mix(in srgb, var(--accent) 40%, transparent));
-      transition:height 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-    .poll-choice .p-pct {
-      position:absolute; left:0; right:0; bottom:12px; z-index:3; text-align:center;
-      font-weight:800; font-size:1.4rem; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,0.9);
-      opacity:0; transition:opacity .5s ease .3s, transform .5s ease; transform: translateY(10px);
-    }
-    .poll-results .poll-choice { opacity:.7; filter: grayscale(30%); }
-    .poll-results .poll-choice.mine { opacity:1; filter: grayscale(0%); border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 40%, transparent), var(--shadow-lg); }
-    .poll-results .p-pct { opacity:1; transform: translateY(0); }
-    .p-chose { 
-      position:absolute; left:0; right:0; bottom:0; z-index:4; text-align:center;
-      font-size:.75rem; font-weight:800; letter-spacing:.03em; color:var(--accent-text-on);
-      background:var(--accent); padding:6px 4px; opacity:0; transition:opacity .5s ease .4s; 
-    }
-    .poll-results .mine .p-chose { opacity:1; }
-    .poll-results .mine .p-pct { bottom:30px; }
-    
-    /* Callouts & Links */
-    .callout { background:color-mix(in srgb, var(--accent) 10%, transparent); border-left:4px solid var(--accent); padding:1rem 1.25rem; border-radius:0 8px 8px 0; margin:1.5rem 0; font-size: 0.95rem; }
-    a { color: var(--accent); text-decoration: none; font-weight: 600; transition: color var(--transition-fast); }
-    a:hover { color: var(--accent-hover); text-decoration: underline; }
-    
-    /* Scrolling Wheel */
-    .scroll-label { font-size: 0.95rem; color:var(--text-dim); margin-bottom: 8px; font-weight: 500; }
-    .recent-scroll-container {
-      overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
-      scrollbar-width: none; -ms-overflow-style: none; margin: 8px 0 16px; position: relative; cursor: grab;
-      -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
-      mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
-    }
-    .recent-scroll-container::-webkit-scrollbar { display: none; }
-    .recent-scroll-track { display: inline-flex; align-items: flex-start; gap: 4px; padding: 10px 0; }
-    .scroll-item {
-      display: inline-flex; flex-direction: column; align-items: center; gap: 8px;
-      padding: 0 8px; color: var(--text); font-weight: 600; font-size: 0.85rem;
-      width: 130px; text-align: center; cursor: pointer; text-decoration: none;
-    }
-    .scroll-item:hover .scroll-poster { transform: scale(1.08) translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
-    .scroll-item span { display:block; max-width:120px; line-height:1.2; white-space:normal; opacity: 0.9; }
-    .scroll-poster {
-      width: 114px; height: 171px; object-fit: cover; border-radius: 10px;
-      background: var(--border); flex-shrink: 0; border: 2px solid transparent;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      box-shadow: var(--shadow-md);
-    }
-    .scroll-poster-fallback {
-      width: 114px; height: 171px; border-radius: 10px; background: var(--surface-2);
-      display: inline-flex; align-items: center; justify-content: center;
-      color: var(--text-dim); font-size: 2.5rem; flex-shrink: 0; border: 2px solid transparent;
-    }
+
+    .theme-pop { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+    .theme-pop.open { display:flex; }
+    .theme-panel { background:var(--surface); border:1px solid var(--border); border-radius:24px; box-shadow:var(--shadow-lg); padding:32px; max-width:400px; width:100%; }
+    .theme-panel h3 { font-size:1.3rem; margin-bottom:6px; }
+    .theme-panel p { color:var(--text-dim); margin-bottom:24px; }
+    .swatches { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+    .swatch { width:100%; aspect-ratio:1; border-radius:50%; cursor:pointer; border:3px solid transparent; display:grid; place-items:center; transition:all var(--transition-fast); }
+    .swatch:hover { transform:scale(1.15); }
+    .swatch.active { border-color:var(--text); transform:scale(1.1); }
+    .swatch.active::after { content:"✓"; color:#fff; font-weight:800; font-size:1.2rem; text-shadow:0 1px 2px rgba(0,0,0,.4); }
+    .swatch-label { text-align:center; font-size:.75rem; color:var(--text-dim); margin-top:8px; }
+    .swatch-wrap { display:flex; flex-direction:column; align-items:center; }
+    .theme-close { margin-top:28px; width:100%; background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:999px; padding:14px; font-weight:700; cursor:pointer; }
+
+    .scroll-label { font-size:.95rem; color:var(--text-dim); margin-bottom:8px; font-weight:500; }
+    .recent-scroll-container { overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; scrollbar-width:none; margin:8px 0 16px; cursor:grab; -webkit-mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent); mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent); }
+    .recent-scroll-container::-webkit-scrollbar { display:none; }
+    .recent-scroll-track { display:inline-flex; align-items:flex-start; gap:4px; padding:10px 0; }
+    .scroll-item { display:inline-flex; flex-direction:column; align-items:center; gap:8px; padding:0 8px; color:var(--text); font-weight:600; font-size:.85rem; width:130px; text-align:center; text-decoration:none; }
+    .scroll-item span { display:block; max-width:120px; line-height:1.2; }
+    .scroll-poster,.scroll-poster-fallback { width:114px; height:171px; border-radius:10px; flex-shrink:0; border:2px solid transparent; }
+    .scroll-poster { object-fit:cover; background:var(--border); transition:all .2s; box-shadow:var(--shadow-md); }
+    .scroll-poster-fallback { background:var(--surface-2); display:inline-flex; align-items:center; justify-content:center; color:var(--text-dim); font-size:2.5rem; }
+    .scroll-item:hover .scroll-poster { transform:scale(1.08) translateY(-4px); border-color:var(--accent); }
     .request-next-row { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:12px 0 8px; }
 
-    /* Badges */
-    .app-badges { display: flex; justify-content: flex-start; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-    .app-badges a { transition: transform var(--transition-fast); }
-    .app-badges a:hover { transform: translateY(-2px) scale(1.02); }
-    .app-badges a img { height: 44px; width: auto; }
-    
-    footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .platform-grid { display:grid; grid-template-columns:1fr; gap:10px; margin:1.5rem 0; }
+    .tv-guide { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .tv-guide summary { display:flex; align-items:center; gap:.75rem; cursor:pointer; padding:1rem 1.25rem; font-weight:600; font-size:1.05rem; }
+    .tv-guide p { padding:0 1.25rem 1.25rem; color:var(--text-dim); font-size:.95rem; }
+    .callout { background:color-mix(in srgb,var(--accent) 10%,transparent); border-left:4px solid var(--accent); padding:1rem 1.25rem; border-radius:0 8px 8px 0; margin:1.5rem 0; font-size:.95rem; }
+    .app-badges { display:flex; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
+    .app-badges img { height:44px; width:auto; }
+
+    .poll-grid { display:grid; gap:16px; margin-top:16px; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
+    .poll-choice { position:relative; border-radius:12px; overflow:hidden; cursor:pointer; aspect-ratio:2/3; background:var(--surface-2); border:2px solid transparent; box-shadow:var(--shadow-base); }
+    .poll-choice img,.poll-choice .noimg { width:100%; height:100%; object-fit:cover; display:flex; align-items:center; justify-content:center; font-size:2.5rem; }
+    .poll-choice.locked { cursor:default; }
+    .poll-choice:not(.locked):hover { transform:translateY(-4px); border-color:var(--accent); }
+    .p-title { position:absolute; inset:0 0 auto; padding:10px; z-index:3; color:#fff; font-size:.85rem; font-weight:700; text-shadow:0 1px 4px #000; background:linear-gradient(to bottom,rgba(0,0,0,.8),transparent); }
+    .poll-bar { position:absolute; inset:auto 0 0; height:0; z-index:2; background:linear-gradient(to top,color-mix(in srgb,var(--accent) 90%,transparent),color-mix(in srgb,var(--accent) 40%,transparent)); transition:height 1s ease; }
+    .p-pct { position:absolute; left:0; right:0; bottom:12px; z-index:3; text-align:center; font-weight:800; font-size:1.4rem; color:#fff; text-shadow:0 2px 6px #000; opacity:0; }
+    .p-chose { position:absolute; left:0; right:0; bottom:0; z-index:4; text-align:center; font-size:.75rem; font-weight:800; color:#fff; background:var(--accent); padding:6px 4px; }
+    .poll-results .poll-choice { opacity:.7; }
+    .poll-results .poll-choice.mine { opacity:1; border-color:var(--accent); }
+    .poll-results .p-pct { opacity:1; }
+    .poll-results .mine .p-pct { bottom:30px; }
+
+    footer { margin-top:40px; padding-top:20px; border-top:1px solid var(--border); }
+
+    @media (max-width:700px) {
+      .hero { padding-top:32px; margin-bottom:10px; }
+      .hero h1 { font-size:2.35rem; }
+      .casino-link img { width:84px; height:84px; }
+      .topbar { padding-top:16px; }
+      .card,.widget-card { padding:22px; }
+    }
   </style>
 </head>
 <body data-mode="light" data-palette="gold">
   <div class="topbar">
     <div class="brand">Well Done <span>Streams</span></div>
     <div class="controls">
-      <button class="pill" id="modeBtn">Dark</button>
+      <button class="pill" id="modeBtn">Dark Mode</button>
       <button class="pill" id="themeBtn">Change Theme</button>
-      <a href="/casino.html" title="Casino" class="casino-link" style="display:inline-flex;align-items:center;justify-content:center; border:none; background:transparent; padding:0; margin-left:-4px;">
-        <img src="pokerchipnew.svg" alt="Casino" style="width:104px; height:104px; border-radius:50%; object-fit:contain;" onerror="this.outerHTML='<span style=\'font-size:44px;\'>🪙</span>'">
-      </a>
+      <a href="/casino.html" title="Casino" class="casino-link"><img src="pokerchipnew.svg" alt="Casino" onerror="this.outerHTML='<span style=\'font-size:44px\'>🪙</span>'"></a>
     </div>
   </div>
 
   <div class="theme-pop" id="themePop">
     <div class="theme-panel">
       <h3>Pick a Theme</h3>
-      <p>Choose a color &mdash; it applies across the whole page. Works in both light and dark mode.</p>
+      <p>Choose a color. It works in light and dark mode.</p>
       <div class="swatches" id="swatches"></div>
       <button class="theme-close" id="themeClose">Done</button>
     </div>
@@ -269,405 +169,95 @@
   <div class="wrap">
     <div class="hero">
       <h1>Your movies &amp; shows,<br><span>on demand.</span></h1>
-
       <div class="scroll-label">Recently Added &mdash; tap a title to request more like it</div>
-      <div class="recent-scroll-container">
-        <div class="recent-scroll-track" id="recent-scroll-track">
-          <span class="scroll-item" style="color:var(--text-dim); font-size:1rem;">Loading recent additions&hellip;</span>
-        </div>
-      </div>
-
-      <div class="request-next-row">
-        <a class="btn" href="https://requests.welldonestreams.com" target="_blank" rel="noopener" style="flex-direction:column; gap:2px; padding:14px 30px; line-height:1.25;">
-          <span>Request what's next &rarr;</span>
-          <small style="font-weight:500; font-size:.72rem; opacity:.85;">Sign in with Plex after getting access.</small>
-        </a>
-      </div>
-      
-     <p style="margin:16px 0 6px;">
-       Welcome! Here's everything you need to start watching &mdash; and how to request anything you want added.
-     </p>
+      <div class="recent-scroll-container"><div class="recent-scroll-track" id="recent-scroll-track"><span class="scroll-item">Loading recent additions&hellip;</span></div></div>
+      <div class="request-next-row"><a class="btn" href="https://requests.welldonestreams.com" target="_blank" rel="noopener" style="flex-direction:column;gap:2px;line-height:1.25"><span>Request what's next &rarr;</span><small style="font-weight:500;font-size:.72rem;opacity:.85">Sign in with Plex after getting access.</small></a></div>
+      <p>Welcome! Here's everything you need to start watching &mdash; and how to request anything you want added.</p>
     </div>
 
-
     <section id="stage1">
-      <h2>1. Get Access <small style="font-weight:500;color:var(--text-dim);font-size:0.9rem;">(you only do this once)</small></h2>
+      <h2>1. Get Access <small style="font-weight:500;color:var(--text-dim);font-size:.9rem">(you only do this once)</small></h2>
       <p>Fill in your name and Plex email address. I will add you to the server within 24 hours.</p>
-      <div class="card">
-        <form id="accessForm">
-          <input type="text" id="name" name="name" placeholder="Your name" required />
-          <input type="email" id="email" name="email" placeholder="Your Plex email" required />
-          <div class="s1-actions">
-            <button class="btn" type="submit">Request Access</button>
-            <span class="s1-hint">While you wait for the invite email, head to step 2 &darr; to get set up.</span>
-          </div>
-          <div class="form-msg" id="formMsg" aria-live="polite"></div>
-        </form>
-      </div>
+      <div class="card"><form id="accessForm"><input type="text" id="name" name="name" placeholder="Your name" required><input type="email" id="email" name="email" placeholder="Your Plex email" required><div class="s1-actions"><button class="btn" type="submit">Request Access</button><span class="s1-hint">While you wait for the invite email, head to step 2 &darr; to get set up.</span></div><div class="form-msg" id="formMsg" aria-live="polite"></div></form></div>
     </section>
 
     <section id="stage2">
       <h2>2. Get the App &amp; Set Up Your TV</h2>
-      <div class="app-badges">
-        <a href="https://play.google.com/store/apps/details?id=com.plexapp.android" target="_blank" rel="noopener">
-          <img src="GetItOnGooglePlay_Badge_Web_color_English.svg" alt="Get it on Google Play" onerror="this.style.display='none';"/>
-        </a>
-        <a href="https://apps.apple.com/app/id383457673" target="_blank" rel="noopener">
-          <img src="Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg" alt="Download on the App Store" onerror="this.style.display='none';"/>
-        </a>
-      </div>
-
-      <div class="callout">
-        <strong>TV sign-in:</strong> You won't type your password on a TV. The Plex app shows a <strong>4-character code</strong>. On your phone or computer, go to <strong><a href="https://plex.tv/link" target="_blank" rel="noopener">plex.tv/link</a></strong>, sign in, and enter the code. Some apps also show a QR code to scan.
-      </div>
+      <div class="app-badges"><a href="https://play.google.com/store/apps/details?id=com.plexapp.android" target="_blank" rel="noopener"><img src="GetItOnGooglePlay_Badge_Web_color_English.svg" alt="Get it on Google Play"></a><a href="https://apps.apple.com/app/id383457673" target="_blank" rel="noopener"><img src="Download_on_the_App_Store_Badge_US-UK_RGB_blk_092917.svg" alt="Download on the App Store"></a></div>
+      <div class="callout"><strong>TV sign-in:</strong> The Plex app shows a <strong>4-character code</strong>. On your phone or computer, open <a href="https://plex.tv/link" target="_blank" rel="noopener">plex.tv/link</a>, sign in, and enter it.</div>
       <div class="platform-grid">
-        <details class="tv-guide"><summary><span>Roku</span></summary><p>Home &rarr; Streaming Channels &rarr; Search &rarr; "Plex" &rarr; Add Channel. Launch &rarr; Sign In &rarr; enter the code at <strong>plex.tv/link</strong>.</p></details>
-        <details class="tv-guide"><summary><span>Fire TV</span></summary><p>Find &rarr; Search &rarr; "Plex" &rarr; Download. Launch &rarr; Sign In &rarr; code at <strong>plex.tv/link</strong>.</p></details>
-        <details class="tv-guide"><summary><span>Android TV / Google TV</span></summary><p>Google Play Store &rarr; search "Plex" &rarr; Install. Launch &rarr; scan the QR code or enter the code at <strong>plex.tv/link</strong>.</p></details>
-        <details class="tv-guide"><summary><span>Apple TV</span></summary><p>App Store &rarr; search "Plex" &rarr; Get. Launch &rarr; Sign In &rarr; code at <strong>plex.tv/link</strong>.</p></details>
-        <details class="tv-guide"><summary><span>Samsung</span></summary><p>Samsung Apps &rarr; search "Plex" &rarr; Install. Availability varies by model year; very old sets may not have a current app &mdash; use a cheap streaming stick if so.</p></details>
-        <details class="tv-guide"><summary><span>LG (webOS)</span></summary><p>LG Content Store &rarr; search "Plex" &rarr; Install. Same model-year caveat as Samsung.</p></details>
-        <details class="tv-guide"><summary><span>Gaming Consoles</span></summary><p>Plex is available on <strong>Xbox</strong> (One, Series S/X) and <strong>PlayStation</strong> (PS4, PS5). Open the console's store &mdash; Microsoft Store or PlayStation Store &rarr; search "Plex" &rarr; Install/Download. Launch &rarr; Sign In &rarr; enter the code at <strong>plex.tv/link</strong>.</p></details>
-        <details class="tv-guide"><summary><span>Any web browser</span></summary><p>Go to <a href="https://app.plex.tv" target="_blank" rel="noopener">app.plex.tv</a> and sign in &mdash; no install and no code needed. The best fallback if a device app won't cooperate.</p></details>
+        <details class="tv-guide"><summary>Roku</summary><p>Home &rarr; Streaming Channels &rarr; Search &rarr; Plex &rarr; Add Channel. Launch and enter the code at plex.tv/link.</p></details>
+        <details class="tv-guide"><summary>Fire TV</summary><p>Find &rarr; Search &rarr; Plex &rarr; Download. Launch and enter the code at plex.tv/link.</p></details>
+        <details class="tv-guide"><summary>Android TV / Google TV</summary><p>Install Plex from Google Play, then scan the QR code or enter the link code.</p></details>
+        <details class="tv-guide"><summary>Apple TV</summary><p>Install Plex from the App Store, launch it, and enter the displayed link code.</p></details>
+        <details class="tv-guide"><summary>Samsung / LG</summary><p>Install Plex from the TV's app store. Older sets may need a streaming stick.</p></details>
+        <details class="tv-guide"><summary>Xbox / PlayStation</summary><p>Install Plex from the console store, launch it, and enter the displayed link code.</p></details>
+        <details class="tv-guide"><summary>Web browser</summary><p>Open <a href="https://app.plex.tv" target="_blank" rel="noopener">app.plex.tv</a> and sign in.</p></details>
       </div>
     </section>
 
     <section id="stage3">
-      <h2>3. Request Content <small style="font-weight:500;color:var(--text-dim); font-size:0.9rem;">(added within 24 hrs or upon release)</small></h2>
-      <p style="margin-bottom: 24px;">
-        <a class="btn" href="https://requests.welldonestreams.com" target="_blank" rel="noopener">Request new content to be added</a>
-      </p>
-
+      <h2>3. Request Content <small style="font-weight:500;color:var(--text-dim);font-size:.9rem">(added within 24 hrs or upon release)</small></h2>
+      <p><a class="btn" href="https://requests.welldonestreams.com" target="_blank" rel="noopener">Request new content to be added</a></p>
       <div class="widget-row">
-        <div class="widget-card" id="status-card" style="flex: 1; min-width: 280px;">
-          <h3>Request Status</h3>
-          <p style="font-size:.9rem;color:var(--text-dim); margin-bottom:12px;">Enter your Plex email to see the status of your requests.</p>
-          <input type="email" id="status-email" placeholder="your@email.com" />
-          <button class="btn secondary" id="status-lookup" style="width:100%; justify-content:center;">Check Status</button>
-          <div id="status-result"></div>
-        </div>
-
-        <div class="widget-card" id="poll-card" style="flex: 2; min-width: 300px;">
-          <h3>Vote for what's next</h3>
-          <div id="poll-options"></div>
-          <div id="poll-message"></div>
-        </div>
+        <div class="widget-card" style="flex:1;min-width:280px"><h3>Request Status</h3><p style="font-size:.9rem;color:var(--text-dim);margin-bottom:12px">Enter your Plex email to see the status of your requests.</p><input type="email" id="status-email" placeholder="your@email.com"><button class="btn secondary" id="status-lookup" style="width:100%">Check Status</button><div id="status-result" aria-live="polite"></div></div>
+        <div class="widget-card" style="flex:2;min-width:300px"><h3>Vote for what's next</h3><div id="poll-options"></div><div id="poll-message"></div></div>
       </div>
     </section>
 
-    <footer>
-      <p style="text-align:center;color:var(--text-dim);font-size:.9rem; font-weight:500;">
-        <a href="/admin.html" style="color:inherit;text-decoration:none;cursor:pointer;" title="Admin">Well Done Streams</a> &middot; est. 2026 &middot; v2.1
-      </p>
-    </footer>
+    <footer><p style="text-align:center;color:var(--text-dim);font-size:.9rem;font-weight:500"><a href="/admin.html" style="color:inherit" title="Admin">Well Done Streams</a> &middot; est. 2026 &middot; v2.2</p></footer>
   </div>
 
 <script>
-  // Mock data is ONLY for static previews (GitHub Pages / *.pages.dev).
-  // On welldonestreams.com the real API is used and failures show real errors —
-  // never fake success messages that would silently swallow a real request.
   const IS_PREVIEW = location.hostname !== 'welldonestreams.com';
-
+  const API = '/api';
   const MOCK_RECENT = [
-    { title: "Dune: Part Two", poster: "https://image.tmdb.org/t/p/w200/1pdfLvkbY9ohJlCjQH2TDpiB8.jpg" },
-    { title: "Civil War", poster: "https://image.tmdb.org/t/p/w200/sh7Rg8Er3tFcN9BpKIPOMvALgZd.jpg" },
-    { title: "Fallout", poster: "https://image.tmdb.org/t/p/w200/8c5VdOaT9q9fE0gG9f1Wb4gCqGv.jpg" },
-    { title: "Shogun", poster: "https://image.tmdb.org/t/p/w200/7O4iVfOMQmdCSxhOg1WNzG1AEVT.jpg" },
-    { title: "Godzilla x Kong", poster: "https://image.tmdb.org/t/p/w200/tMefBSflR6PGQLvLuPEHZnutpAm.jpg" },
-    { title: "The Bear", poster: "https://image.tmdb.org/t/p/w200/bOruQ9xH3n9eJd9pIubK1qX42s8.jpg" }
+    {title:'Dune: Part Two',poster:'https://image.tmdb.org/t/p/w200/1pdfLvkbY9ohJlCjQH2TDpiB8.jpg'},
+    {title:'Civil War',poster:'https://image.tmdb.org/t/p/w200/sh7Rg8Er3tFcN9BpKIPOMvALgZd.jpg'},
+    {title:'Fallout',poster:''},{title:'Shogun',poster:''},{title:'Godzilla x Kong',poster:''},{title:'The Bear',poster:''}
   ];
-
-  const MOCK_POLL = {
-    version: '2',
-    options: [
-      { name: "Deadpool & Wolverine", poster: "https://image.tmdb.org/t/p/w200/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg" },
-      { name: "Inside Out 2", poster: "https://image.tmdb.org/t/p/w200/vpnVM9B6NMmQpWeZvzRxMgG32f.jpg" },
-      { name: "A Quiet Place: Day One", poster: "https://image.tmdb.org/t/p/w200/yrpPYKijwdMvUTJeqxLqmHQ14K.jpg" }
-    ],
-    counts: { "Deadpool & Wolverine": 58, "Inside Out 2": 41, "A Quiet Place: Day One": 22 }
-  };
-
-  const API = "/api";
+  const MOCK_POLL = {version:'2',options:[{name:'Deadpool & Wolverine',poster:''},{name:'Inside Out 2',poster:''},{name:'A Quiet Place: Day One',poster:''}],counts:{'Deadpool & Wolverine':58,'Inside Out 2':41,'A Quiet Place: Day One':22}};
+  const escapeHtml = value => String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   async function readResponse(res) {
-    const ct = res.headers.get('content-type') || '';
-    if (ct.includes('application/json')) {
-      const data = await res.json().catch(() => ({}));
-      return { ok: res.ok, data, text: data.error || data.message || '' };
-    }
-    const text = await res.text().catch(() => '');
-    return { ok: res.ok, data: null, text };
-  }
-  
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const type = res.headers.get('content-type') || '';
+    if (type.includes('application/json')) { const data = await res.json().catch(()=>({})); return {ok:res.ok,data,text:data.error||data.message||''}; }
+    const text = await res.text().catch(()=> ''); return {ok:res.ok,data:null,text};
   }
 
-  // --- UI & THEME LOGIC ---
-  const PALETTES = [
-    {id:'gold',name:'Gold',color:'#eab308'},{id:'emerald',name:'Emerald',color:'#10b981'},
-    {id:'ocean',name:'Ocean',color:'#3b82f6'},{id:'purple',name:'Purple',color:'#8b5cf6'},
-    {id:'crimson',name:'Crimson',color:'#ef4444'},{id:'rose',name:'Rose',color:'#f43f5e'},
-    {id:'teal',name:'Teal',color:'#14b8a6'},{id:'slate',name:'Slate',color:'#64748b'},
-  ];
-  const body=document.body, modeBtn=document.getElementById('modeBtn'), themeBtn=document.getElementById('themeBtn'),
-    themePop=document.getElementById('themePop'), themeClose=document.getElementById('themeClose'), swatches=document.getElementById('swatches');
-    
-  function saveState(){ try{ localStorage.setItem('wds-mode',body.getAttribute('data-mode')); localStorage.setItem('wds-palette',body.getAttribute('data-palette')); }catch(e){} }
-  function setMode(m){ body.setAttribute('data-mode',m); modeBtn.textContent=m==='dark'?'Light Mode':'Dark Mode'; saveState(); }
-  function setPalette(p){ body.setAttribute('data-palette',p); document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active',s.dataset.pal===p)); saveState(); }
-  
-  PALETTES.forEach(p=>{ 
-    const wrap=document.createElement('div'); wrap.className='swatch-wrap';
-    const sw=document.createElement('div'); sw.className='swatch'; sw.style.background=p.color; sw.dataset.pal=p.id;
-    sw.setAttribute('role','button'); sw.setAttribute('tabindex','0'); sw.setAttribute('aria-label',p.name+' theme');
-    sw.addEventListener('click',()=>setPalette(p.id));
-    sw.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setPalette(p.id); } });
-    const lbl=document.createElement('div'); lbl.className='swatch-label'; lbl.textContent=p.name;
-    wrap.appendChild(sw); wrap.appendChild(lbl); swatches.appendChild(wrap); 
-  });
-  
-  let savedMode='light', savedPal='gold';
-  try{ savedMode=localStorage.getItem('wds-mode')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'); savedPal=localStorage.getItem('wds-palette')||'gold'; }catch(e){}
-  setMode(savedMode); setPalette(savedPal);
-  
-  modeBtn.addEventListener('click',()=>setMode(body.getAttribute('data-mode')==='dark'?'light':'dark'));
-  themeBtn.addEventListener('click',()=>themePop.classList.add('open'));
-  themeClose.addEventListener('click',()=>themePop.classList.remove('open'));
-  themePop.addEventListener('click',e=>{ if(e.target===themePop) themePop.classList.remove('open'); });
+  const palettes=[['gold','Gold','#eab308'],['emerald','Emerald','#10b981'],['ocean','Ocean','#3b82f6'],['purple','Purple','#8b5cf6'],['crimson','Crimson','#ef4444'],['rose','Rose','#f43f5e'],['teal','Teal','#14b8a6'],['slate','Slate','#64748b']];
+  const body=document.body,modeBtn=document.getElementById('modeBtn'),themePop=document.getElementById('themePop'),swatches=document.getElementById('swatches');
+  const saveState=()=>{try{localStorage.setItem('wds-mode',body.dataset.mode);localStorage.setItem('wds-palette',body.dataset.palette)}catch{}};
+  function setMode(mode){body.dataset.mode=mode;modeBtn.textContent=mode==='dark'?'Light Mode':'Dark Mode';saveState()}
+  function setPalette(palette){body.dataset.palette=palette;document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active',s.dataset.pal===palette));saveState()}
+  palettes.forEach(([id,name,color])=>{const wrap=document.createElement('div');wrap.className='swatch-wrap';const sw=document.createElement('div');sw.className='swatch';sw.style.background=color;sw.dataset.pal=id;sw.tabIndex=0;sw.setAttribute('role','button');sw.setAttribute('aria-label',name+' theme');const choose=()=>setPalette(id);sw.addEventListener('click',choose);sw.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose()}});const label=document.createElement('div');label.className='swatch-label';label.textContent=name;wrap.append(sw,label);swatches.append(wrap)});
+  let savedMode='light',savedPalette='gold';try{savedMode=localStorage.getItem('wds-mode')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');savedPalette=localStorage.getItem('wds-palette')||'gold'}catch{}
+  setMode(savedMode);setPalette(savedPalette);
+  modeBtn.addEventListener('click',()=>setMode(body.dataset.mode==='dark'?'light':'dark'));
+  document.getElementById('themeBtn').addEventListener('click',()=>themePop.classList.add('open'));
+  document.getElementById('themeClose').addEventListener('click',()=>themePop.classList.remove('open'));
+  themePop.addEventListener('click',e=>{if(e.target===themePop)themePop.classList.remove('open')});
 
-  // --- ACCESS FORM ---
-  const form = document.getElementById('accessForm');
-  const msg = document.getElementById('formMsg');
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    msg.className = 'form-msg'; msg.textContent = '';
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-
-    if (name.toLowerCase() === 'admin') { window.location.href = '/admin.html'; return; }
-    if (!name || !email) { msg.className='form-msg err'; msg.textContent='Please fill in both fields.'; return; }
-    
-    const btn = form.querySelector('button[type="submit"]');
-    btn.disabled = true; btn.textContent = 'Sending...';
-    
-    try {
-      const res = await fetch(`${API}/submit`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,email}) });
-      const r = await readResponse(res);
-      if (r.ok) { msg.className='form-msg ok'; msg.textContent='Got it! '+(r.text||'You will be added within 24 hours.'); form.reset(); }
-      else { throw new Error(r.text || ('Server error ('+res.status+')')); }
-    } catch (err) {
-      if (IS_PREVIEW) {
-        msg.className='form-msg ok'; msg.textContent='Request simulated (preview mode — backend disabled on static host).';
-        form.reset();
-      } else {
-        // PROD: fail loudly so a real request is never silently dropped
-        msg.className='form-msg err'; msg.textContent='Something went wrong: '+err.message+' — or just text me your Plex email.';
-      }
-    } finally { btn.disabled=false; btn.textContent='Request Access'; }
+  document.getElementById('accessForm').addEventListener('submit',async e=>{
+    e.preventDefault();const form=e.currentTarget,msg=document.getElementById('formMsg'),btn=form.querySelector('button[type=submit]');const name=document.getElementById('name').value.trim(),email=document.getElementById('email').value.trim();
+    if(name.toLowerCase()==='admin'){location.href='/admin.html';return}if(!name||!email){msg.className='form-msg err';msg.textContent='Please fill in both fields.';return}
+    btn.disabled=true;btn.textContent='Sending...';msg.textContent='';
+    try{const res=await fetch(API+'/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email})});const result=await readResponse(res);if(!result.ok)throw new Error(result.text||'Server error');msg.className='form-msg ok';msg.textContent='Got it! '+(result.text||'You will be added within 24 hours.');form.reset()}
+    catch(err){if(IS_PREVIEW){msg.className='form-msg ok';msg.textContent='Request simulated in preview mode.';form.reset()}else{msg.className='form-msg err';msg.textContent='Something went wrong: '+err.message+' — or just text me your Plex email.'}}
+    finally{btn.disabled=false;btn.textContent='Request Access'}
   });
 
-  // --- AUTO-SCROLL WHEEL ---
-  let scrollInterval = null; let autoScroll = true; let resumeTimer = null; let isDragging = false;
-  let dragStartX = 0; let dragStartScroll = 0; let dragMoved = false;
+  let scrollTimer,autoScroll=true,resumeTimer,isDragging=false,dragStartX=0,dragStartScroll=0,dragMoved=false;
+  function startAutoScroll(){const container=document.querySelector('.recent-scroll-container'),track=document.getElementById('recent-scroll-track');if(!container||!track)return;clearInterval(scrollTimer);scrollTimer=setInterval(()=>{if(autoScroll&&!isDragging&&track.scrollWidth>container.clientWidth){container.scrollLeft+=1;const setWidth=track.scrollWidth/2;if(container.scrollLeft>=setWidth)container.scrollLeft-=setWidth;if(container.scrollLeft<=0)container.scrollLeft+=setWidth}},30);const pause=()=>{autoScroll=false;clearTimeout(resumeTimer)},resume=()=>{clearTimeout(resumeTimer);resumeTimer=setTimeout(()=>autoScroll=true,2500)};container.addEventListener('touchstart',pause,{passive:true});container.addEventListener('touchend',resume,{passive:true});container.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')return;isDragging=true;dragMoved=false;dragStartX=e.clientX;dragStartScroll=container.scrollLeft;pause();container.setPointerCapture(e.pointerId);container.style.cursor='grabbing'});container.addEventListener('pointermove',e=>{if(!isDragging||e.pointerType!=='mouse')return;const dx=e.clientX-dragStartX;if(Math.abs(dx)>5)dragMoved=true;container.scrollLeft=dragStartScroll-dx});const end=e=>{if(e.pointerType&&e.pointerType!=='mouse')return;isDragging=false;container.style.cursor='grab';resume()};container.addEventListener('pointerup',end);container.addEventListener('pointercancel',end);container.addEventListener('pointerleave',end);container.addEventListener('click',e=>{if(dragMoved){e.preventDefault();e.stopPropagation();dragMoved=false}},true)}
+  async function initRecentScroll(){const track=document.getElementById('recent-scroll-track');let items;try{const res=await fetch(API+'/recent');if(res.ok)items=await res.json()}catch{}if(!Array.isArray(items))items=IS_PREVIEW?MOCK_RECENT:null;if(!items){track.innerHTML='<span class="scroll-item">Could not load recent additions.</span>';return}if(!items.length){track.innerHTML='<span class="scroll-item">Nothing new right now — check back soon!</span>';return}const html=items.map(item=>{const poster=item.poster?`<img class="scroll-poster" src="${escapeHtml(item.poster)}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'"><span class="scroll-poster-fallback" style="display:none">🎬</span>`:'<span class="scroll-poster-fallback">🎬</span>';return `<a class="scroll-item" href="https://requests.welldonestreams.com/search?query=${encodeURIComponent(item.title)}" target="_blank" rel="noopener">${poster}<span>${escapeHtml(item.title)}</span></a>`}).join('');track.innerHTML=html+html;requestAnimationFrame(startAutoScroll)}
 
-  function startAutoScroll() {
-    const container = document.querySelector('.recent-scroll-container');
-    const track = document.getElementById('recent-scroll-track');
-    if (!container || !track) return;
+  let voted=false,myPick=null;
+  const readVote=v=>{const match=document.cookie.match(new RegExp('(?:^|; )pollvote_v'+v+'=([^;]*)'));return match?decodeURIComponent(match[1]):null};
+  async function loadPoll(){const container=document.getElementById('poll-options'),msg=document.getElementById('poll-message');let data;try{const res=await fetch(API+'/poll');if(res.ok)data=await res.json()}catch{}if(!data)data=IS_PREVIEW?MOCK_POLL:null;if(!data){container.textContent='Poll unavailable.';return}if(!data.options?.length){container.textContent='No poll active right now.';return}const version=data.version||'0',counts=data.counts||{},total=Object.values(counts).reduce((a,b)=>a+b,0);myPick=readVote(version);voted=!!myPick;container.className='poll-grid'+(voted?' poll-results':'');container.innerHTML=data.options.map(opt=>{const name=typeof opt==='string'?opt:opt.name||'Unknown',poster=typeof opt==='object'&&opt.poster?opt.poster:'',pct=total?Math.round(((counts[name]||0)/total)*100):0,mine=myPick===name;return `<div class="poll-choice${mine?' mine':''}${voted?' locked':''}" data-option="${escapeHtml(name)}" data-pct="${pct}"><div class="p-title">${escapeHtml(name)}</div>${poster?`<img src="${escapeHtml(poster)}" alt="" loading="lazy">`:'<div class="noimg">🎬</div>'}<div class="poll-bar"></div><div class="p-pct">${pct}%</div>${mine?'<div class="p-chose">✓ You chose</div>':''}</div>`}).join('');if(voted){requestAnimationFrame(()=>container.querySelectorAll('.poll-choice').forEach(el=>el.querySelector('.poll-bar').style.height=el.dataset.pct+'%'));return}container.querySelectorAll('.poll-choice').forEach(el=>el.addEventListener('click',async()=>{const option=el.dataset.option;if(!option)return;try{const res=await fetch(API+'/vote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({option})});if(!res.ok)throw new Error('Could not record vote.');msg.className='form-msg ok';msg.textContent='Thanks for voting!';loadPoll()}catch(err){if(IS_PREVIEW){document.cookie='pollvote_v'+version+'='+encodeURIComponent(option)+'; path=/; max-age=31536000';msg.className='form-msg ok';msg.textContent='Thanks for voting! (preview mode)';loadPoll()}else{msg.className='form-msg err';msg.textContent=err.message}}}))}
 
-    if (scrollInterval) clearInterval(scrollInterval);
-    scrollInterval = setInterval(() => {
-      if (autoScroll && !isDragging && track.scrollWidth > container.clientWidth) {
-        container.scrollLeft += 1;
-        const half = track.scrollWidth / 2;
-        if (container.scrollLeft >= half) container.scrollLeft -= half;
-        if (container.scrollLeft <= 0) container.scrollLeft += half;
-      }
-    }, 30);
+  document.getElementById('status-lookup').addEventListener('click',async e=>{const button=e.currentTarget,email=document.getElementById('status-email').value.trim(),result=document.getElementById('status-result');if(!email){result.textContent='Please enter an email.';return}button.disabled=true;const original=button.textContent;button.textContent='Checking...';result.textContent='Checking...';try{const res=await fetch(API+'/request-status?email='+encodeURIComponent(email));const data=await res.json();if(!res.ok)throw new Error(data.error||'Request failed');result.innerHTML=data.requests?.length?data.requests.map(r=>`<div style="margin-top:6px;font-size:.95rem">${escapeHtml(r.title)} - <strong style="color:var(--accent)">${escapeHtml(r.status)}</strong></div>`).join(''):'No requests found for that email.'}catch(err){result.innerHTML=IS_PREVIEW?'<div style="margin-top:12px;color:var(--text-dim)">Preview mode — API offline on static host.</div>':'Error: '+escapeHtml(err.message)}finally{button.disabled=false;button.textContent=original}});
 
-    function pause() { autoScroll = false; clearTimeout(resumeTimer); }
-    function scheduleResume() { clearTimeout(resumeTimer); resumeTimer = setTimeout(() => { autoScroll = true; }, 2500); }
-
-    container.addEventListener('touchstart', pause, { passive: true });
-    container.addEventListener('touchend', scheduleResume, { passive: true });
-    container.addEventListener('touchcancel', scheduleResume, { passive: true });
-
-    container.addEventListener('pointerdown', e => {
-      if (e.pointerType !== 'mouse') return;
-      isDragging = true; dragMoved = false; dragStartX = e.clientX; dragStartScroll = container.scrollLeft;
-      pause(); container.setPointerCapture(e.pointerId); container.style.cursor = 'grabbing';
-    });
-    container.addEventListener('pointermove', e => {
-      if (!isDragging || e.pointerType !== 'mouse') return;
-      const dx = e.clientX - dragStartX;
-      if (Math.abs(dx) > 5) dragMoved = true;
-      container.scrollLeft = dragStartScroll - dx;
-    });
-    function endDrag(e) {
-      if (e.pointerType && e.pointerType !== 'mouse') return;
-      isDragging = false; container.style.cursor = 'grab'; scheduleResume();
-    }
-    container.addEventListener('pointerup', endDrag);
-    container.addEventListener('pointercancel', endDrag);
-    container.addEventListener('pointerleave', endDrag);
-    container.addEventListener('click', e => { if (dragMoved) { e.preventDefault(); e.stopPropagation(); dragMoved = false; } }, true);
-  }
-
-  // --- RECENTLY ADDED ---
-  async function initRecentScroll() {
-    const track = document.getElementById('recent-scroll-track');
-    if (!track) return;
-    
-    let items = null;
-    try {
-      const res = await fetch(`${API}/recent`);
-      if (res.ok) items = await res.json();
-    } catch (e) {}
-    if (!Array.isArray(items)) items = IS_PREVIEW ? MOCK_RECENT : null;
-
-    if (!items) {
-      track.innerHTML = '<span class="scroll-item">Could not load recent additions.</span>';
-      return;
-    }
-    if (items.length === 0) {
-      track.innerHTML = '<span class="scroll-item">Nothing new right now — check back soon!</span>';
-      return;
-    }
-    
-    let html = '';
-    items.forEach(item => {
-      const posterHtml = item.poster
-        ? `<img class="scroll-poster" src="${escapeHtml(item.poster)}" alt="" loading="lazy" onerror="this.style.display='none'; this.parentElement.querySelector('.scroll-poster-fallback').style.display='inline-flex';" /><span class="scroll-poster-fallback" style="display:none;">🎬</span>`
-        : `<span class="scroll-poster-fallback">🎬</span>`;
-      const searchUrl = 'https://requests.welldonestreams.com/search?query=' + encodeURIComponent(item.title);
-      html += `<a class="scroll-item" href="${searchUrl}" target="_blank" rel="noopener">${posterHtml}<span>${escapeHtml(item.title)}</span></a>`;
-    });
-    
-    track.innerHTML = html + html + html; // duplicate for the infinite-scroll illusion
-    requestAnimationFrame(() => startAutoScroll());
-  }
-
-  // --- POLL ---
-  let voted = false;
-  let myPick = null;
-
-  function readVote(version) {
-    const m = document.cookie.match(new RegExp('(?:^|; )pollvote_v' + version + '=([^;]*)'));
-    return m ? decodeURIComponent(m[1]) : null;
-  }
-
-  async function loadPoll() {
-    const container = document.getElementById('poll-options');
-    const msgDiv = document.getElementById('poll-message');
-    
-    let data = null;
-    try {
-      const res = await fetch(`${API}/poll`);
-      if (res.ok) data = await res.json();
-    } catch (e) {}
-    if (!data) {
-      if (IS_PREVIEW) data = MOCK_POLL;
-      else { container.className = ''; container.textContent = 'Poll unavailable.'; return; }
-    }
-
-    if (!data.options || data.options.length === 0) {
-      container.className = ''; container.textContent = 'No poll active right now.'; return;
-    }
-    
-    container.className = 'poll-grid';
-    const version = data.version || '0';
-    myPick = readVote(version); voted = !!myPick;
-    
-    let counts = data.counts || {};
-    const total = Object.values(counts).reduce((a,b) => a+b, 0);
-    container.classList.toggle('poll-results', voted);
-
-    container.innerHTML = data.options.map(opt => {
-      const name = typeof opt === 'string' ? opt : (opt.name || 'Unknown');
-      const poster = (opt && opt.poster) ? opt.poster : '';
-      const count = counts[name] || 0;
-      const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-      const mine = (myPick === name) ? ' mine' : '';
-      const locked = voted ? ' locked' : '';
-      const img = poster
-        ? `<img src="${escapeHtml(poster)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.noimg').style.display='flex';" /><div class="noimg" style="display:none;">🎬</div>`
-        : `<div class="noimg">🎬</div>`;
-      const chose = (myPick === name) ? `<div class="p-chose">✓ You chose</div>` : '';
-      return `<div class="poll-choice${mine}${locked}" data-option="${escapeHtml(name)}" data-pct="${pct}">
-                <div class="p-title">${escapeHtml(name)}</div>
-                ${img}
-                <div class="poll-bar"></div>
-                <div class="p-pct">${pct}%</div>
-                ${chose}
-              </div>`;
-    }).join('');
-
-    if (voted) {
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        container.querySelectorAll('.poll-choice').forEach(el => {
-          el.querySelector('.poll-bar').style.height = el.dataset.pct + '%';
-        });
-      }));
-      msgDiv.textContent = '';
-    } else {
-      container.querySelectorAll('.poll-choice').forEach(el => {
-        el.addEventListener('click', async () => {
-          const opt = el.dataset.option;
-          if (!opt) return;
-          
-          try {
-            const res = await fetch(`${API}/vote`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ option: opt }) });
-            if (!res.ok) {
-              const r = await readResponse(res);
-              throw new Error(r.text || 'Could not record vote.');
-            }
-            msgDiv.className = 'form-msg ok';
-            msgDiv.textContent = 'Thanks for voting!';
-            loadPoll();
-          } catch (e) {
-            if (IS_PREVIEW) {
-              document.cookie = 'pollvote_v' + version + '=' + encodeURIComponent(opt) + '; path=/; max-age=31536000';
-              msgDiv.className = 'form-msg ok';
-              msgDiv.textContent = 'Thanks for voting! (preview mode)';
-              loadPoll();
-            } else {
-              msgDiv.className = 'form-msg err';
-              msgDiv.textContent = e.message;
-            }
-          }
-        });
-      });
-    }
-  }
-
-  // --- STATUS LOOKUP ---
-  document.getElementById('status-lookup').addEventListener('click', async () => {
-    const email = document.getElementById('status-email').value.trim();
-    const resultDiv = document.getElementById('status-result');
-    if (!email) { resultDiv.textContent = 'Please enter an email.'; return; }
-    
-    resultDiv.textContent = 'Checking...';
-    try {
-      const res = await fetch(`${API}/request-status?email=${encodeURIComponent(email)}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Request failed');
-      
-      if (data.requests && data.requests.length) {
-        resultDiv.innerHTML = data.requests.map(r => `<div style="margin-top:6px; font-size:0.95rem;">${escapeHtml(r.title)} - <strong style="color:var(--accent);">${escapeHtml(r.status)}</strong></div>`).join('');
-      } else { resultDiv.textContent = 'No requests found for that email.'; }
-    } catch (err) { 
-      if (IS_PREVIEW) {
-        resultDiv.innerHTML = '<div style="margin-top:12px; font-size:0.95rem; color:var(--text-dim);">Preview mode — API offline on static host.</div>';
-      } else {
-        resultDiv.textContent = 'Error: ' + err.message;
-      }
-    }
-  });
-
-  // Init
-  initRecentScroll();
-  loadPoll();
+  initRecentScroll();loadPoll();
 </script>
 </body>
 </html>
