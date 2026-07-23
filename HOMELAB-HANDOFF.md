@@ -43,6 +43,17 @@ contains no passwords, API keys, tokens, cookies, or certificate credentials.
 - The four periodic snapshot tasks are enabled with the schedules above.
 - The two trusted proxy hosts use access-list ID 1 and certificate ID 9.
 
+## Related PC diagnostic snapshot
+
+- Windows currently reports the AMD Radeon RX 7800 XT as healthy with driver
+  32.0.31021.5001 dated 2026-06-27. The CPU's integrated AMD graphics device is
+  also enumerated normally; this is not a second discrete graphics card.
+- The System log contains Kernel-Power event 41 at 17:58 and 18:10 on
+  2026-07-22, confirming two unclean restarts after the freezes. The same
+  seven-day critical/error filter showed no WHEA, disk, NTFS, storage-NVMe, or
+  AMD display-driver events, so event 41 is evidence of the forced resets rather
+  than a root-cause diagnosis.
+
 ## Intentional follow-ups
 
 - Do not perform the OPNsense 26.7 feature upgrade unattended. Export a current
