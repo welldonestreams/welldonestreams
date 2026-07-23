@@ -90,4 +90,6 @@ window.Games.slots = function () {
       spinBtn.disabled = false;
     }
   });
+
+  CasinoShared.addGameInfo(stage, { title: 'More info', html: `<p>Each spin creates a 3-by-3 grid. Wins are checked on the three horizontal rows and both diagonals.</p><table class="game-info-table"><thead><tr><th>Result</th><th>Gross payout</th></tr></thead><tbody><tr><td>Three 7s or diamonds</td><td>12× wager</td></tr><tr><td>Three matching regular symbols</td><td>6× wager</td></tr><tr><td>First two symbols match</td><td>0.4× wager</td></tr></tbody></table><p class="game-info-note">Winning lines are added together, then the original wager is subtracted to calculate the net result.</p>` });
 };
