@@ -1,76 +1,123 @@
-// GameAPI — talks to the Worker at /api/casino/*. Server owns all balances now.
-// Each device picks a nickname once (stored locally) so people get their own wallet.
+// GameAPI — communicates with the casino Worker through /api/casino/*.
 window.GameAPI = {
   BASE: '/api/casino',
   cachedBalance: null,
+  REQUEST_TIMEOUT_MS: 10000,
 
   getUserId() {
-    let u = null;
-    try { u = localStorage.getItem('wds-casino-user'); } catch (e) {}
-    if (!u) {
-      u = (prompt('Pick a nickname for your chips (saved on this device):') || '').trim();
-      u = u.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 24);
-      if (!u) u = 'guest-' + Math.random().toString(36).slice(2, 8);
-      try { localStorage.setItem('wds-casino-user', u); } catch (e) {}
+    let user = null;
+
+    try {
+      user = localStorage.getItem('wds-casino-user');
+    } catch (error) {
+      console.warn('Unable to read casino nickname from localStorage.', error);
     }
-    return u;
+
+    if (!user) {
+      user = (prompt('Pick a nickname for your chips (saved on this device):') || '').trim();
+      user = user.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 24);
+
+      if (!user) {
+        user = `guest-${Math.random().toString(36).slice(2, 8)}`;
+      }
+
+      try {
+        localStorage.setItem('wds-casino-user', user);
+      } catch (error) {
+        console.warn('Unable to save casino nickname to localStorage.', error);
+      }
+    }
+
+    return user;
   },
 
-  async request(path, opts = {}) {
-    const sep = path.includes('?') ? '&' : '?';
-    const res = await fetch(`${this.BASE}${path}${sep}user=${encodeURIComponent(this.getUserId())}`, opts);
-    let data = {};
-    try { data = await res.json(); } catch (e) {}
-    if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
-    return data;
+  async request(path, options = {}) {
+    const separator = path.includes('?') ? '&' : '?';
+    const url = `${this.BASE}${path}${separator}user=${encodeURIComponent(this.getUserId())}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), this.REQUEST_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (error) {
+        // Preserve the HTTP error below when the server does not return JSON.
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || `Request failed (${response.status})`);
+      }
+
+      return data;
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new Error('The casino server took too long to respond.');
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
   },
 
   async getBalance() {
     try {
-      const d = await this.request('/balance');
-      this.cachedBalance = d.balance;
-    } catch (e) {
-      if (this.cachedBalance == null) this.cachedBalance = 0;
-      console.error('Balance fetch failed:', e.message);
+      const data = await this.request('/balance');
+      this.cachedBalance = data.balance;
+    } catch (error) {
+      console.error('Balance fetch failed:', error.message);
+      // Keep the UI usable even when the backend is temporarily unavailable.
+      if (this.cachedBalance == null) {
+        this.cachedBalance = 0;
+      }
     }
+
     this.updateBalanceUI();
     return this.cachedBalance;
   },
 
   async claimDaily() {
-    const d = await this.request('/claim', { method: 'POST' }); // throws if already claimed today
-    this.cachedBalance = d.balance;
+    const data = await this.request('/claim', { method: 'POST' });
+    this.cachedBalance = data.balance;
     this.updateBalanceUI();
-    return d;
+    return data;
   },
 
-  // payload examples:
-  //  { game:'slots', bet:50 }
-  //  { game:'coinflip', bet:50, choice:'heads' }
-  //  { game:'roulette', bets:[{choice:'red',amt:100},{choice:'number',number:17,amt:10}] }
-  //  { game:'blackjack', netWin:-150, resultMsg:'You lost 150 chips.' }
   async play(payload) {
-    const d = await this.request('/play', {
+    const data = await this.request('/play', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    if (typeof d.newBalance === 'number') {
-      this.cachedBalance = d.newBalance;
+
+    if (typeof data.newBalance === 'number') {
+      this.cachedBalance = data.newBalance;
       this.updateBalanceUI();
     }
-    return d;
+
+    return data;
   },
 
   updateBalanceUI() {
-    const el = document.getElementById('global-balance');
-    if (!el || this.cachedBalance == null) return;
-    const prev = el.textContent;
+    const element = document.getElementById('global-balance');
+    if (!element || this.cachedBalance == null) return;
+
+    const previous = element.textContent;
     const next = this.cachedBalance.toLocaleString();
-    el.textContent = next;
-    if (prev !== next && prev !== '---') {
-      const badge = el.closest('.balance-badge') || el.parentElement;
-      if (badge) { badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
+    element.textContent = next;
+
+    if (previous !== next && previous !== '---') {
+      const badge = element.closest('.balance-badge') || element.parentElement;
+      if (badge) {
+        badge.classList.remove('bump');
+        void badge.offsetWidth;
+        badge.classList.add('bump');
+      }
     }
   }
 };
