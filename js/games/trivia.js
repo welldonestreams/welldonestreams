@@ -38,6 +38,7 @@ window.Games.trivia = function () {
   let secondsLeft = ROUND_SECONDS;
   let active = false;
   let pot = 0;
+  let disposed = false;
 
   function fmt(n) { return Number(n || 0).toLocaleString(); }
   function setStreak(n) { streakEl.textContent = `🔥 Streak: ${n}`; }
@@ -84,6 +85,7 @@ window.Games.trivia = function () {
     ansEl.disabled = true;
     try {
       const d = await window.GameAPI.request('/trivia-question');
+      if (disposed) return;
       qEl.textContent = d.question;
       setStreak(d.streak || 0);
       setPot(d.pot || 0);
@@ -174,6 +176,12 @@ window.Games.trivia = function () {
   ansEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAnswer(false); });
   nextBtn.addEventListener('click', loadQuestion);
   cashBtn.addEventListener('click', cashOut);
+
+  window.addEventListener('casino:game-leave', () => {
+    disposed = true;
+    active = false;
+    stopTimer();
+  }, { once: true });
 
   showRoundButtons('idle');
 

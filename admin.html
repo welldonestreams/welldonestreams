@@ -199,12 +199,12 @@
     const ph = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2230%22 height=%2245%22%3E%3Crect width=%2230%22 height=%2245%22 fill=%22%23333%22/%3E%3C/svg%3E';
     
     // UPGRADED: Added an explicit visible input for the poster URL so you can edit it directly
-    div.innerHTML = `<img src="${poster || ph}" alt="" />`
+    div.innerHTML = `<img src="${escapeHtml(poster || ph)}" alt="" />`
       + `<div class="poll-inputs">`
       +   `<input type="text" class="nm" value="${escapeHtml(name)}" placeholder="Movie/Show Name" />`
       +   `<input type="text" class="poster-url" value="${escapeHtml(poster||'')}" placeholder="Poster Image URL" style="font-size:0.8rem; padding:8px;" />`
       + `</div>`
-      + `<div class="vwrap"><input type="number" class="votes" min="0" value="${votes}" title="Vote count" /><button class="plus" title="+1 vote">+1</button></div>`
+      + `<div class="vwrap"><input type="number" class="votes" min="0" value="${escapeHtml(votes)}" title="Vote count" /><button class="plus" title="+1 vote">+1</button></div>`
       + `<button class="rm">✖</button>`;
       
     div.querySelector('.rm').addEventListener('click', () => div.remove());
