@@ -3,7 +3,7 @@ window.Games.trivia = function () {
   stage.innerHTML = `
     <div class="table-felt" style="background: radial-gradient(circle, #14532d 0%, #052e16 100%); max-width: 640px; margin: 0 auto;">
       <h2>🧠 Brain Bets</h2>
-      <p id="tv-intro" style="opacity:.8; font-size:.9rem; margin-top:-6px;">15 seconds per question. Winnings bank into a POT. After each correct answer: CASH OUT — or risk it on the next question for 50% MORE coins. One wrong answer, or not answering in time torches the entire pot. Always free to play, even flat broke.</p>
+      <p id="tv-intro" style="opacity:.8; font-size:.9rem; margin-top:-6px;">15 seconds per question. Questions rotate without immediate repeats. Winnings bank into a POT. After each correct answer: CASH OUT — or risk it on the next question for 50% MORE coins. One wrong answer, or not answering in time torches the entire pot. Always free to play, even flat broke.</p>
       <div style="display:flex; gap:18px; justify-content:center; margin:10px 0; font-weight:800; font-size:1.05rem;">
         <span id="tv-pot">💰 Pot: 0</span>
         <span id="tv-streak">🔥 Streak: 0</span>
@@ -176,4 +176,12 @@ window.Games.trivia = function () {
   cashBtn.addEventListener('click', cashOut);
 
   showRoundButtons('idle');
+
+  CasinoShared.addGameInfo(stage, {
+    title: 'More info',
+    html: `
+      <p>Questions include easy general knowledge, pop culture, games, animals, food, sports, and quick math. The Worker prevents the immediately previous question from appearing again.</p>
+      <p>Math prompts use two-digit numbers, except addition, which may use three-digit numbers. You have 15 seconds to answer.</p>
+      <p>Correct answers grow the pot. Cash out whenever you like; a wrong answer, timeout, or skipped active question loses the current pot.</p>`
+  });
 };
