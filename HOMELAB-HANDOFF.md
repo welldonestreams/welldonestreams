@@ -4,6 +4,7 @@ Last verified: 2026-07-23 (America/Los_Angeles)
 
 This file records durable homelab state for Codex and Claude. It intentionally
 contains no passwords, API keys, tokens, cookies, or certificate credentials.
+The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
 ## Completed maintenance
 
@@ -43,6 +44,28 @@ contains no passwords, API keys, tokens, cookies, or certificate credentials.
 - The four periodic snapshot tasks are enabled with the schedules above.
 - The two trusted proxy hosts use access-list ID 1 and certificate ID 9.
 
+## Media-stack facts and active queue issues
+
+- TrueNAS host address: `10.0.0.162`.
+- Download client: NZBGet; the system is Usenet-first. Do not assume qBittorrent.
+- Usenet host path: `/mnt/tank/data/usenet`.
+- Shared media-container path: `/data/usenet`.
+- Recyclarr configuration/data lives under `/mnt/tank/apps/recyclarr` and is run
+  with Docker.
+- Sonarr currently reports some releases as matched by grab-history ID and unable
+  to import automatically. Manual Import is required after verifying the actual
+  file; suspicious or incorrect releases should be removed and blocklisted.
+- A `Platonic.2025...NF...` release is especially suspicious for the expected
+  `Platonic (2023)` series. Verify runtime, episode title, and actual content
+  before importing.
+- Radarr has shown the same ID-only matching condition for The Invitation; verify
+  the actual movie and year before Manual Import.
+- Radarr has also shown an archive warning for Elio. First confirm NZBGet's native
+  Unpack setting and inspect the NZBGet History log for password protection,
+  missing RAR volumes, failed PAR2 repair, permissions, or insufficient space.
+- Unpackerr is not the default recommendation for this setup because NZBGet
+  handles normal Usenet unpacking natively.
+
 ## Related PC diagnostic snapshot
 
 - Windows currently reports the AMD Radeon RX 7800 XT as healthy with driver
@@ -56,15 +79,20 @@ contains no passwords, API keys, tokens, cookies, or certificate credentials.
 
 ## Intentional follow-ups
 
+- Follow `HOMELAB-GAMEPLAN.md` for the ordered setup and validation checklist.
 - Do not perform the OPNsense 26.7 feature upgrade unattended. Export a current
   configuration backup and schedule a short network maintenance window first.
-- Add an off-box replication target for irreplaceable data. Local snapshots
-  protect against mistakes and ransomware history, but not loss of the server.
+- Add an off-box replication or cloud-backup target for irreplaceable data. Local
+  snapshots protect against mistakes and ransomware history, but not loss of the
+  server.
+- Verify scrub schedules, SMART test schedules, and working TrueNAS alert
+  delivery. Avoid long SMART tests overlapping scrubs or resilvers.
 - Homepage still triggers TrueNAS's deprecated legacy REST API warning. Upgrade
   or replace that widget when a compatible Homepage release is available before
   moving TrueNAS to a release that removes the endpoint.
-- The best next application is Uptime Kuma. Add it after choosing notification
-  targets, then monitor the public services, both trusted admin names, DNS, and
-  the Renewals endpoint. Avoid installing it without alert delivery configured.
+- The best next application is Uptime Kuma. Add it after choosing a notification
+  target, then monitor public services, both trusted admin names, DNS, the media
+  applications, and the Renewals endpoint. Do not consider it complete until a
+  real failure and recovery notification are delivered.
 - Kometa remains intentionally stopped and was not the source of the Renewals
   startup failure.
