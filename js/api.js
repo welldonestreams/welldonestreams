@@ -71,10 +71,10 @@ window.GameAPI = {
       this.cachedBalance = data.balance;
     } catch (error) {
       console.error('Balance fetch failed:', error.message);
-      // Keep the UI usable even when the backend is temporarily unavailable.
-      if (this.cachedBalance == null) {
-        this.cachedBalance = 0;
-      }
+      // Keep an unknown balance unknown. Treating a temporary outage as a real
+      // zero prevents players from placing a bet even after the game UI loads.
+      const element = document.getElementById('global-balance');
+      if (element && this.cachedBalance == null) element.textContent = '?';
     }
 
     this.updateBalanceUI();
