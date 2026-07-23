@@ -45,6 +45,64 @@
 
   <!-- ORDER MATTERS: shared first (defines window.Games), games in the middle, ui last -->
   <script src="js/shared.js?v=4.2"></script>
+  <script src="js/api.js?v=4.2.1"></script>
+  <script src="js/games/slots.js?v=4.2"></script>
+  <script src="js/games/roulette.js?v=4.2"></script>
+  <script src="js/games/blackjack.js?v=4.2"></script>
+  <script src="js/games/coinflip.js?v=4.2"></script>
+  <script src="js/games/craps.js?v=4.2"></script>
+  <script src="js/games/baccarat.js?v=4.2"></script>
+  <script src="js/games/trivia.js?v=4.2"></script>
+  <script src="js/ui.js?v=4.2.1"></script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>WellDoneBets | Well Done Streams</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/main.css?v=4.2">
+  <link rel="stylesheet" href="css/games.css?v=4.2">
+</head>
+<body data-mode="dark" data-palette="gold">
+
+  <div class="topbar">
+    <div class="brand" style="display:inline-flex; align-items:center; gap:10px;"><img src="pokerchipnew.svg" alt="" style="width:34px; height:34px; border-radius:50%; object-fit:contain;" onerror="this.style.display='none';">WellDone<span>Bets</span></div>
+    <div class="controls">
+      <div class="balance-badge">
+        <span id="global-balance">---</span> <span class="chip-icon">🪙</span>
+      </div>
+      <button class="pill" id="dailyClaimBtn">Claim Daily</button>
+      <a href="/" class="pill secondary">Exit</a>
+    </div>
+  </div>
+  <div class="casino-layout">
+    <aside class="sidebar">
+      <nav class="game-nav" id="gameNav">
+        <button class="nav-btn active" data-game="slots">🎰 Slots</button>
+        <button class="nav-btn" data-game="roulette">🎡 Roulette</button>
+        <button class="nav-btn" data-game="blackjack">🃏 Blackjack</button>
+        <button class="nav-btn" data-game="coinflip">🪙 Coin Flip</button>
+        <button class="nav-btn" data-game="craps">🎲 Craps</button>
+        <button class="nav-btn" data-game="baccarat">🃏 Baccarat</button>
+        <button class="nav-btn" data-game="trivia">🧠 Trivia</button>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <section id="game-stage">
+        <div class="stage-notice">
+          <h2>Dealing you in…</h2>
+          <p>Pick a game from the rail.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ORDER MATTERS: shared first (defines window.Games), games in the middle, ui last -->
+  <script src="js/shared.js?v=4.2"></script>
   <script src="js/api.js?v=4.2"></script>
   <script src="js/games/slots.js?v=4.2"></script>
   <script src="js/games/roulette.js?v=4.2"></script>
