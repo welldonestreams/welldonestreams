@@ -6,6 +6,11 @@ commit an entry with the change it describes.
 
 ## Entries
 
+- 2026-07-23 — Homelab: added `HOMELAB-GAMEPLAN.md` as the shared Codex/Claude
+  execution plan. It records the real NZBGet and `/data/usenet` environment,
+  current import/unpack issues, Uptime Kuma as the next application, storage
+  health checks, off-box backup priorities, and the definition of done.
+
 - 2026-07-23 — Homelab: migrated Homepage secrets to environment variables,
   repaired Renewals ownership/orchestration, added ZFS snapshot schedules,
   deployed LAN-only trusted HTTPS names, and hardened OPNsense administration.
