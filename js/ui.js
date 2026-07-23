@@ -38,8 +38,12 @@ const UI = {
 
     document.querySelectorAll('.nav-btn').forEach((button) => {
       button.addEventListener('click', () => {
-        document.querySelectorAll('.nav-btn').forEach((item) => item.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach((item) => {
+          item.classList.remove('active');
+          item.setAttribute('aria-pressed', 'false');
+        });
         button.classList.add('active');
+        button.setAttribute('aria-pressed', 'true');
         this.launch(button.dataset.game);
       });
     });
@@ -47,6 +51,10 @@ const UI = {
 
   launch(game) {
     const stage = document.getElementById('game-stage');
+
+    // Let the previous game stop timers and other background activity before
+    // the stage is replaced.
+    window.dispatchEvent(new CustomEvent('casino:game-leave'));
 
     if (!window.Games || typeof window.Games[game] !== 'function') {
       if (stage) {
