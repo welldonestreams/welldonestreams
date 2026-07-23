@@ -1,6 +1,9 @@
 // UI wiring for WellDoneBets. LOAD THIS LAST.
 const UI = {
+  initialized: false,
   init() {
+    if (this.initialized) return;
+    this.initialized = true;
     this.bindEvents();
     this.boot();
   },
