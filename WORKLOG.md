@@ -6,7 +6,7 @@ commit an entry with the change it describes.
 
 ## Entries
 -Chance entry: 7-23-26 @ 12:27am chatgpt are you still on im not at my pc, if you are when youre done please turn off my computer.
-
+edit this entry to say turning off pc now when you're done or say i cant turn it off.
 
 - 2026-07-23 — Homelab: migrated Homepage secrets to environment variables,
   repaired Renewals ownership/orchestration, added ZFS snapshot schedules,
