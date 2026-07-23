@@ -420,7 +420,9 @@
   PALETTES.forEach(p=>{ 
     const wrap=document.createElement('div'); wrap.className='swatch-wrap';
     const sw=document.createElement('div'); sw.className='swatch'; sw.style.background=p.color; sw.dataset.pal=p.id;
-    sw.setAttribute('role','button'); sw.setAttribute('aria-label',p.name+' theme'); sw.addEventListener('click',()=>setPalette(p.id));
+    sw.setAttribute('role','button'); sw.setAttribute('tabindex','0'); sw.setAttribute('aria-label',p.name+' theme');
+    sw.addEventListener('click',()=>setPalette(p.id));
+    sw.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); setPalette(p.id); } });
     const lbl=document.createElement('div'); lbl.className='swatch-label'; lbl.textContent=p.name;
     wrap.appendChild(sw); wrap.appendChild(lbl); swatches.appendChild(wrap); 
   });
