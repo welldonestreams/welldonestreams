@@ -73,77 +73,6 @@ window.Games.craps = function () {
         min-height: 22px;
       }
 
-      .cr-info {
-        max-width: 620px;
-        margin: 24px auto 0;
-        text-align: left;
-        background: rgba(0, 0, 0, .25);
-        border: 1px solid rgba(255, 255, 255, .14);
-        border-radius: var(--r-md);
-        overflow: hidden;
-      }
-
-      .cr-info summary {
-        padding: 14px 17px;
-        cursor: pointer;
-        font-weight: 700;
-        color: var(--ember);
-        list-style: none;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .cr-info summary::-webkit-details-marker {
-        display: none;
-      }
-
-      .cr-info summary::after {
-        content: "+";
-        font-family: var(--money);
-        font-size: 1.25rem;
-      }
-
-      .cr-info[open] summary::after {
-        content: "−";
-      }
-
-      .cr-info-body {
-        padding: 0 17px 17px;
-        color: rgba(255, 255, 255, .84);
-        font-size: .9rem;
-        line-height: 1.55;
-      }
-
-      .cr-info-body p {
-        margin-bottom: 12px;
-        color: inherit;
-      }
-
-      .cr-odds {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-        font-family: var(--money);
-        font-size: .82rem;
-      }
-
-      .cr-odds th,
-      .cr-odds td {
-        padding: 9px 8px;
-        text-align: left;
-        border-bottom: 1px solid rgba(255, 255, 255, .1);
-      }
-
-      .cr-odds th {
-        color: var(--ember);
-      }
-
-      .cr-odds td:last-child,
-      .cr-odds th:last-child {
-        text-align: right;
-      }
-
       @media (max-width: 520px) {
         .cr-die {
           width: 66px;
@@ -195,10 +124,10 @@ window.Games.craps = function () {
 
       <div class="cr-log" id="cr-log"></div>
 
-      <details class="cr-info">
+      <details class="game-info">
         <summary>More info</summary>
 
-        <div class="cr-info-body">
+        <div class="game-info-body">
           <p>
             Your first roll establishes a point. If the first roll is 7,
             the dice are rolled again until a point is established.
@@ -215,7 +144,7 @@ window.Games.craps = function () {
             receiving your original wager back.
           </p>
 
-          <table class="cr-odds">
+          <table class="game-info-table">
             <thead>
               <tr>
                 <th>Point</th>
