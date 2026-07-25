@@ -125,11 +125,19 @@ Treat this as suspicious even though episode titles may look plausible.
 **Exit condition:** the queue contains no unexplained yellow import warnings and
 NZBGet can unpack a normal completed test job into `/data/usenet`.
 
-## Phase 2 — Install Uptime Kuma (30-60 minutes)
+## Phase 2 — Install Uptime Kuma (45-75 minutes)
 
 Uptime Kuma is the next recommended application because local services can fail
 silently even when Homepage still renders. Do not finish deployment without a
 working notification channel.
+
+**Known limitation — read before building monitors.** Kuma will run on
+`10.0.0.162`, the same host as almost everything it monitors, and it resolves
+internal names through AdGuard, which is also on `10.0.0.162`. It therefore
+cannot alert on a NAS outage, a DNS failure, or a WAN outage — the three
+failures that matter most. Both notification channels (email and SMS) also
+depend on reaching `smtp.gmail.com`, so neither fires when the internet is
+down. The external watcher below is what covers that gap; it is not optional.
 
 ### Before installation
 
@@ -142,47 +150,114 @@ working notification channel.
       never into a committed file, since this repo is public. Carrier
       gateways can be blocked/flaky; if T-Mobile's gateway proves unreliable
       after testing, fall back to a paid SMS API (Twilio/ClickSend).
+      NOTE: both channels share one dependency (Gmail SMTP over the WAN), so
+      they are two destinations, not two independent paths.
 - [ ] Decide whether Kuma is LAN-only. Default: LAN-only through Nginx Proxy
       Manager; no public exposure is required.
-- [ ] Create persistent storage under a dedicated dataset such as
-      `/mnt/tank/apps/uptime-kuma` using the ownership required by the selected
-      TrueNAS application/container method.
+- [ ] Create a dedicated dataset `tank/apps/uptime-kuma`.
+- [ ] **Apply the standard ACL to that dataset before deploying:** both
+      `User-truenas_admin` and `Group-apps` (GID 568), Allow / Full Control,
+      with File + Directory Inherit checked. Delete the bogus `User-apps`
+      entry the Apps preset auto-creates. Skipping this is the recurring cause
+      of app EPERM failures on this system.
+- [ ] Point Kuma's config/data volume at `/mnt/tank/apps/uptime-kuma` (a host
+      path, not an ixVolume) so it is covered by the existing `tank/apps`
+      snapshot schedule.
+
+### Proxy and DNS
+
+- [ ] NPM proxy host `kuma.welldonestreams.com` -> the container's port on
+      `10.0.0.162`, using the existing `*.welldonestreams.com` wildcard
+      certificate, Force SSL, HTTP/2, and the `LAN Only` access list.
+- [ ] AdGuard Home local DNS rewrite: `kuma.welldonestreams.com` ->
+      `10.0.0.162`. No public Cloudflare record.
+
+### Smoke test before building the full monitor set
+
+- [ ] Create **one** hostname monitor (`https://home.welldonestreams.com`) and
+      confirm it goes green. TrueNAS containers do not automatically use
+      AdGuard for DNS; if the container inherits an upstream resolver, every
+      hostname monitor returns NXDOMAIN and the install will look broken. If
+      this monitor fails while the name resolves fine from a LAN client, fix
+      the container's DNS (or fall back to `IP:port` monitors) before
+      continuing.
+
+### External watcher (required — covers what Kuma structurally cannot)
+
+- [ ] Sign up for a free external monitoring tier (UptimeRobot or
+      Healthchecks.io) hosted outside the house.
+- [ ] Monitor `https://welldonestreams.com` and
+      `https://requests.welldonestreams.com` from it, 5-minute interval.
+- [ ] Point its alerts at the same email address.
+- [ ] This is the only alert path that survives a NAS, DNS, or WAN outage.
 
 ### Initial monitors
 
 Create monitors in this order:
 
-- [ ] `https://welldonestreams.com` — HTTPS and expected keyword.
-- [ ] Cloudflare Worker API endpoint used by the site — HTTPS status/JSON check
-      without embedding a secret in the monitor.
-- [ ] `https://truenas.welldonestreams.com` — HTTPS, reachable from LAN.
-- [ ] `https://opnsense.welldonestreams.com` — HTTPS, reachable from LAN.
-- [ ] Homepage.
-- [ ] Plex web endpoint.
-- [ ] Sonarr HTTP endpoint.
-- [ ] Radarr HTTP endpoint.
-- [ ] Prowlarr HTTP endpoint.
-- [ ] NZBGet HTTP endpoint.
-- [ ] AdGuard Home HTTP endpoint.
-- [ ] Renewals on its current endpoint/port.
-- [ ] DNS record or DNS query monitor for an internal rewrite.
+- [ ] `https://welldonestreams.com` — HTTPS, 60s, expected keyword.
+- [ ] `https://welldonestreams.com/api/poll` — Worker API. Public, returns
+      JSON, needs no auth, and exercises KV, so it proves the Worker and its
+      storage are both alive. No secret in the monitor.
+- [ ] `https://vault.welldonestreams.com` — Vaultwarden. Public and holds every
+      credential; highest-value thing to know is down.
+- [ ] `https://requests.welldonestreams.com` — Seerr. Public.
+- [ ] `https://renewals.welldonestreams.com` — Renewals.
+- [ ] `https://npm.welldonestreams.com` — Nginx Proxy Manager. If NPM is down
+      every internal name fails at once; monitoring it directly turns a
+      14-alert storm into an instant diagnosis.
+- [ ] `https://truenas.welldonestreams.com` — HTTPS, LAN.
+- [ ] `https://opnsense.welldonestreams.com` — HTTPS, LAN.
+- [ ] `https://home.welldonestreams.com` — Homepage.
+- [ ] `https://plex.welldonestreams.com` — add 401 to accepted status codes.
+- [ ] `https://nzbget.welldonestreams.com` — add 401 to accepted status codes.
+- [ ] `https://sonarr.welldonestreams.com`
+- [ ] `https://radarr.welldonestreams.com`
+- [ ] `https://prowlarr.welldonestreams.com`
+- [ ] `https://bazarr.welldonestreams.com`
+- [ ] `https://tautulli.welldonestreams.com`
+- [ ] `https://immich.welldonestreams.com`
+- [ ] `https://actual.welldonestreams.com`
+- [ ] `https://adguard.welldonestreams.com`
+- [ ] DNS monitor: resolve `home.welldonestreams.com`, expect `10.0.0.162`.
 - [ ] Ping monitor for `10.0.0.162`.
+- [ ] Ping monitor for `10.0.0.1` (OPNsense) — distinguishes "NAS down" from
+      "network down".
+- [ ] At least two services monitored a second time by raw `10.0.0.162:<port>`
+      instead of hostname, so a DNS failure is distinguishable from a service
+      failure.
 
 Use 60-second intervals for critical public endpoints and 2-5 minute intervals
 for internal applications. Require two or three consecutive failures before
 alerting to reduce false alarms during application restarts.
 
+### Reduce alert noise
+
+- [ ] Set the DNS monitor and the `10.0.0.162` ping monitor as **parent
+      monitors** (Kuma monitor dependencies) for the hostname-based monitors,
+      so one DNS or host failure sends one alert instead of twenty.
+
+### Certificate expiry
+
+- [ ] Enable **Certificate Expiry Notification** on the HTTPS monitors. The
+      `*.welldonestreams.com` wildcard expires **2026-10-23**. NPM should
+      auto-renew via the Cloudflare DNS challenge, but silent renewal failure
+      breaks all 17 internal names at once, so it must be watched.
+
 ### Validation
 
-- [ ] Send a test notification.
-- [ ] Temporarily point one test monitor at a closed port and confirm an alert is
-      delivered and later resolves.
+- [ ] Send a test notification on both channels.
+- [ ] Temporarily point one test monitor at a closed port and confirm an alert
+      is delivered **and later resolves**. Recovery notifications are the step
+      people skip and then discover alerting was one-directional.
+- [ ] Verify the external watcher alerts independently (pause the site or block
+      it at the firewall briefly).
 - [ ] Add the Kuma widget/link to Homepage only after alerts work.
-- [ ] Back up Kuma's persistent data through local snapshots and the future
-      off-box backup task.
+- [ ] Confirm `/mnt/tank/apps/uptime-kuma` is covered by the existing hourly
+      `tank/apps` snapshot schedule.
 
 **Exit condition:** at least one real alert and one recovery notification have
-been received.
+been received on both the internal Kuma channel and the external watcher.
 
 ## Phase 3 — Verify TrueNAS data-protection basics (30-45 minutes)
 
