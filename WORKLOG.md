@@ -6,6 +6,12 @@ commit an entry with the change it describes.
 
 ## Entries
 
+- 2026-07-25 — Refreshed `HOMELAB-GAMEPLAN.md`'s environment section (stale
+  since the internal HTTPS rollout in commit e53db04) and verified from a LAN
+  client that both open items in that rollout — Homepage's allowed-hosts
+  setting and `switch.welldonestreams.com` routing — already work end to end.
+  Recorded both as resolved in `HOMELAB-HANDOFF.md`.
+
 - 2026-07-25 — Added `scripts/check-landing-page.mjs` and a shared
   `.githooks/pre-commit` hook (wired via `core.hooksPath`) so a future
   `index.html` minification/cleanup pass can't silently drop the onerror
