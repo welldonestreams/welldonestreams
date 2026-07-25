@@ -165,6 +165,18 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
 ## Completed maintenance
 
+### 2026-07-25 — internal HTTPS naming rollout (Codex)
+
+- Created a new Cloudflare-scoped DNS API token for Nginx Proxy Manager (NPM), limited to DNS edit access for `welldonestreams.com`, then used it to issue a wildcard Let's Encrypt certificate for `*.welldonestreams.com` through the Cloudflare DNS challenge. The certificate was successfully issued by NPM and is valid through 2026-10-23.
+- Created these NPM proxy hosts using that wildcard certificate, `Force SSL`, HTTP/2, and the existing `LAN Only` access list. No new WAN port forwards or public proxy hosts were created:
+  - `home`, `plex`, `tautulli`, `sonarr`, `radarr`, `bazarr`, `prowlarr`, `nzbget`, `adguard`, `npm`, `immich`, `mail-archiver`, and `actual` all forward to the associated TrueNAS application on `10.0.0.162`.
+  - `switch` forwards to `10.0.0.168:80`; `ap` forwards to `10.0.0.117:80`.
+  - Existing `truenas` and `opnsense` LAN-only proxies were retained. Existing intentionally public `vault`, `requests`, and `renewals` were not changed.
+- Added corresponding AdGuard Home local DNS rewrites to `10.0.0.162` for all of the above internal names. These records only work for devices that use AdGuard Home as DNS; they deliberately do not create public Cloudflare A/AAAA records.
+- Backed up the live Homepage config as `/app/config/services.yaml.bak-before-proxy-links`, then updated `/app/config/services.yaml` to replace every active `10.0.0.x[:port]` Homepage service link with its matching `https://<name>.welldonestreams.com` address. The Plex secondary card and Seerr/Requests link were also changed appropriately. No Homepage API variables or credentials were changed.
+- Homepage host validation still needs one final TrueNAS application update. Homepage's log explicitly requires `HOMEPAGE_ALLOWED_HOSTS`; the TrueNAS Homepage edit screen has an `Allowed Hosts` section. `home.welldonestreams.com` was added there alongside the existing `10.0.0.162:30054`, but the final TrueNAS **Update** click timed out before it submitted. Do not rely on a manual `settings.yaml` `allowedHosts` key; the documented log hint requires the application environment/TrueNAS setting. Click **Update**, wait for Homepage to redeploy, then test `https://home.welldonestreams.com`.
+- Current reported problem: `https://switch.welldonestreams.com/` does not resolve for the user. First verify the client is using AdGuard Home for DNS and that its new rewrite is present/enabled. If DNS resolves to `10.0.0.162` but the page fails, test whether the switch UI actually serves plain HTTP on `10.0.0.168:80`; the NPM backend was configured from the Homepage's prior direct `http://10.0.0.168` link and has not yet been end-to-end tested. Apply the same check to the access point (`10.0.0.117:80`).
+
 - Homepage now receives all service credentials through TrueNAS application
   environment variables. `services.yaml` uses `HOMEPAGE_VAR_*` references only;
   plaintext backup copies were removed after a recursive ZFS recovery snapshot.
