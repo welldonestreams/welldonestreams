@@ -6,6 +6,13 @@ commit an entry with the change it describes.
 
 ## Entries
 
+- 2026-07-25 — Homelab: worked Phase 6 of the gameplan (network/access review)
+  from a LAN client. Verified 16 of 17 internal HTTPS hostnames resolve and
+  respond correctly and confirmed none have a public DNS record. Found
+  `actual.welldonestreams.com` is missing its AdGuard rewrite despite being
+  listed as created — needs a follow-up fix. OPNsense-side checks (DNS loop,
+  DHCP bypass) remain open; no OPNsense access this session.
+
 - 2026-07-25 — Refreshed `HOMELAB-GAMEPLAN.md`'s environment section (stale
   since the internal HTTPS rollout in commit e53db04) and verified from a LAN
   client that both open items in that rollout — Homepage's allowed-hosts

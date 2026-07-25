@@ -179,6 +179,26 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 - Current reported problem: `https://switch.welldonestreams.com/` does not resolve for the user. First verify the client is using AdGuard Home for DNS and that its new rewrite is present/enabled. If DNS resolves to `10.0.0.162` but the page fails, test whether the switch UI actually serves plain HTTP on `10.0.0.168:80`; the NPM backend was configured from the Homepage's prior direct `http://10.0.0.168` link and has not yet been end-to-end tested. Apply the same check to the access point (`10.0.0.117:80`).
   - **Verified resolved (Claude, 2026-07-25, from a LAN client using AdGuard DNS):** DNS resolves `switch.welldonestreams.com` to `10.0.0.162` correctly; `https://switch.welldonestreams.com` and direct `http://10.0.0.168` both return HTTP 200; `http://10.0.0.117` (`ap`) also returns HTTP 200. Working end to end from this vantage point. If the user's own device still can't reach it, the difference is likely that device's DNS configuration (not using AdGuard Home) rather than the NPM/proxy setup — worth confirming which DNS server that specific device uses before assuming the proxy is broken again.
 
+### Claude Phase 6 network/access review (2026-07-25)
+
+- Re-tested all 17 configured internal hostnames from a LAN client using
+  AdGuard DNS. 16 resolve correctly to `10.0.0.162` and respond over HTTPS
+  (`plex` and `nzbget` return HTTP 401 on their root path, which is expected
+  since both require login and confirms the proxy reaches a live backend).
+- **Gap found:** `actual.welldonestreams.com` returns NXDOMAIN even though the
+  `e53db04` rollout commit lists it as one of the AdGuard rewrites created.
+  Every other name from that same list resolves fine, so this looks like a
+  single missed entry rather than a systemic problem. Add the missing AdGuard
+  Home local DNS rewrite for `actual` (same pattern as the other names, to
+  `10.0.0.162`).
+- Confirmed via a public DNS resolver (1.1.1.1) that none of a representative
+  sample (`truenas`, `home`, `plex`, `sonarr`, `switch`, `actual`) have a
+  public A/AAAA record — all return NXDOMAIN externally, matching the
+  intended LAN-only design.
+- Did not verify OPNsense/Unbound DNS-loop behavior or DHCP-provided DNS
+  bypass prevention — both require OPNsense config access this session
+  didn't have. Still open in `HOMELAB-GAMEPLAN.md` Phase 6.
+
 - Homepage now receives all service credentials through TrueNAS application
   environment variables. `services.yaml` uses `HOMEPAGE_VAR_*` references only;
   plaintext backup copies were removed after a recursive ZFS recovery snapshot.
