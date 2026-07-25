@@ -46,6 +46,42 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   2026-07-25 event timeline, and capture GPU temperature/power/driver telemetry
   during a controlled gaming test before blaming hardware or uninstalling tools.
 
+### Claude PC diagnostic findings (2026-07-25, crash-dump review)
+
+- Crash-dump configuration is correctly enabled: `CrashDumpEnabled=3` (full
+  kernel dump), `AutoReboot=1`, dump path `C:\Windows\MEMORY.DMP`, minidump
+  path `C:\Windows\Minidump`. The earlier "no MEMORY.DMP" observation is not a
+  misconfiguration; these particular incidents are watchdog recoveries, not
+  full bugchecks, so Windows writes them to `C:\Windows\LiveKernelReports\`
+  instead of `MEMORY.DMP`.
+- `C:\Windows\LiveKernelReports\AMD_WATCHDOG\` and `AMD_REPORT_UM\` contain
+  AMD GPU-driver-specific watchdog timeout dumps. Timestamps: 2026-05-28,
+  2026-05-30, 2026-06-18 (sporadic), then a cluster at 2026-07-21 21:36,
+  22:44, and 22:45, then 2026-07-22 17:53 (about 5 minutes before that day's
+  17:58 unclean reboot), and again around 18:01 and 18:13-18:14 (before the
+  18:10 unclean reboot).
+- This revises the earlier correlation: the AMD_WATCHDOG cluster on
+  2026-07-21 predates the 2026-07-22 AMD software install (Ryzen Master SDK,
+  Ryzen Master, AMD DVR, AMD Settings, AMD WVR64). The install looks like it
+  was a response to crashes already happening on 7/21, not the cause. The
+  real suspect is the Radeon RX 7800 XT driver (32.0.31021.5001, 2026-06-27)
+  itself hanging/timing out under load, recurring intermittently since at
+  least late May 2026.
+- No AMD_WATCHDOG or other LiveKernelReports dump matches the 2026-07-25
+  10:17 AM unclean reboot. That incident's mechanism is still unconfirmed;
+  do not assume it is the same root cause as the 7/21-7/22 cluster.
+- Checked current live power settings: active scheme is Balanced. PCIe Link
+  State Power Management (ASPM) is Off on AC / Maximum power savings on DC;
+  USB selective suspend is Enabled on both AC and DC. No battery is present
+  (desktop), so the DC values likely never take effect. Not identified as a
+  cause, but recorded so no one re-checks it as a fresh idea.
+- No WHEA-Logger events found in the reviewed window.
+- Recommended next step unchanged from the prior entry: a controlled
+  load/gaming test capturing GPU temperature, power draw, and clocks would
+  confirm whether this is thermal/power-delivery or a driver-only fault. A
+  DDU-clean reinstall of a different (older or newer) Radeon driver build is
+  a reasonable next troubleshooting step given the driver-watchdog evidence.
+
 ## 2026-07-25 execution update
 
 - Re-verified all three pools ONLINE: `apps` had 456 GiB free, `boot-pool`
