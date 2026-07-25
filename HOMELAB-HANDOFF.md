@@ -46,11 +46,13 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   user-approved remote-access services. Leave their public access unchanged.
   All new internal service names must use the existing `LAN Only` access list,
   local AdGuard DNS rewrites, and no WAN port-forward rule.
-- The current internal TLS certificate is a two-name Cloudflare-DNS-validated
-  certificate for the TrueNAS and OPNsense hostnames. A separate certificate
-  covering the planned local service names (preferably a wildcard, if the
-  existing Cloudflare credential permits it) is required before the remaining
-  HTTPS proxy hosts can be added.
+- ~~The current internal TLS certificate is a two-name certificate; a wildcard
+  is required before the remaining HTTPS proxy hosts can be added.~~
+  **RESOLVED 2026-07-25** — a `*.welldonestreams.com` wildcard was issued via
+  NPM's Cloudflare DNS challenge and all 17 internal proxy hosts now use it.
+  See "internal HTTPS naming rollout" under Completed maintenance.
+  **Expires 2026-10-23** — renewal is automatic but must be monitored (see
+  Phase 2 cert-expiry monitor).
 
 - Updated the enabled TrueNAS email alert service to the user's requested Gmail
   address and sent a fresh live test. Middleware accepted the send; receipt still
@@ -187,12 +189,9 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   AdGuard DNS. 16 resolve correctly to `10.0.0.162` and respond over HTTPS
   (`plex` and `nzbget` return HTTP 401 on their root path, which is expected
   since both require login and confirms the proxy reaches a live backend).
-- **Gap found:** `actual.welldonestreams.com` returns NXDOMAIN even though the
-  `e53db04` rollout commit lists it as one of the AdGuard rewrites created.
-  Every other name from that same list resolves fine, so this looks like a
-  single missed entry rather than a systemic problem. Add the missing AdGuard
-  Home local DNS rewrite for `actual` (same pattern as the other names, to
-  `10.0.0.162`).
+- ~~**Gap found:** `actual.welldonestreams.com` returns NXDOMAIN.~~
+  **RESOLVED 2026-07-25** — the missing AdGuard rewrite was added and the name
+  was verified end to end over HTTPS. All 17 internal names now resolve.
 - Confirmed via a public DNS resolver (1.1.1.1) that none of a representative
   sample (`truenas`, `home`, `plex`, `sonarr`, `switch`, `actual`) have a
   public A/AAAA record — all return NXDOMAIN externally, matching the
