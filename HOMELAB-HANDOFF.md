@@ -22,9 +22,9 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   title and has imported `the.invite.2026.720p.CAM.h264-jff.mkv`; it is a
   1:44:04 720p CAM copy, so retain it only until a proper WEB-DL or better
   replacement is available.
-- OPNsense configuration export is still open. Both the trusted hostname and
-  direct-IP Chrome tabs showed the login page, so no firewall credentials were
-  guessed and no configuration backup was exported.
+- Exported and XML-validated a fresh OPNsense configuration backup at 10:58 PDT.
+  It is stored outside the firewall appliance in the private local homelab
+  backups folder; the backup file itself is intentionally excluded from Git.
 - No off-box backup provider has been selected. Do not start a paid or large
   upload until the user chooses a target.
 
@@ -157,8 +157,9 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 ## Intentional follow-ups
 
 - Follow `HOMELAB-GAMEPLAN.md` for the ordered setup and validation checklist.
-- Do not perform the OPNsense 26.7 feature upgrade unattended. Export a current
-  configuration backup and schedule a short network maintenance window first.
+- Do not perform the OPNsense 26.7 feature upgrade unattended. A current
+  configuration export now exists; still schedule a short network maintenance
+  window first.
 - Add an off-box replication or cloud-backup target for irreplaceable data. Local
   snapshots protect against mistakes and ransomware history, but not loss of the
   server.
