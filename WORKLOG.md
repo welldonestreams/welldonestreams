@@ -66,3 +66,9 @@ commit an entry with the change it describes.
 ```text
 - YYYY-MM-DD — Scope: decision, reason, and any important follow-up.
 ```
+- 2026-07-25 — Homelab: confirmed the restored `actual.welldonestreams.com`
+  AdGuard rewrite and LAN-only HTTPS proxy route end to end; updated the shared
+  Phase 6 checklist to remove the stale NXDOMAIN exception.
+- 2026-07-25 — Homelab: verified OPNsense's split DNS listener design (Dnsmasq
+  LAN:5354 and AdGuard upstream:5353), closing the documented DNS-loop review
+  without changing firewall or DHCP policy.
