@@ -20,11 +20,27 @@ it free of passwords, API keys, cookies, tokens, and certificate secrets.
   `/mnt/tank/apps/recyclarr`.
 - Network stack includes OPNsense, AdGuard Home, Nginx Proxy Manager, and
   Homepage.
-- Trusted local HTTPS names include `truenas.welldonestreams.com` and
-  `opnsense.welldonestreams.com`; they resolve internally to `10.0.0.162` and
-  are restricted by the Nginx Proxy Manager `LAN Only` access list.
+- Trusted local HTTPS names now cover the full internal stack, not just
+  TrueNAS/OPNsense: `truenas`, `opnsense`, `home`, `plex`, `tautulli`,
+  `sonarr`, `radarr`, `bazarr`, `prowlarr`, `nzbget`, `adguard`, `npm`,
+  `immich`, `mail-archiver`, and `actual`, all under `.welldonestreams.com`,
+  proxying to their TrueNAS application on `10.0.0.162`. `switch` and `ap`
+  proxy to `10.0.0.168:80` and `10.0.0.117:80`. All use a wildcard
+  `*.welldonestreams.com` Let's Encrypt certificate (issued via a
+  DNS-edit-scoped Cloudflare token, valid through 2026-10-23) and the Nginx
+  Proxy Manager `LAN Only` access list; none have public Cloudflare DNS
+  records. AdGuard Home holds the matching local rewrites. The pre-existing
+  public hosts (Vault, Requests, Renewals) were intentionally left unchanged.
 - Homepage, Renewals, Nginx Proxy Manager, and AdGuard Home were last verified
-  running on 2026-07-23.
+  running on 2026-07-25 (Claude, from a LAN client using AdGuard DNS):
+  `https://home.welldonestreams.com` and `https://switch.welldonestreams.com`
+  both resolve and return a real HTTP 200 render, not an error page. This
+  supersedes the two open items recorded earlier in `HOMELAB-HANDOFF.md` (the
+  Homepage `HOMEPAGE_ALLOWED_HOSTS` update possibly not saving, and `switch`
+  not resolving) — both now work from this vantage point. Worth a second
+  confirmation from the device that originally reported the `switch` failure,
+  in case that device's issue was local DNS configuration rather than the
+  proxy itself.
 - Local ZFS snapshots exist, but an off-box backup target has not yet been
   configured.
 
