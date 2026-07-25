@@ -1,6 +1,6 @@
 # Homelab completion game plan
 
-Last updated: 2026-07-23 (America/Los_Angeles)
+Last updated: 2026-07-25 (America/Los_Angeles)
 
 This is the shared operating plan for the remaining TrueNAS, networking, media,
 monitoring, and backup work. It is written for the user, Codex, and Claude. Keep
@@ -97,9 +97,10 @@ Treat this as suspicious even though episode titles may look plausible.
 - [x] Open NZBGet > History, select the Elio job, and read the full log.
 - [x] Look specifically for password protection, missing RAR volumes, failed
       PAR2 repair, unpack errors, permissions, or insufficient free space.
-- [ ] If repair/unpack succeeds after retry, refresh Radarr's queue.
-- [ ] If the release is password-protected or incomplete, delete and blocklist
-      it, then grab another release.
+- [x] Confirmed the completed item was a full-disc Blu-ray BDMV ZIP rather than
+      a failed archive. Created a recursive Usenet safety snapshot, removed and
+      blocklisted the disc release, and grabbed a normal 2160p WEB-DL instead.
+- [ ] Confirm the new WEB-DL completes, imports automatically, and plays in Plex.
 - [ ] Install Unpackerr only if a recurring, verified archive workflow remains
       that NZBGet cannot handle natively.
 
@@ -170,8 +171,9 @@ Local snapshots are already configured. Verify the remaining layers:
 - [x] Schedule short SMART tests regularly and long tests during low usage,
       avoiding scrub/resilver windows.
 - [x] Configure TrueNAS alert delivery to a destination the user actually reads.
-      Email delivery is enabled and a live send-side test completed; user receipt
-      confirmation remains part of the exit condition.
+      Email delivery now targets the user's requested Gmail address and a fresh
+      live send-side test completed; user receipt confirmation remains part of
+      the exit condition.
 - [ ] Review UPS status and shutdown behavior if a UPS is connected; otherwise
       record UPS coverage as an open infrastructure task.
 

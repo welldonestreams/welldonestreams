@@ -6,6 +6,41 @@ This file records durable homelab state for Codex and Claude. It intentionally
 contains no passwords, API keys, tokens, cookies, or certificate credentials.
 The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
+## 2026-07-25 follow-up
+
+- Updated the enabled TrueNAS email alert service to the user's requested Gmail
+  address and sent a fresh live test. Middleware accepted the send; receipt still
+  needs user confirmation, including a check of Spam/Promotions.
+- Created recursive snapshot
+  `tank/data/usenet@codex-pre-elio-regrab-20260725`, removed and blocklisted the
+  75 GB Elio full-disc Blu-ray job, and grabbed
+  `Elio.2025.2160p.MA.WEB-DL.TrueHD.Atmos.7.1.DV.HDR10P.H.265-TheFarm` instead.
+  Radarr verified the replacement as a 27.3 GB `WEBDL-2160p` item in downloading
+  state. The snapshot is the recovery point for the removed download data.
+- OPNsense configuration export is still open. Both the trusted hostname and
+  direct-IP Chrome tabs showed the login page, so no firewall credentials were
+  guessed and no configuration backup was exported.
+- No off-box backup provider has been selected. Do not start a paid or large
+  upload until the user chooses a target.
+
+### Claude PC diagnostic questions and coordination notes
+
+- Claude asked what ChatGPT changed after finding Kernel-Power event 41 restarts,
+  a cluster of AMD software installs on 2026-07-22, no current `MEMORY.DMP`, and
+  only one older minidump. Treat the AMD-install timing as correlation, not proof
+  of cause; the separate 2026-07-25 abrupt restart still needs investigation.
+- The durable facts already recorded here are that the Radeon RX 7800 XT was
+  enumerated normally, the CPU integrated graphics is not a second discrete GPU,
+  and the event log showed no matching WHEA, disk, NTFS, NVMe, or AMD display
+  errors in the reviewed window.
+- Earlier user-confirmed troubleshooting includes a clean Windows reinstall,
+  reseating the GPU and PSU cables, changing the main monitor back to DisplayPort,
+  installing AMD chipset software, and running DISM/SFC. Do not infer additional
+  AMD tuning or power-setting changes without auditing the current live settings.
+- Next PC diagnostic steps are to verify crash-dump configuration, inspect the
+  2026-07-25 event timeline, and capture GPU temperature/power/driver telemetry
+  during a controlled gaming test before blaming hardware or uninstalling tools.
+
 ## 2026-07-25 execution update
 
 - Re-verified all three pools ONLINE: `apps` had 456 GiB free, `boot-pool`
@@ -97,9 +132,8 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   before importing.
 - Radarr has shown the same ID-only matching condition for The Invitation; verify
   the actual movie and year before Manual Import.
-- Radarr has also shown an archive warning for Elio. First confirm NZBGet's native
-  Unpack setting and inspect the NZBGet History log for password protection,
-  missing RAR volumes, failed PAR2 repair, permissions, or insufficient space.
+- Elio's archive warning was resolved by replacing the full-disc BDMV ZIP with a
+  normal 2160p WEB-DL. Confirm that the new job completes and imports into Plex.
 - Unpackerr is not the default recommendation for this setup because NZBGet
   handles normal Usenet unpacking natively.
 
