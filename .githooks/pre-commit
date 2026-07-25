@@ -1,0 +1,6 @@
+#!/bin/sh
+# Blocks a commit that stages index.html without passing its invariant
+# checks. See scripts/check-landing-page.mjs and AGENTS.md for why.
+if git diff --cached --name-only | grep -q '^index\.html$'; then
+  node scripts/check-landing-page.mjs || exit 1
+fi

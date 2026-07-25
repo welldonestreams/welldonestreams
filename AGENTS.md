@@ -76,6 +76,12 @@ Claude both assist with the user's TrueNAS and network environment.
 ## Verification
 
 - Run `node --check` on every changed JavaScript file.
+- If `index.html` changes, run `node scripts/check-landing-page.mjs`. It
+  catches cosmetic regressions a minification/cleanup pass can silently drop
+  (missing image `onerror` fallbacks, blanked preview-mode mock posters, a
+  collapsed poll-bar animation frame). A shared pre-commit hook already runs
+  it automatically for any commit that stages `index.html`; if hooks aren't
+  wired up in your checkout, run `git config core.hooksPath .githooks` once.
 - Confirm every local script and stylesheet reference resolves to an exact
   filename; look for duplicate or non-printing-character variants when an
   asset behaves like a 404.
