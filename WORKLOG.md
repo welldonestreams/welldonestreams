@@ -9,6 +9,18 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-25 — Docs: fetched origin and found Codex had already pushed 4
+  commits reformatting `HOMELAB-GAMEPLAN.md`/`HOMELAB-HANDOFF.md`/`WORKLOG.md`
+  (fast-forwarded locally, no conflicts). The local working tree separately
+  still had the user's original raw Kuma/Signal scratch notes appended to
+  `HOMELAB-GAMEPLAN.md`, already superseded by that reformat, so it was
+  stashed and dropped rather than reapplied. One real gap remained: the
+  reformatted Phase 2 open items still listed the Signal recovery
+  notification test as not performed, but both the user's raw notes and
+  Codex's own worklog entry below confirm it was tested (stop/restart an app,
+  DOWN and UP both received). Checked that item off to remove the
+  contradiction.
+
 - 2026-07-25 — Homelab: deployed Uptime Kuma with 24 monitors and wired up a
   three-tier alerting design. Signal via a local `bbernhard/signal-cli-rest-api`
   container on `10.0.0.162:9922` (MODE=normal) is the primary channel — it's

@@ -213,10 +213,10 @@ were removed in cleanup.
 - [ ] **`tautulli` raw-IP monitor at ~50% uptime.** Tautulli serves plain HTTP,
       not HTTPS; confirm the monitor URL is `http://10.0.0.162:30047/` and
       that Kuma isn't following a redirect it can't validate.
-- [ ] **Recovery notification test not yet performed.** Point one monitor at a
-      closed port to force DOWN, then restore it, and confirm both the DOWN
-      and UP alerts arrive on Signal. Down-only alerting is a common one-way
-      failure mode.
+- [x] **Recovery notification test performed.** Stopped and restarted an app
+      to force a real DOWN/UP cycle and confirmed both alerts arrived on
+      Signal. Down-only alerting is a common one-way failure mode, so this
+      matters as much as the initial DOWN alert.
 - [x] Certificate-expiry notification enabled on the HTTPS monitors. Wildcard
       expires **2026-10-23**; NPM auto-renews via the Cloudflare DNS
       challenge, but Kuma will now surface a silent renewal failure before it
