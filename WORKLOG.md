@@ -6,6 +6,12 @@ commit an entry with the change it describes.
 
 ## Entries
 
+- 2026-07-25 — Homelab: user decided Uptime Kuma's alert channels (email via
+  existing Gmail SMTP + SMS via T-Mobile's email-to-SMS gateway) and deferred
+  the off-box backup provider decision to roughly the first week of August
+  2026. Neither the phone number nor email address was written to this repo
+  since it's public; both go only into Kuma's own notification config.
+
 - 2026-07-25 — Homelab: worked Phase 6 of the gameplan (network/access review)
   from a LAN client. Verified 16 of 17 internal HTTPS hostnames resolve and
   respond correctly and confirmed none have a public DNS record. Found

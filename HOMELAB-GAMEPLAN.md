@@ -133,8 +133,15 @@ working notification channel.
 
 ### Before installation
 
-- [ ] Choose one alert destination: Discord, Telegram, Pushover, SMTP email, or
-      another service already used by the user.
+- [x] Alert destination decided (user, 2026-07-25): two channels, both
+      configured directly in Kuma's own notification settings, not stored in
+      this repo. (1) Email via SMTP, reusing the user's already-configured
+      Gmail address (same one used for TrueNAS alerts). (2) SMS via
+      T-Mobile's free email-to-SMS gateway (`<number>@tmomail.net`) — the
+      user's phone number goes only into that one Kuma notification field,
+      never into a committed file, since this repo is public. Carrier
+      gateways can be blocked/flaky; if T-Mobile's gateway proves unreliable
+      after testing, fall back to a paid SMS API (Twilio/ClickSend).
 - [ ] Decide whether Kuma is LAN-only. Default: LAN-only through Nginx Proxy
       Manager; no public exposure is required.
 - [ ] Create persistent storage under a dedicated dataset such as
@@ -202,6 +209,11 @@ scheduled and their most recent results are visible.
 
 Snapshots on the same server do not protect against theft, fire, catastrophic
 pool loss, or server-wide compromise.
+
+**Status (user, 2026-07-25): not deciding yet.** The user expects to choose a
+provider around the first week of August 2026 (said "next week" relative to
+this date). Do not start a paid or large upload before then. Re-ask rather
+than assuming a default once that's arrived.
 
 ### What to back up first
 
