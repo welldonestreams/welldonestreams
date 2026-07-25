@@ -60,8 +60,8 @@ or networking fault and resolve that fault before installing more applications.
       media imports.
 - [x] Confirm Homepage, Plex, Sonarr, Radarr, Prowlarr, NZBGet, AdGuard Home,
       Nginx Proxy Manager, and Renewals are reachable.
-- [ ] Export a fresh OPNsense configuration backup and store a copy outside the
-      firewall appliance.
+- [x] Exported a fresh OPNsense configuration backup and stored it outside the
+      firewall appliance in the private local homelab-backups folder.
 - [x] Create a new recursive pre-work snapshot of `tank/apps` if any application
       configuration will be changed tonight.
 

@@ -6,6 +6,10 @@ commit an entry with the change it describes.
 
 ## Entries
 
+- 2026-07-25 — Homelab firewall protection: exported and XML-validated a fresh
+  OPNsense configuration backup outside the appliance; the private backup file
+  is intentionally excluded from Git.
+
 - 2026-07-25 — Homelab media correction: verified Radarr's intended title is
   *The Invite* (2026), not *The Invitation*; preserved its current CAM file as a
   temporary correct-title match and recorded the future quality-upgrade path.
