@@ -11,8 +11,9 @@ it free of passwords, API keys, cookies, tokens, and certificate secrets.
 - TrueNAS SCALE host: `10.0.0.162`.
 - Primary pool/dataset root: `/mnt/tank`.
 - Application data commonly lives under `/mnt/tank/apps`.
-- Usenet data lives at host path `/mnt/tank/data/usenet` and is mapped into the
-  media containers as `/data/usenet`.
+- Usenet data lives at host path `/mnt/tank/data/usenet`. NZBGet maps it as
+  `/downloads`; Sonarr and Radarr map `/mnt/tank/data` as `/data` and translate
+  `/downloads/` to `/data/usenet/` with explicit remote-path mappings.
 - Download client: NZBGet. Do not assume qBittorrent or torrent paths.
 - Media stack includes Plex, Sonarr, Radarr, Prowlarr, NZBGet, and Recyclarr.
 - Recyclarr runs with Docker and stores configuration under
@@ -52,16 +53,16 @@ or networking fault and resolve that fault before installing more applications.
 
 ## Phase 0 — Capture a baseline (15 minutes)
 
-- [ ] Open TrueNAS and verify `apps`, `boot-pool`, and `tank` are ONLINE.
-- [ ] Check the TrueNAS alerts panel for active storage, application, UPS, or
+- [x] Open TrueNAS and verify `apps`, `boot-pool`, and `tank` are ONLINE.
+- [x] Check the TrueNAS alerts panel for active storage, application, UPS, or
       certificate warnings.
-- [ ] Confirm at least 15-20% free space remains on datasets used by NZBGet and
+- [x] Confirm at least 15-20% free space remains on datasets used by NZBGet and
       media imports.
-- [ ] Confirm Homepage, Plex, Sonarr, Radarr, Prowlarr, NZBGet, AdGuard Home,
+- [x] Confirm Homepage, Plex, Sonarr, Radarr, Prowlarr, NZBGet, AdGuard Home,
       Nginx Proxy Manager, and Renewals are reachable.
 - [ ] Export a fresh OPNsense configuration backup and store a copy outside the
       firewall appliance.
-- [ ] Create a new recursive pre-work snapshot of `tank/apps` if any application
+- [x] Create a new recursive pre-work snapshot of `tank/apps` if any application
       configuration will be changed tonight.
 
 **Exit condition:** pools are healthy, no unexplained critical alerts exist, and
@@ -92,9 +93,9 @@ Treat this as suspicious even though episode titles may look plausible.
 
 ### Elio archive warning
 
-- [ ] Open NZBGet > Settings > Unpack and confirm `Unpack` is enabled.
-- [ ] Open NZBGet > History, select the Elio job, and read the full log.
-- [ ] Look specifically for password protection, missing RAR volumes, failed
+- [x] Open NZBGet > Settings > Unpack and confirm `Unpack` is enabled.
+- [x] Open NZBGet > History, select the Elio job, and read the full log.
+- [x] Look specifically for password protection, missing RAR volumes, failed
       PAR2 repair, unpack errors, permissions, or insufficient free space.
 - [ ] If repair/unpack succeeds after retry, refresh Radarr's queue.
 - [ ] If the release is password-protected or incomplete, delete and blocklist
@@ -161,13 +162,16 @@ been received.
 
 Local snapshots are already configured. Verify the remaining layers:
 
-- [ ] Confirm the four periodic snapshot tasks are enabled and have recent
+- [x] Confirm the four periodic snapshot tasks are enabled and have recent
       successful snapshots.
-- [ ] Confirm pool scrub schedules exist and do not overlap long SMART tests.
-- [ ] Confirm the SMART service is enabled when disks are directly attached.
-- [ ] Schedule short SMART tests regularly and long tests during low usage,
+- [x] Confirm pool scrub schedules exist and do not overlap long SMART tests.
+- [x] Confirm automatic TrueNAS 25.10 drive-health polling is active and all
+      directly attached disks currently pass SMART health.
+- [x] Schedule short SMART tests regularly and long tests during low usage,
       avoiding scrub/resilver windows.
-- [ ] Configure TrueNAS alert delivery to a destination the user actually reads.
+- [x] Configure TrueNAS alert delivery to a destination the user actually reads.
+      Email delivery is enabled and a live send-side test completed; user receipt
+      confirmation remains part of the exit condition.
 - [ ] Review UPS status and shutdown behavior if a UPS is connected; otherwise
       record UPS coverage as an open infrastructure task.
 
@@ -213,17 +217,17 @@ Prioritize irreplaceable and configuration data, not replaceable media:
 
 ## Phase 5 — Media automation validation (20-30 minutes)
 
-- [ ] Confirm Sonarr, Radarr, Prowlarr, and NZBGet all use the same container path
-      `/data/usenet` for the shared Usenet dataset.
-- [ ] Confirm completed download handling is enabled in Sonarr and Radarr.
-- [ ] Verify category names in NZBGet match the download-client definitions in
+- [x] Confirm NZBGet's `/downloads` path and Sonarr/Radarr's `/data/usenet` path
+      are connected by matching remote-path mappings to the same host dataset.
+- [x] Confirm completed download handling is enabled in Sonarr and Radarr.
+- [x] Verify category names in NZBGet match the download-client definitions in
       Sonarr and Radarr.
 - [ ] Verify permissions allow NZBGet to write and Sonarr/Radarr to move without
       recursive chmod/chown jobs.
 - [ ] Run one small test episode and one small test movie end to end.
 - [ ] Confirm Plex sees the imported files after library scanning.
-- [ ] Run `recyclarr sync --preview` before any real Recyclarr sync.
-- [ ] Confirm only the intended Sonarr/Radarr instances and profiles are changed.
+- [x] Run `recyclarr sync --preview` before any real Recyclarr sync.
+- [x] Confirm only the intended Sonarr/Radarr instances and profiles are changed.
 - [ ] Schedule Recyclarr only after a clean preview and one successful manual
       sync.
 
@@ -304,7 +308,8 @@ The baseline is complete when all of the following are true:
 - Snapshots, scrubs, and SMART tests are scheduled and verified.
 - Uptime Kuma detects failures and successfully sends notifications.
 - Sonarr/Radarr/NZBGet complete normal downloads and imports automatically.
-- All media containers share `/data/usenet` consistently.
+- NZBGet's `/downloads` path is translated consistently to Sonarr/Radarr's
+  `/data/usenet` path.
 - Admin interfaces remain LAN-only and use trusted HTTPS names.
 - An encrypted off-box backup exists and a restore has been tested.
 - The OPNsense upgrade is either completed in a planned window or explicitly

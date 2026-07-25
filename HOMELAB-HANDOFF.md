@@ -1,10 +1,47 @@
 # Homelab handoff
 
-Last verified: 2026-07-23 (America/Los_Angeles)
+Last verified: 2026-07-25 (America/Los_Angeles)
 
 This file records durable homelab state for Codex and Claude. It intentionally
 contains no passwords, API keys, tokens, cookies, or certificate credentials.
 The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
+
+## 2026-07-25 execution update
+
+- Re-verified all three pools ONLINE: `apps` had 456 GiB free, `boot-pool`
+  233 GiB free, and `tank` 44.4 TiB free. All critical service endpoints
+  responded normally.
+- Created recursive pre-work snapshots
+  `tank/apps@codex-pre-gameplan-20260725` and
+  `apps@codex-pre-gameplan-20260725`.
+- Upgraded Prowlarr to 1.5.19, Immich to 1.14.30, Vaultwarden to 1.6.23,
+  and Mail Archiver to 1.2.37. All four restarted successfully, their HTTP
+  endpoints responded, and TrueNAS reports no remaining upgrade for them.
+- Confirmed all four periodic snapshot tasks are enabled and completing on
+  schedule. Pool scrub tasks remain enabled for Sunday at 00:00 with a 35-day
+  threshold.
+- TrueNAS 25.10 no longer provides the old SMART scheduling screen. All six
+  HDDs and both NVMe devices currently pass SMART health. Added supported cron
+  tasks for short tests every Wednesday at 01:00 and long tests monthly on the
+  8th at 01:00; both skip execution while a scrub or resilver is active.
+- TrueNAS has enabled SNMP and email alert services. A live email alert-service
+  test was accepted by middleware; receipt still needs user confirmation.
+- NZBGet has unpacking and cleanup enabled with automatic PAR checking. Elio is
+  not a failed repair: NZBGet reports `SUCCESS/PAR`, but the completed item is a
+  75 GB ZIP containing a full Blu-ray BDMV structure, so it was preserved rather
+  than deleted or force-imported.
+- Platonic contains eight plausibly sized MKV files but remains an ID-only match
+  for the wrong-looking `Platonic.2025...NF` release name. The Invitation contains
+  one 19.5 GB MKV named `ZFo9.mkv`. Both were preserved pending human playback or
+  content verification.
+- Confirmed the live media-path design: NZBGet maps the host Usenet dataset to
+  `/downloads`; Sonarr and Radarr map `/mnt/tank/data` to `/data`; both have an
+  explicit `10.0.0.162` remote-path mapping from `/downloads/` to
+  `/data/usenet/`. Completed-download handling, failure cleanup, and matching
+  NZBGet categories are enabled.
+- Ran `recyclarr sync --preview`, followed by a real sync. Radarr's 40 custom
+  formats and Sonarr's 37 custom formats, quality definitions, and profiles were
+  already current; the sync made no material profile changes.
 
 ## Completed maintenance
 
@@ -86,7 +123,9 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   snapshots protect against mistakes and ransomware history, but not loss of the
   server.
 - Verify scrub schedules, SMART test schedules, and working TrueNAS alert
-  delivery. Avoid long SMART tests overlapping scrubs or resilvers.
+  delivery. SMART schedules and the send-side email test are now complete;
+  confirm that the test email arrived. Avoid long tests overlapping scrubs or
+  resilvers.
 - Homepage still triggers TrueNAS's deprecated legacy REST API warning. Upgrade
   or replace that widget when a compatible Homepage release is available before
   moving TrueNAS to a release that removes the endpoint.
