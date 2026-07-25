@@ -9,6 +9,12 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-25 — Docs: found the same stale "recovery notification not yet
+  tested" contradiction also survived in `HOMELAB-HANDOFF.md` (two spots:
+  the Open Kuma follow-ups list and the Intentional follow-ups summary),
+  even though that same file's own Signal channel note says it was already
+  confirmed by stopping and restarting an app. Amended both in place.
+
 - 2026-07-25 — Docs: fetched origin and found Codex had already pushed 4
   commits reformatting `HOMELAB-GAMEPLAN.md`/`HOMELAB-HANDOFF.md`/`WORKLOG.md`
   (fast-forwarded locally, no conflicts). The local working tree separately

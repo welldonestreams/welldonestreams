@@ -216,9 +216,9 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   - `tautulli` raw-IP monitor is also at ~50% uptime. Tautulli serves plain
     HTTP, not HTTPS; confirm the monitor URL is
     `http://10.0.0.162:30047/` and that no redirect is confusing Kuma.
-  - Recovery notification not yet forced end to end. Point one monitor at a
-    closed port, then restore it, and confirm both DOWN and UP arrive on
-    Signal.
+  - ~~Recovery notification not yet forced end to end.~~ **RESOLVED
+    2026-07-25** — confirmed by stopping and restarting an app; both DOWN and
+    UP arrived on Signal (see the Signal channel note above).
 
 ### 2026-07-25 — internal HTTPS naming rollout (Codex)
 
@@ -346,8 +346,8 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   moving TrueNAS to a release that removes the endpoint.
 - Uptime Kuma is deployed with 24 monitors and Signal + Gmail alerting, plus
   a UptimeRobot external watcher (see the 2026-07-25 Uptime Kuma deployment
-  section above). Remaining Kuma work: configure monitor dependencies to
-  suppress alert storms, fix or remove the two ~50%-uptime monitors, and run
-  a real DOWN + recovery test end to end.
+  section above). A real DOWN + recovery test is confirmed on Signal.
+  Remaining Kuma work: configure monitor dependencies to suppress alert
+  storms and fix or remove the two ~50%-uptime monitors.
 - Kometa remains intentionally stopped and was not the source of the Renewals
   startup failure.
