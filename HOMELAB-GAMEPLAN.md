@@ -84,12 +84,14 @@ Treat this as suspicious even though episode titles may look plausible.
       search for a correctly named release.
 - [ ] Do not force-import based only on the grab-history ID.
 
-### The Invitation in Radarr
+### The Invite (2026) in Radarr
 
-- [ ] Open Radarr > Activity > Queue > Manual Import.
-- [ ] Verify the file is the intended movie and year.
-- [ ] If correct, map it and import with Move.
-- [ ] If uncertain, remove and blocklist it rather than forcing the match.
+- [x] Verified the intended title is **The Invite (2026)**, TMDb 950028, not
+      *The Invitation*. Radarr monitors the correct movie and currently has an
+      imported file named `the.invite.2026.720p.CAM.h264-jff.mkv`.
+- [ ] Replace or upgrade the current 720p CAM copy when a legitimate WEB-DL or
+      higher-quality release is available. Do not delete it solely because older
+      notes referred to the wrong title.
 
 ### Elio archive warning
 

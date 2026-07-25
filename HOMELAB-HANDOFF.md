@@ -17,6 +17,11 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   `Elio.2025.2160p.MA.WEB-DL.TrueHD.Atmos.7.1.DV.HDR10P.H.265-TheFarm` instead.
   Radarr verified the replacement as a 27.3 GB `WEBDL-2160p` item in downloading
   state. The snapshot is the recovery point for the removed download data.
+- Corrected a stale Radarr note: the wanted movie is **The Invite (2026)**
+  (TMDb 950028), not *The Invitation*. Radarr is already monitoring the correct
+  title and has imported `the.invite.2026.720p.CAM.h264-jff.mkv`; it is a
+  1:44:04 720p CAM copy, so retain it only until a proper WEB-DL or better
+  replacement is available.
 - OPNsense configuration export is still open. Both the trusted hostname and
   direct-IP Chrome tabs showed the login page, so no firewall credentials were
   guessed and no configuration backup was exported.
@@ -130,8 +135,9 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 - A `Platonic.2025...NF...` release is especially suspicious for the expected
   `Platonic (2023)` series. Verify runtime, episode title, and actual content
   before importing.
-- Radarr has shown the same ID-only matching condition for The Invitation; verify
-  the actual movie and year before Manual Import.
+- Radarr's earlier *The Invitation* reference was stale. The correct managed
+  movie is **The Invite (2026)**, which currently has a lower-quality CAM copy
+  awaiting a later WEB-DL-or-better upgrade.
 - Elio's archive warning was resolved by replacing the full-disc BDMV ZIP with a
   normal 2160p WEB-DL. Confirm that the new job completes and imports into Plex.
 - Unpackerr is not the default recommendation for this setup because NZBGet
