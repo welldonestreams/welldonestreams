@@ -232,6 +232,12 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
 ## Verified health
 
+- OPNsense DNS service review (2026-07-25): Dnsmasq DNS/DHCP is enabled on the
+  LAN interface and listens on port 5354. AdGuard Home's documented upstream is
+  `10.0.0.1:5353`, so these services are deliberately separated by port and no
+  direct listener conflict was found. DHCP DNS-bypass enforcement still needs a
+  client/DHCP-options review before changing firewall policy.
+
 - Pools `apps`, `boot-pool`, and `tank` are ONLINE at 3%, 1%, and 18% capacity.
 - Renewals, Homepage, Nginx Proxy Manager, and AdGuard Home are RUNNING.
 - The four periodic snapshot tasks are enabled with the schedules above.

@@ -257,13 +257,13 @@ and appear in Plex without manual intervention.
 ## Phase 6 — Network and access review (20-30 minutes)
 
 - [x] Confirm AdGuard Home still serves LAN DNS and internal rewrites. Verified
-      (Claude, 2026-07-25, LAN client): 16 of 17 internal hostnames resolve
-      correctly to `10.0.0.162` via AdGuard. **Gap found:**
-      `actual.welldonestreams.com` returns NXDOMAIN — its AdGuard rewrite is
-      missing despite being listed as created in the `e53db04` rollout. Needs
-      an AdGuard Home rewrite added for `actual`.
-- [ ] Confirm OPNsense/Unbound forwarding design has no DNS loop with AdGuard.
-      Not verifiable from a LAN client; requires OPNsense config access.
+      (Codex and Claude, 2026-07-25): all 17 internal hostnames, including
+      `actual.welldonestreams.com`, resolve through AdGuard to the LAN proxy.
+      Actual Budget was reached over HTTPS after its rewrite was restored.
+- [x] Confirm OPNsense/Unbound forwarding design has no DNS loop with AdGuard.
+      Verified live (Codex, 2026-07-25): OPNsense Dnsmasq is bound to LAN port
+      5354, while AdGuard forwards to `10.0.0.1:5353`; the services are not
+      competing for the same listener.
 - [ ] Confirm clients cannot bypass intended DNS using DHCP-provided alternatives,
       except where explicitly allowed. Not verifiable from a LAN client;
       requires OPNsense DHCP config access.
