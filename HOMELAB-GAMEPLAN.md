@@ -256,13 +256,31 @@ and appear in Plex without manual intervention.
 
 ## Phase 6 — Network and access review (20-30 minutes)
 
-- [ ] Confirm AdGuard Home still serves LAN DNS and internal rewrites.
+- [x] Confirm AdGuard Home still serves LAN DNS and internal rewrites. Verified
+      (Claude, 2026-07-25, LAN client): 16 of 17 internal hostnames resolve
+      correctly to `10.0.0.162` via AdGuard. **Gap found:**
+      `actual.welldonestreams.com` returns NXDOMAIN — its AdGuard rewrite is
+      missing despite being listed as created in the `e53db04` rollout. Needs
+      an AdGuard Home rewrite added for `actual`.
 - [ ] Confirm OPNsense/Unbound forwarding design has no DNS loop with AdGuard.
+      Not verifiable from a LAN client; requires OPNsense config access.
 - [ ] Confirm clients cannot bypass intended DNS using DHCP-provided alternatives,
-      except where explicitly allowed.
-- [ ] Re-test both LAN-only admin hostnames from a LAN client.
-- [ ] Confirm those hostnames are not reachable from an external/mobile network.
+      except where explicitly allowed. Not verifiable from a LAN client;
+      requires OPNsense DHCP config access.
+- [x] Re-test both LAN-only admin hostnames from a LAN client. Expanded scope:
+      re-tested all 17 configured internal hostnames, not just the original
+      two. All resolve and respond over HTTPS except `actual` (see above).
+      `plex` and `nzbget` return HTTP 401 on their root path, which is
+      expected (both require login) and confirms the proxy reaches a live
+      backend rather than failing.
+- [x] Confirm those hostnames are not reachable from an external/mobile network.
+      Verified (Claude, 2026-07-25): queried a public resolver (1.1.1.1)
+      directly for a representative sample (`truenas`, `home`, `plex`,
+      `sonarr`, `switch`, `actual`) — all return NXDOMAIN, confirming no
+      public Cloudflare A/AAAA record exists for any of them.
 - [ ] Keep OPNsense SSH disabled unless a specific maintenance task requires it.
+      Not independently re-verified this session; relies on prior documented
+      state.
 - [ ] Defer the OPNsense 26.7 feature upgrade until a scheduled maintenance
       window with a current configuration export.
 
