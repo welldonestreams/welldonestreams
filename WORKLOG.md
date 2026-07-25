@@ -6,6 +6,13 @@ commit an entry with the change it describes.
 
 ## Entries
 
+- 2026-07-25 — Added `scripts/check-landing-page.mjs` and a shared
+  `.githooks/pre-commit` hook (wired via `core.hooksPath`) so a future
+  `index.html` minification/cleanup pass can't silently drop the onerror
+  badge fallbacks, preview-mode mock poster URLs, or the double-rAF poll-bar
+  animation again — the exact three regressions found in commit 35478c6 and
+  fixed in commit 9863ab4.
+
 - 2026-07-25 — Homelab firewall protection: exported and XML-validated a fresh
   OPNsense configuration backup outside the appliance; the private backup file
   is intentionally excluded from Git.
