@@ -8,6 +8,34 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
 ## 2026-07-25 follow-up
 
+### Claude review of index.html landing-page cleanup (commit 35478c6)
+
+- Reviewed the "Clean up landing page behavior and styles" commit end to end:
+  no secrets, no broken script/asset references, no invariant violations. It
+  is mostly whitespace/comment minification plus a few real content edits
+  (larger casino chip icon, simplified Plex TV-guide copy). Verified the
+  inline script still passes `node --check` after extraction.
+- Patched three small regressions introduced by that cleanup, in commit
+  `9863ab4` ("Restore small UX safeguards dropped in landing page cleanup"):
+  - Re-added `onerror` fallbacks on the Google Play / App Store badge
+    `<img>` tags. Without them, a 404'd badge asset shows a broken-image icon
+    instead of just disappearing.
+  - Restored real TMDb poster URLs in `MOCK_RECENT` and `MOCK_POLL` (preview
+    mode only, used on non-`welldonestreams.com` hosts). The cleanup had
+    blanked several of them to empty strings, so preview/staging previews
+    showed more placeholder icons than intended.
+  - Restored the double `requestAnimationFrame` before animating poll-result
+    bar heights in `loadPoll()`. The cleanup collapsed it to a single rAF,
+    which risks the bar-fill transition snapping instantly to its final
+    height instead of animating, on a page load where the visitor already
+    has a vote cookie.
+- None of these affect production behavior on `welldonestreams.com` in the
+  common case (mock data only loads in preview mode; the animation and badge
+  issues are cosmetic edge cases). Fixed them anyway since they were easy
+  small deltas against the pre-cleanup version. No functional or security
+  issues found otherwise — the minification approach itself is fine to keep
+  using.
+
 - Updated the enabled TrueNAS email alert service to the user's requested Gmail
   address and sent a fresh live test. Middleware accepted the send; receipt still
   needs user confirmation, including a check of Spam/Promotions.
