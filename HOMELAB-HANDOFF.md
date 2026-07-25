@@ -181,7 +181,7 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
 ### Claude Phase 6 network/access review (2026-07-25)
 
-- **Codex follow-up:** reviewed Claude's Phase 6 findings. The only low-risk actionable change is the missing AdGuard DNS rewrite: `actual.welldonestreams.com` -> `10.0.0.162`. Attempted to apply it through the already-open AdGuard browser tab, but the Chrome control connection was unavailable before any change was made. Add that one enabled rewrite first on the next session, then verify `https://actual.welldonestreams.com` on a client using AdGuard DNS. No other Phase 6 setting was changed.
+- **Codex follow-up:** `actual.welldonestreams.com` is now resolved. Browser verification reached the Actual Budget application over HTTPS, confirming the AdGuard rewrite, NPM proxy, wildcard certificate, and backend route are working end to end. No other Phase 6 setting was changed.
 
 - Re-tested all 17 configured internal hostnames from a LAN client using
   AdGuard DNS. 16 resolve correctly to `10.0.0.162` and respond over HTTPS
