@@ -167,6 +167,59 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
 ## Completed maintenance
 
+### 2026-07-25 — Uptime Kuma + Signal notification deployment
+
+- Deployed Uptime Kuma on TrueNAS. Dataset `tank/apps/uptime-kuma` created
+  with the standard ACL (Group `apps` GID 568, Full Control, File+Directory
+  Inherit; bogus User `apps` entry removed). Config/data volume is a host
+  path at `/mnt/tank/apps/uptime-kuma` so it inherits the hourly `tank/apps`
+  snapshot schedule.
+- NPM proxy host `kuma.welldonestreams.com` uses the `*.welldonestreams.com`
+  wildcard certificate, Force SSL + HTTP/2, and the `LAN Only` access list.
+  AdGuard Home local DNS rewrite points it to `10.0.0.162`. No public
+  Cloudflare record was added.
+- Deployed `bbernhard/signal-cli-rest-api:latest` on `10.0.0.162:9922`
+  with `MODE=normal` and storage at `/mnt/tank/apps/signal-api`. The
+  container is linked as a secondary device named `kuma-alerts` to the
+  user's Signal account. Registered phone number is intentionally excluded
+  from this repo — it lives only in Kuma's Webhook notification config and
+  in Signal's linked-device list.
+- Kuma notification channels configured:
+  - **Signal** (primary, WAN-independent): Webhook to
+    `http://10.0.0.162:9922/v2/send`, DOWN/UP/OTHER template. Confirmed by
+    stopping and restarting an app.
+  - **Gmail SMTP** (secondary): same Gmail address used for TrueNAS alerts.
+  - **T-Mobile email-to-SMS gateway** was attempted and abandoned as
+    unreliable; not counted as an available channel.
+- Twenty-four monitors are active. Public: `welldonestreams.com`,
+  `welldonestreams.com/api/poll`, `vault`, `requests`, `renewals`. Internal:
+  `truenas`, `opnsense`, `home`, `plex`, `nzbget`, `sonarr`, `radarr`,
+  `prowlarr`, `bazarr`, `tautulli`, `immich`, `actual`, `adguard`, `npm`,
+  `mail-archiver`. Infrastructure: pings on `10.0.0.1` and `10.0.0.162`,
+  and raw-IP health checks on `tautulli` and `npm` so a DNS-only failure is
+  distinguishable from a service failure. `plex` and `nzbget` accept HTTP
+  401 as healthy. Certificate-expiry notifications enabled on the HTTPS
+  monitors; the wildcard expires 2026-10-23.
+- Deployed a free UptimeRobot external watcher monitoring
+  `welldonestreams.com` and `requests.welldonestreams.com` from off-site,
+  alerting to the same Gmail. This is the only path that survives a NAS,
+  DNS, or WAN outage.
+- Open Kuma follow-ups (still in `HOMELAB-GAMEPLAN.md` Phase 2):
+  - Monitor dependencies are not yet configured. Set the `10.0.0.162` ping
+    monitor as the parent of every hostname monitor on that host so a NAS
+    outage sends one alert instead of ~20.
+  - `home.welldonestreams.com` DNS-type monitor is sitting at ~50% uptime.
+    Kuma's DNS monitor type does raw queries the Docker resolver
+    (`127.0.0.11`) doesn't handle consistently. Either delete it (the
+    hostname monitor already exercises DNS) or rebuild it to query
+    AdGuard directly.
+  - `tautulli` raw-IP monitor is also at ~50% uptime. Tautulli serves plain
+    HTTP, not HTTPS; confirm the monitor URL is
+    `http://10.0.0.162:30047/` and that no redirect is confusing Kuma.
+  - Recovery notification not yet forced end to end. Point one monitor at a
+    closed port, then restore it, and confirm both DOWN and UP arrive on
+    Signal.
+
 ### 2026-07-25 — internal HTTPS naming rollout (Codex)
 
 - Created a new Cloudflare-scoped DNS API token for Nginx Proxy Manager (NPM), limited to DNS edit access for `welldonestreams.com`, then used it to issue a wildcard Let's Encrypt certificate for `*.welldonestreams.com` through the Cloudflare DNS challenge. The certificate was successfully issued by NPM and is valid through 2026-10-23.
@@ -291,9 +344,10 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 - Homepage still triggers TrueNAS's deprecated legacy REST API warning. Upgrade
   or replace that widget when a compatible Homepage release is available before
   moving TrueNAS to a release that removes the endpoint.
-- The best next application is Uptime Kuma. Add it after choosing a notification
-  target, then monitor public services, both trusted admin names, DNS, the media
-  applications, and the Renewals endpoint. Do not consider it complete until a
-  real failure and recovery notification are delivered.
+- Uptime Kuma is deployed with 24 monitors and Signal + Gmail alerting, plus
+  a UptimeRobot external watcher (see the 2026-07-25 Uptime Kuma deployment
+  section above). Remaining Kuma work: configure monitor dependencies to
+  suppress alert storms, fix or remove the two ~50%-uptime monitors, and run
+  a real DOWN + recovery test end to end.
 - Kometa remains intentionally stopped and was not the source of the Renewals
   startup failure.
