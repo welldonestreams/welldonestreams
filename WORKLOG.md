@@ -9,6 +9,31 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-25 — Homelab: deployed Uptime Kuma with 24 monitors and wired up a
+  three-tier alerting design. Signal via a local `bbernhard/signal-cli-rest-api`
+  container on `10.0.0.162:9922` (MODE=normal) is the primary channel — it's
+  the only path that doesn't share a Gmail/WAN dependency with everything else.
+  Gmail SMTP is the secondary channel. The T-Mobile email-to-SMS gateway was
+  attempted and abandoned as unreliable; if SMS ever becomes necessary,
+  Twilio/ClickSend rather than a carrier gateway. UptimeRobot free tier
+  monitors `welldonestreams.com` and `requests.welldonestreams.com` from
+  off-site as the required external watcher. Kuma sits behind NPM at
+  `kuma.welldonestreams.com` with the wildcard cert and LAN Only access list.
+  DOWN and UP alerts on Signal were confirmed by stopping and restarting an
+  app. Phone number was intentionally not committed to this public repo.
+
+- 2026-07-25 — Homelab: cleaned up `HOMELAB-GAMEPLAN.md` by merging the
+  night's Kuma/Signal work into Phase 2 as checked items and removing the raw
+  "delete below and reformat" scratchpad and a DeepSeek-generated session
+  summary that had been appended below the definition of done. The DeepSeek
+  summary contradicted the user's own notes on two points (Signal REST mode,
+  and whether the T-Mobile SMS gateway worked) and leaked the user's phone
+  number three times into a public repo. Kept only what was independently
+  confirmed. Recorded the two remaining Phase 2 opens: monitor dependencies
+  are not set up, and two monitors (`home.welldonestreams.com` DNS-type and
+  the raw `tautulli` IP monitor) are sitting at ~50% uptime and need to be
+  either fixed or removed.
+
 - 2026-07-25 — Docs: corrected two stale contradictions in
   `HOMELAB-HANDOFF.md` that could cause an agent to redo finished work. The
   "wildcard certificate is required" note and the "`actual.welldonestreams.com`
@@ -21,7 +46,7 @@ entry — never below the `## Entry template` section at the bottom.**
   `HOMELAB-GAMEPLAN.md`. The original plan ran Kuma on `10.0.0.162` and
   monitored ~14 services that all live on `10.0.0.162`, resolved through
   AdGuard which is also on `10.0.0.162` — so it could not have alerted on a
-  NAS, DNS, or WAN outage, and both notification channels share one Gmail SMTP
+  NAS, DNS, or WAN outage, and both notification channels shared one Gmail SMTP
   dependency that also fails when the WAN is down. Added a required external
   watcher (free tier, off-site), monitor dependencies to suppress alert
   storms, a container-DNS smoke test before building the full monitor set,
