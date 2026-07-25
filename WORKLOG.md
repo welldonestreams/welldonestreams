@@ -6,6 +6,11 @@ commit an entry with the change it describes.
 
 ## Entries
 
+- 2026-07-25 — Homelab follow-up: retargeted and retested TrueNAS email alerts,
+  replaced the Elio full-disc Blu-ray job with a protected 2160p WEB-DL regrab,
+  recorded the still-blocked OPNsense export, and added Claude's PC crash
+  questions and verified diagnostic boundaries to the shared handoff.
+
 - 2026-07-25 — Homelab: completed the live baseline, protected and upgraded four
   apps, verified current snapshots/scrubs/SMART health, added non-overlapping
   SMART cron schedules, tested email alert delivery, diagnosed media queue
