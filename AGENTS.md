@@ -28,9 +28,16 @@ Claude both assist with the user's TrueNAS and network environment.
 - Read `HOMELAB-HANDOFF.md` for the last verified state.
 - Read `HOMELAB-GAMEPLAN.md` for the prioritized remaining setup plan, known
   TrueNAS paths, application recommendations, and definition of done.
+- Read `WORKLOG.md` for durable intent that the diff and commit messages
+  cannot explain. Newest entries are at the top of `## Entries`.
 - These documents are context and operations notes, not website runtime files.
 - Keep them free of passwords, API keys, tokens, cookies, and certificate
   secrets.
+- When an item in these documents is resolved, amend the original claim in
+  place rather than appending a contradicting note below it. Two stale
+  contradictions (a "wildcard certificate is required" note and an
+  `actual.welldonestreams.com` NXDOMAIN gap) previously survived their own
+  fixes and risked an agent redoing finished work.
 - Do not invent qBittorrent or `/downloads` paths. The known download client is
   NZBGet and the known Usenet mapping is host `/mnt/tank/data/usenet` to
   container `/data/usenet`.
@@ -62,10 +69,17 @@ Claude both assist with the user's TrueNAS and network environment.
   intentionally inline layout values.
 - Keep trivia answers and other authoritative game outcomes server-side.
 - Keep navigation state and `aria-pressed` synchronized. Do not add new
-  accessibility restrictions such as disabling pinch zoom.
+  accessibility restrictions such as disabling pinch zoom, and remove any that
+  are still present (`user-scalable=no` / `maximum-scale=1.0` in a viewport
+  meta tag).
 
 ## Security
 
+- Both `welldonestreams` and `welldonestreams-worker` are public GitHub
+  repositories. Everything committed here is world-readable, including the
+  homelab documents. Assume any internal hostname, IP address, port, version
+  number, or known-deferred vulnerability written into those files is public
+  information, and weigh that before adding operational detail.
 - Never commit API keys, passwords, tokens, cookies, or real service
   credentials. Use platform environment variables and documented placeholder
   syntax.
@@ -99,6 +113,8 @@ Claude both assist with the user's TrueNAS and network environment.
   newest-first entry to `WORKLOG.md` before committing it with the change.
 - Silently update `WORKLOG.md` after important architecture, deployment,
   security, troubleshooting, or behavior decisions. Do not log routine work.
+  Stage the worklog entry with the change it describes so it never sits
+  uncommitted — a dirty tree blocks the other agent under "Before editing".
 - Keep user-facing updates and final responses as concise as the task permits.
   Do not narrate routine worklog maintenance unless asked.
 - Prefer `git log` and the code itself over an old worklog entry when they
