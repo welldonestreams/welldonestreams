@@ -36,6 +36,22 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   issues found otherwise — the minification approach itself is fine to keep
   using.
 
+### Local-name / proxy review (in progress)
+
+- Reconfirmed that Nginx Proxy Manager is healthy and that its existing trusted
+  admin names (`truenas.welldonestreams.com` and
+  `opnsense.welldonestreams.com`) are online, HTTPS-enabled, and restricted by
+  the `LAN Only` access list.
+- The pre-existing public hosts—Vault, Requests, and Renewals—are intentional
+  user-approved remote-access services. Leave their public access unchanged.
+  All new internal service names must use the existing `LAN Only` access list,
+  local AdGuard DNS rewrites, and no WAN port-forward rule.
+- The current internal TLS certificate is a two-name Cloudflare-DNS-validated
+  certificate for the TrueNAS and OPNsense hostnames. A separate certificate
+  covering the planned local service names (preferably a wildcard, if the
+  existing Cloudflare credential permits it) is required before the remaining
+  HTTPS proxy hosts can be added.
+
 - Updated the enabled TrueNAS email alert service to the user's requested Gmail
   address and sent a fresh live test. Middleware accepted the send; receipt still
   needs user confirmation, including a check of Spam/Promotions.
