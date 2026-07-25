@@ -9,6 +9,18 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-25 — Docs: rewrote `HOMELAB-GAMEPLAN.md` around a new "What to do
+  next, in order" punch list so the user has one flat, prioritized view
+  instead of needing to scan every phase for open checkboxes. Reordered by
+  effort/urgency: quick checks first (TrueNAS test email, Sonarr/Elio queue
+  items), then the two ~50%-uptime Kuma monitors and dependency setup, then
+  the off-box backup provider decision (flagged as time-sensitive — the
+  user's own first-week-of-August target is about a week out), then the
+  remaining media-automation and network items, then non-homelab work.
+  Corrected the Phase 5 Recyclarr item: `HOMELAB-HANDOFF.md` already records
+  a successful manual sync with no material changes, so the only remaining
+  step is turning on the schedule, not re-running the preconditions.
+
 - 2026-07-25 — Docs: found the same stale "recovery notification not yet
   tested" contradiction also survived in `HOMELAB-HANDOFF.md` (two spots:
   the Open Kuma follow-ups list and the Intentional follow-ups summary),

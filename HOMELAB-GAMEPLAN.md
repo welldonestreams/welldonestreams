@@ -61,6 +61,44 @@ secrets — both `welldonestreams` and `welldonestreams-worker` are public.
 7. Record important verified changes in `HOMELAB-HANDOFF.md` and add a concise,
    newest-first `WORKLOG.md` entry, staged with the change it describes.
 
+## What to do next, in order
+
+This is the flat punch list. Each item links to its full detail in the phase
+below. Everything not listed here in a phase is already done.
+
+1. **Check that the TrueNAS test alert email arrived** (check Spam/Promotions
+   too). Two-minute check; closes out Phase 3. *(Phase 3)*
+2. **Resolve the `Platonic` release in Sonarr's queue** via Manual Import —
+   verify the actual episode content before importing or blocklisting.
+   *(Phase 1)*
+3. **Confirm the Elio WEB-DL replacement finished, imported, and plays in
+   Plex.** *(Phase 1)*
+4. **Fix Kuma's two ~50%-uptime monitors and add monitor dependencies:**
+   delete or rebuild the `home.welldonestreams.com` DNS-type monitor, fix the
+   `tautulli` raw-IP monitor's URL/redirect handling, and set the
+   `10.0.0.162` ping monitor as the parent of every hostname monitor on that
+   host so one outage doesn't fire ~20 alerts. *(Phase 2)*
+5. **Decide the off-box backup provider.** Target window is roughly the first
+   week of August 2026 — about a week out from this writing — so this is the
+   next big decision, not a someday item. Once chosen: enable encryption, run
+   the first backup, and test a restore. *(Phase 4)*
+6. **Run one real Sonarr and one real Radarr download end to end**, confirm
+   NZBGet/Sonarr/Radarr file permissions don't need manual chmod/chown, then
+   turn on the Recyclarr schedule — the required preview and manual sync
+   already succeeded, so scheduling is the only remaining step. *(Phase 5)*
+7. **Replace the 720p CAM copy of The Invite (2026)** when a legitimate
+   WEB-DL or better release is available. Not urgent; opportunistic. *(Phase
+   1)*
+8. **Record UPS status and shutdown behavior**, or record explicitly that no
+   UPS is connected. *(Phase 3)*
+9. **Next time you're in OPNsense:** confirm DHCP can't hand out a
+   DNS server other than the intended one, confirm SSH is still disabled, and
+   schedule the 26.7 upgrade maintenance window. *(Phase 6)*
+10. **Non-homelab, whenever you get to it:** the craps prop-bet UI in
+    `casino.html`, and the GPU crash investigation (controlled load test with
+    HWiNFO64). Neither blocks the homelab baseline. *(see "Non-homelab open
+    work" at the bottom)*
+
 # Prioritized plan
 
 Work top to bottom. Stop after any step that reveals a storage, pool, permission,
@@ -124,7 +162,7 @@ Treat this as suspicious even though episode titles may look plausible.
 **Exit condition:** the queue contains no unexplained yellow import warnings and
 NZBGet can unpack a normal completed test job into `/data/usenet`.
 
-## Phase 2 — Install Uptime Kuma (largely complete 2026-07-25)
+## Phase 2 — Install Uptime Kuma (deployed 2026-07-25; 3 items remaining)
 
 Uptime Kuma is the next recommended application because local services can fail
 silently even when Homepage still renders. Do not finish deployment without a
@@ -303,8 +341,10 @@ Prioritize irreplaceable and configuration data, not replaceable media:
 - [ ] Confirm Plex sees the imported files after library scanning.
 - [x] Run `recyclarr sync --preview` before any real Recyclarr sync.
 - [x] Confirm only the intended Sonarr/Radarr instances and profiles are changed.
-- [ ] Schedule Recyclarr only after a clean preview and one successful manual
-      sync.
+- [x] Run one successful manual `recyclarr sync` (done: no material profile
+      changes were needed).
+- [ ] Turn on the Recyclarr schedule. Both preconditions above are met — this
+      is the only remaining step.
 
 **Exit condition:** one TV and one movie download complete, unpack, import,
 rename, and appear in Plex without manual intervention.
