@@ -6,6 +6,12 @@ commit an entry with the change it describes.
 
 ## Entries
 
+- 2026-07-25 — Homelab: completed the live baseline, protected and upgraded four
+  apps, verified current snapshots/scrubs/SMART health, added non-overlapping
+  SMART cron schedules, tested email alert delivery, diagnosed media queue
+  exceptions without destructive imports, verified remote paths and categories,
+  and confirmed Recyclarr profiles are current.
+
 - 2026-07-23 — Homelab: added `HOMELAB-GAMEPLAN.md` as the shared Codex/Claude
   execution plan. It records the real NZBGet and `/data/usenet` environment,
   current import/unpack issues, Uptime Kuma as the next application, storage
