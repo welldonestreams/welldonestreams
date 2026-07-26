@@ -1,6 +1,6 @@
 # Homelab handoff
 
-Last verified: 2026-07-25 (America/Los_Angeles)
+Last verified: 2026-07-26 (America/Los_Angeles)
 
 This file records durable homelab state for Codex and Claude. It intentionally
 contains no passwords, API keys, tokens, cookies, or certificate credentials.
@@ -194,8 +194,11 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 - Twenty-four monitors are active. Public: `welldonestreams.com`,
   `welldonestreams.com/api/poll`, `vault`, `requests`, `renewals`. Internal:
   `truenas`, `opnsense`, `home`, `plex`, `nzbget`, `sonarr`, `radarr`,
-  `prowlarr`, `bazarr`, `tautulli`, `immich`, `actual`, `adguard`, `npm`,
-  `mail-archiver`. Infrastructure: pings on `10.0.0.1` and `10.0.0.162`,
+  `prowlarr`, `bazarr`, `tautulli`, `immich`, `actual` (hostname renamed to
+  `budget.welldonestreams.com` on 2026-07-26 — this monitor's target URL was
+  **not** updated to match and still needs fixing), `adguard`, `npm`,
+  `mail-archiver`. Beszel is not yet monitored here. Infrastructure: pings on
+  `10.0.0.1` and `10.0.0.162`,
   and raw-IP health checks on `tautulli` and `npm` so a DNS-only failure is
   distinguishable from a service failure. `plex` and `nzbget` accept HTTP
   401 as healthy. Certificate-expiry notifications enabled on the HTTPS
@@ -351,3 +354,100 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   storms and fix or remove the two ~50%-uptime monitors.
 - Kometa remains intentionally stopped and was not the source of the Renewals
   startup failure.
+- Finish the Tailscale subnet-router setup (see the 2026-07-26 section below):
+  approve the `10.0.0.0/24` route in the Tailscale admin console, configure
+  split DNS for `welldonestreams.com` -> `10.0.0.162`, and verify reachability
+  from an actual off-LAN client.
+- Update the Uptime Kuma monitor still pointed at `actual.welldonestreams.com`
+  (renamed to `budget.welldonestreams.com` on 2026-07-26) — Kuma needs its own
+  login this session didn't have.
+- Finish Beszel setup (see the 2026-07-26 section below): create the hub admin
+  account, generate a real agent token/key, start `beszel-agent`, and add
+  Homepage's Beszel widget credentials.
+
+## 2026-07-26 Tailscale subnet router deployment
+
+- Deployed Tailscale as a subnet router on TrueNAS, per `TAILSCALE-DEPLOY.md`
+  in the site repo. Container `tailscale` (image `tailscale/tailscale:stable`)
+  runs as a TrueNAS custom app in host network mode with `NET_ADMIN`/`NET_RAW`
+  capabilities, state at `/mnt/tank/apps/tailscale/state` (dataset
+  `tank/apps/tailscale`, standard `truenas_admin` + `Group-apps` ACL).
+- The deploy brief's ACL command used `nfs4xdr_setfacl -R -m`, which is wrong
+  for this host's `nfs4xdr_setfacl` (0.3.3): `-m` does an in-place swap of one
+  ACE and requires a `from_ace`/`to_ace` pair, not a full ACL spec. `-s` (set,
+  replacing the whole ACL) is the correct flag for a fresh dataset and is what
+  was actually used.
+- A pre-work recursive snapshot `apps@pre-tailscale-20260725` was taken before
+  any of this. `net.ipv4.ip_forward` was already `1`; no sysctl change needed.
+- The container is authenticated (`chanceweldon11@gmail.com`) and running with
+  `--advertise-routes=10.0.0.0/24 --accept-dns=false`. Tailscale IP
+  `100.88.96.116`, hostname `truenas-subnet-router`.
+- `truenas_admin` was granted passwordless sudo (`/etc/sudoers`, appended via
+  `visudo`) so this kind of SSH automation is possible at all — the account
+  previously required an interactive TTY password on every `sudo` call, which
+  blocks any non-interactive SSH session outright. This raises the account's
+  blast radius (anyone who obtains its SSH key/session now has root
+  non-interactively); worth factoring in if reviewing that account's exposure.
+- **Not yet complete / do not mark this deployment done:** the `10.0.0.0/24`
+  route is advertised by the container but has **not** been approved in the
+  Tailscale admin console — verified by checking both a Windows peer's
+  `tailscale status --json` (`PrimaryRoutes` empty) and the container's own
+  `Self.PrimaryRoutes` (also empty). Until it's approved there, only
+  direct device-to-device tailnet features (e.g. Taildrop file transfer)
+  work — the LAN-wide access this deployment exists for is not live yet.
+  Split DNS (`welldonestreams.com` -> `10.0.0.162` in the Tailscale admin
+  DNS settings) and a real off-LAN verification (curl an internal hostname
+  from a client that is provably not on the home LAN, per
+  `TAILSCALE-DEPLOY.md` step 8) are also still open.
+- The existing OPNsense WireGuard tunnel (`10.10.10.0/24`,
+  `vpn.welldonestreams.com`) was left untouched, as designed — it remains a
+  working fallback remote-access path independent of this deployment.
+
+## 2026-07-26 Homepage additions, Actual Budget rename, Beszel deployment
+
+- Added Uptime Kuma, Tailscale, and Actual Budget tiles to Homepage
+  (`/mnt/tank/apps/homepage/services.yaml`, Infrastructure group). Kuma has
+  no widget (no status-page slug exists yet, and Kuma "does not yet have a
+  full API" per Homepage's own widget docs — create a status page and give
+  it a slug if live up/down counts are wanted on the tile later). Tailscale
+  uses Homepage's official widget with `deviceid: nzXB3KcLVg11CNTRL` (a
+  stable, non-secret identifier) and `{{HOMEPAGE_VAR_TAILSCALE_KEY}}`; the
+  user generated the actual API access token and added it as a Homepage env
+  var themselves. Verified live: the tile renders real device data.
+- Renamed the Actual Budget hostname from `actual.welldonestreams.com` to
+  `budget.welldonestreams.com` per user request: AdGuard rewrite edited in
+  place, NPM proxy host's domain swapped (same backend
+  `10.0.0.162:31012`, same wildcard cert, no new certificate issued).
+  Verified `budget.welldonestreams.com` returns HTTP 200 and
+  `actual.welldonestreams.com` no longer resolves. The Kuma monitor for the
+  old hostname was **not** updated (see Open Kuma follow-ups above).
+- Deployed Beszel (host + container metrics; TrueNAS 25.10 no longer
+  provides granular per-process metrics in its own UI, and the gameplan's
+  Phase 7 pre-approved this exact tool once uptime monitoring was stable).
+  Dataset `tank/apps/beszel` (standard ACL), hub container `beszel`
+  (`henrygd/beszel:latest`, port 8090, data at `hub_data`) and agent
+  container `beszel-agent` (`henrygd/beszel-agent:latest`, host network,
+  read-only `docker.sock` mount for container stats, data at `agent_data`).
+  Compose file at `/mnt/tank/apps/beszel/docker-compose.yml`.
+  **Deployed via `docker compose up -d` directly over SSH, not the TrueNAS
+  Apps UI** — the TrueNAS web session had expired at that point in the
+  night and this was done without prompting the user, so unlike every other
+  app in this stack, **Beszel will not appear in TrueNAS's Installed Apps
+  list** and won't get middleware-managed updates. Redeploy it through
+  Apps -> Discover Apps -> Custom App with the same compose content if
+  that management gap matters. Added AdGuard rewrite + NPM proxy host
+  (`beszel.welldonestreams.com` -> `10.0.0.162:8090`, wildcard cert, LAN
+  Only, matching every other internal name) and a Homepage tile. Verified
+  `https://beszel.welldonestreams.com` returns HTTP 200.
+  **Not yet complete:** `beszel-agent` is deployed but stopped (not
+  crash-looping) because it only has placeholder `TOKEN`/`KEY` values —
+  those come from the hub's "Add System" dialog, which requires the hub's
+  first admin account to exist first. Account creation involves choosing a
+  password, which this session did not do (consistent with never handling
+  account credentials directly, same as the sudo password, Tailscale auth
+  key, and Tailscale API token earlier tonight). Create the account at
+  `https://beszel.welldonestreams.com`, add the TrueNAS system, put the
+  real token/key in the compose file's two `PASTE_..._FROM_HUB_ADD_SYSTEM`
+  placeholders, then `docker compose up -d --force-recreate beszel-agent`.
+  Also add `HOMEPAGE_VAR_BESZEL_USER`/`_PASS` to Homepage once the account
+  exists — the tile's widget is already wired to those variable names.

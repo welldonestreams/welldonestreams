@@ -31,9 +31,9 @@ secrets — both `welldonestreams` and `welldonestreams-worker` are public.
   SMS is not currently a working alert path.
 - Trusted local HTTPS names cover the full internal stack: `truenas`,
   `opnsense`, `home`, `plex`, `tautulli`, `sonarr`, `radarr`, `bazarr`,
-  `prowlarr`, `nzbget`, `adguard`, `npm`, `immich`, `mail-archiver`, `actual`,
-  and `kuma`, all under `.welldonestreams.com`, proxying to their TrueNAS
-  application on `10.0.0.162`. `switch` and `ap` proxy to `10.0.0.168:80` and
+  `prowlarr`, `nzbget`, `adguard`, `npm`, `immich`, `mail-archiver`, `budget`,
+  `kuma`, and `beszel`, all under `.welldonestreams.com`, proxying to their
+  TrueNAS application on `10.0.0.162`. `switch` and `ap` proxy to `10.0.0.168:80` and
   `10.0.0.117:80`. All use a wildcard `*.welldonestreams.com` Let's Encrypt
   certificate (issued via a DNS-edit-scoped Cloudflare token, valid through
   2026-10-23) and the Nginx Proxy Manager `LAN Only` access list; none have
@@ -42,6 +42,11 @@ secrets — both `welldonestreams` and `welldonestreams-worker` are public.
   intentionally unchanged.
 - Local ZFS snapshots exist. An off-box backup target is still not configured;
   provider selection is deferred to roughly the first week of August 2026.
+- Tailscale is deployed as a subnet router (dataset `tank/apps/tailscale`,
+  container `truenas-subnet-router`, advertising `10.0.0.0/24`) alongside the
+  existing OPNsense WireGuard tunnel. The subnet route is not yet approved in
+  the Tailscale admin console, so LAN-wide remote access is not live yet — see
+  the 2026-07-26 section in `HOMELAB-HANDOFF.md` and item 1 below.
 
 ## Rules for both agents
 
@@ -66,38 +71,64 @@ secrets — both `welldonestreams` and `welldonestreams-worker` are public.
 This is the flat punch list. Each item links to its full detail in the phase
 below. Everything not listed here in a phase is already done.
 
-1. **Check that the TrueNAS test alert email arrived** (check Spam/Promotions
+1. **Finish last night's (2026-07-26) unattended work — five quick items:**
+   - Approve the `10.0.0.0/24` route for `truenas-subnet-router` at
+     https://login.tailscale.com/admin/machines (toggle it on, then disable
+     key expiry on that machine), then set split DNS
+     (`welldonestreams.com` -> `10.0.0.162`) at
+     https://login.tailscale.com/admin/dns. Without this the Tailscale
+     deployment doesn't actually grant LAN-wide remote access yet.
+   - Update the Uptime Kuma monitor still pointed at the old
+     `actual.welldonestreams.com` (now `budget.welldonestreams.com`) —
+     Kuma needs its own login the agent didn't have.
+   - Finish Beszel setup: create the hub's first admin account at
+     https://beszel.welldonestreams.com, use "Add System" for the TrueNAS
+     host to get a real token/key, put those in
+     `/mnt/tank/apps/beszel/docker-compose.yml` (replacing the two
+     `PASTE_..._FROM_HUB_ADD_SYSTEM` placeholders), then
+     `docker compose up -d --force-recreate beszel-agent` (it's currently
+     stopped on purpose, not crash-looping). Also add
+     `HOMEPAGE_VAR_BESZEL_USER`/`_PASS` to Homepage once the account exists.
+   - Consider redeploying Beszel through TrueNAS's Apps UI (Discover Apps ->
+     Custom App, same compose content) instead of the current plain
+     `docker compose` deployment, if you want it middleware-managed like
+     the other apps.
+   - Do a real off-LAN verification of the Tailscale path once the route is
+     approved (phone on cellular hitting an internal hostname is easiest).
+2. **Check that the TrueNAS test alert email arrived** (check Spam/Promotions
    too). Two-minute check; closes out Phase 3. *(Phase 3)*
-2. **Resolve the `Platonic` release in Sonarr's queue** via Manual Import —
+3. **Resolve the `Platonic` release in Sonarr's queue** via Manual Import —
    verify the actual episode content before importing or blocklisting.
    *(Phase 1)*
-3. **Confirm the Elio WEB-DL replacement finished, imported, and plays in
+4. **Confirm the Elio WEB-DL replacement finished, imported, and plays in
    Plex.** *(Phase 1)*
-4. **Fix Kuma's two ~50%-uptime monitors and add monitor dependencies:**
+5. **Fix Kuma's two ~50%-uptime monitors and add monitor dependencies:**
    delete or rebuild the `home.welldonestreams.com` DNS-type monitor, fix the
    `tautulli` raw-IP monitor's URL/redirect handling, and set the
    `10.0.0.162` ping monitor as the parent of every hostname monitor on that
    host so one outage doesn't fire ~20 alerts. *(Phase 2)*
-5. **Decide the off-box backup provider.** Target window is roughly the first
+6. **Decide the off-box backup provider.** Target window is roughly the first
    week of August 2026 — about a week out from this writing — so this is the
    next big decision, not a someday item. Once chosen: enable encryption, run
    the first backup, and test a restore. *(Phase 4)*
-6. **Run one real Sonarr and one real Radarr download end to end**, confirm
+7. **Run one real Sonarr and one real Radarr download end to end**, confirm
    NZBGet/Sonarr/Radarr file permissions don't need manual chmod/chown, then
    turn on the Recyclarr schedule — the required preview and manual sync
    already succeeded, so scheduling is the only remaining step. *(Phase 5)*
-7. **Replace the 720p CAM copy of The Invite (2026)** when a legitimate
+8. **Replace the 720p CAM copy of The Invite (2026)** when a legitimate
    WEB-DL or better release is available. Not urgent; opportunistic. *(Phase
    1)*
-8. **Record UPS status and shutdown behavior**, or record explicitly that no
+9. **Record UPS status and shutdown behavior**, or record explicitly that no
    UPS is connected. *(Phase 3)*
-9. **Next time you're in OPNsense:** confirm DHCP can't hand out a
-   DNS server other than the intended one, confirm SSH is still disabled, and
-   schedule the 26.7 upgrade maintenance window. *(Phase 6)*
-10. **Non-homelab, whenever you get to it:** the craps prop-bet UI in
-    `casino.html`, and the GPU crash investigation (controlled load test with
-    HWiNFO64). Neither blocks the homelab baseline. *(see "Non-homelab open
-    work" at the bottom)*
+10. **Next time you're in OPNsense:** confirm DHCP can't hand out a
+    DNS server other than the intended one, confirm SSH is still disabled, and
+    schedule the 26.7 upgrade maintenance window. *(Phase 6)*
+11. **Non-homelab, whenever you get to it:** the GPU crash investigation
+    (controlled load test with HWiNFO64). Doesn't block the homelab
+    baseline. The craps prop-bet UI was built 2026-07-26 (Worker + frontend,
+    see `WORKLOG.md`) — smoke-test it in a browser next time you're on the
+    casino page, since it wasn't verified live this session. *(see
+    "Non-homelab open work" at the bottom)*
 
 # Prioritized plan
 
@@ -230,8 +261,11 @@ independent of the home WAN.
 Public: `welldonestreams.com`, `welldonestreams.com/api/poll`, `vault`,
 `requests`, `renewals`.
 Internal: `truenas`, `opnsense`, `home`, `plex`, `nzbget`, `sonarr`, `radarr`,
-`prowlarr`, `bazarr`, `tautulli`, `immich`, `actual`, `adguard`, `npm`,
-`mail-archiver` (all under `.welldonestreams.com`).
+`prowlarr`, `bazarr`, `tautulli`, `immich`, `actual` (hostname renamed to
+`budget.welldonestreams.com` on 2026-07-26 — **this monitor was not
+updated and needs its target URL fixed**, see item 1 above), `adguard`,
+`npm`, `mail-archiver` (all under `.welldonestreams.com`). Beszel is not
+yet monitored here.
 Infrastructure: Ping `10.0.0.1`, Ping `10.0.0.162`, `tautulli` by raw IP, `npm`
 by raw IP.
 
@@ -355,6 +389,9 @@ rename, and appear in Plex without manual intervention.
       (Codex and Claude, 2026-07-25): all 17 internal hostnames, including
       `actual.welldonestreams.com`, resolve through AdGuard to the LAN proxy.
       Actual Budget was reached over HTTPS after its rewrite was restored.
+      **Renamed 2026-07-26:** the Actual Budget hostname is now
+      `budget.welldonestreams.com` (AdGuard rewrite and NPM proxy host both
+      updated; `actual.welldonestreams.com` intentionally no longer resolves).
 - [x] Confirm OPNsense/Unbound forwarding design has no DNS loop with AdGuard.
       Verified live (Codex, 2026-07-25): OPNsense Dnsmasq is bound to LAN port
       5354, while AdGuard forwards to `10.0.0.1:5353`; the services are not
@@ -383,14 +420,22 @@ Install these only when they solve a defined problem:
 
 ### Consider later
 
-- **Tailscale:** simple authenticated remote access without publicly exposing
-  admin pages. Decide whether to run it on OPNsense, a small VM, or another
-  always-on host; do not weaken the existing LAN-only proxy restrictions.
 - **Scrutiny:** optional disk-health dashboard. TrueNAS SMART tests and alerts
   remain authoritative; install Scrutiny only for better visualization/history,
   not as a replacement.
-- **Beszel or Netdata:** optional host/container metrics after uptime monitoring
-  is stable. Avoid adding both initially.
+- ~~**Beszel or Netdata:** optional host/container metrics after uptime
+  monitoring is stable. Avoid adding both initially.~~ **Beszel deployed
+  2026-07-26** (dataset `tank/apps/beszel`, hub on port 8090, agent on host
+  network). Deployed via `docker compose` directly over SSH rather than the
+  TrueNAS Apps UI (session had expired), so it is **not** in TrueNAS's
+  Installed Apps list — a real gap if you want middleware-managed
+  updates/backups for it, worth redeploying through Apps -> Discover Apps ->
+  Custom App later if that matters to you. `beszel.welldonestreams.com` is
+  live (AdGuard + NPM + wildcard cert, LAN Only) and there's a Homepage
+  tile. Still needs a human: create the hub's first admin account, add the
+  TrueNAS system to get a real agent token, and add
+  `HOMEPAGE_VAR_BESZEL_USER`/`_PASS` to Homepage. See the 2026-07-26 entry
+  in `WORKLOG.md` for exact commands.
 - **Watchtower/automatic container updaters:** not recommended for unattended
   production updates. Prefer controlled TrueNAS application updates with a
   snapshot and rollback plan.
@@ -421,9 +466,14 @@ The baseline is complete when all of the following are true:
 
 # Non-homelab open work (tracked here so it doesn't evaporate)
 
-- **Craps prop-bet UI** in `casino.html`. The Worker already supports 2/12 at
-  30:1, 3/11 at 15:1, place bets, and field bets; the frontend surface for
-  those is not yet built. Also the craps "More Info" dropdown work.
+- ~~**Craps prop-bet UI** in `casino.html`. The Worker already supports 2/12
+  at 30:1, 3/11 at 15:1, place bets, and field bets; the frontend surface for
+  those is not yet built.~~ **Built 2026-07-26.** That "Worker already
+  supports it" claim was actually false when checked — only Pass Line
+  existed in `welldonestreams-worker`. Added `betType` handling to the
+  Worker (merged as PR #2) and the matching bet-type picker in
+  `js/games/craps.js`. Not verified in a live browser this session; smoke-
+  test each bet type before trusting it fully.
 - **PC GPU crash investigation** (Radeon RX 7800 XT). Next step is a
   controlled load/gaming test capturing GPU temperature, power draw, and
   clocks with HWiNFO64, followed by a DDU-clean reinstall of a different

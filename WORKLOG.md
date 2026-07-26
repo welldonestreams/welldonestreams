@@ -9,6 +9,94 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-26 — Homelab: deployed Beszel (host + container metrics dashboard)
+  per `HOMELAB-GAMEPLAN.md` Phase 7's pre-approved "after uptime monitoring
+  is stable" recommendation. Dataset `tank/apps/beszel` (standard ACL), hub
+  container `beszel` (port 8090, data at `hub_data`) and agent container
+  `beszel-agent` (host network, read-only Docker socket mount, data at
+  `agent_data`). **Deployed via plain `docker compose up -d` over SSH, not
+  the TrueNAS Apps UI** — the TrueNAS web session had expired and this was
+  done late at night without prompting the user, so it won't appear in
+  TrueNAS's Installed Apps list or get middleware-managed updates/backups
+  the way Kuma/Tailscale/etc. do. Redeploying it through Apps -> Discover
+  Apps -> Custom App with the same compose content (saved at
+  `/mnt/tank/apps/beszel/docker-compose.yml`) would bring it under normal
+  management if that's wanted later; not done here to avoid touching
+  TrueNAS's app database without being able to verify the result end to end.
+  Added AdGuard rewrite + NPM proxy host (`beszel.welldonestreams.com` ->
+  `10.0.0.162:8090`, wildcard cert, LAN Only, matching every other internal
+  name) and a Homepage tile with the widget wired to
+  `{{HOMEPAGE_VAR_BESZEL_USER}}`/`{{HOMEPAGE_VAR_BESZEL_PASS}}`. Verified
+  `https://beszel.welldonestreams.com` returns HTTP 200.
+  **Not done — needs the user:** create the hub's first admin account at
+  that URL, then Add System for the TrueNAS host to get a real TOKEN/KEY,
+  edit those two placeholder values in
+  `/mnt/tank/apps/beszel/docker-compose.yml`, and run
+  `docker compose up -d --force-recreate beszel-agent` (it's currently
+  stopped, not crash-looping, to avoid pointless log noise overnight). Also
+  add the real `HOMEPAGE_VAR_BESZEL_USER`/`_PASS` env vars to Homepage's
+  TrueNAS app config once the account exists, same pattern as every other
+  Homepage credential. None of this involved the agent creating or knowing
+  any account password — consistent with the credential boundary held all
+  session (sudo password, Tailscale auth key, Tailscale API token).
+- 2026-07-26 — Casino: `HOMELAB-GAMEPLAN.md`'s "non-homelab open work" note
+  claimed the Worker already supported craps field/place/prop bets and only
+  the frontend was missing. Checked the actual `welldonestreams-worker` repo
+  (main and its only other branch) and found that claim was false — only
+  Pass Line existed. Built both sides: added `betType`/`number` handling to
+  the Worker's craps case (field 1:1 with 2:1/3:1 on 2/12, place bets at
+  standard 9:5/7:5/7:6 odds, props at 30:1/15:1), merged as
+  `welldonestreams-worker#2`, then built the matching `casino.html`/
+  `js/games/craps.js` bet-type picker and committed it here. Not verified in
+  a live browser this session — worth a smoke test of each new bet type
+  before trusting it fully.
+- 2026-07-26 — Homelab: renamed the Actual Budget hostname from
+  `actual.welldonestreams.com` to `budget.welldonestreams.com` per user
+  request. Updated the AdGuard Home DNS rewrite and the NPM proxy host
+  (domain swapped in place, same backend `10.0.0.162:31012`, same wildcard
+  cert — no new certificate needed). Verified `budget.welldonestreams.com`
+  returns HTTP 200 and `actual.welldonestreams.com` now correctly fails to
+  resolve. Updated hostname-list references in `HOMELAB-GAMEPLAN.md` and
+  `HOMELAB-HANDOFF.md`; left the historical narrative entries describing the
+  original 2026-07-25 rollout intact with an added rename note rather than
+  rewriting history. **Not done:** the Uptime Kuma monitor still targets the
+  old `actual.welldonestreams.com` hostname and will start failing health
+  checks — Kuma requires its own login this session didn't have credentials
+  for, so the monitor's URL needs updating by hand (Settings on the
+  `actual.welldonestreams.com` monitor → change target to
+  `https://budget.welldonestreams.com`).
+- 2026-07-26 — Homelab: added Uptime Kuma, Tailscale, and Actual Budget tiles
+  to Homepage's `/mnt/tank/apps/homepage/services.yaml` (Infrastructure
+  group), matching the existing `HOMEPAGE_VAR_*` secret-reference pattern.
+  Uptime Kuma is a plain link (no Kuma status-page slug exists yet, and Kuma
+  "does not yet have a full API" per its own Homepage widget docs, so no
+  live-stats widget was possible without one). Tailscale uses Homepage's
+  official `tailscale` widget (`deviceid: nzXB3KcLVg11CNTRL`, a non-secret
+  stable identifier, plus `{{HOMEPAGE_VAR_TAILSCALE_KEY}}` for the actual API
+  access token, which the user added themselves as a new Homepage
+  environment variable — not typed in by the agent). Verified live after a
+  Homepage container restart: the Tailscale tile renders real device data
+  (address, last-seen, key-expiry countdown).
+- 2026-07-26 — Homelab: deployed Tailscale as a subnet router on TrueNAS
+  (container `tailscale`, dataset `tank/apps/tailscale`, advertising
+  `10.0.0.0/24`), per a user-authored deployment brief now saved at
+  `TAILSCALE-DEPLOY.md` (not committed — contains no secrets but is
+  session-scratch in intent). Pre-work snapshot `apps@pre-tailscale-20260725`
+  taken first. The brief's ACL command was wrong for this host's
+  `nfs4xdr_setfacl` (0.3.3): its `-m` flag does an in-place single-ACE swap,
+  not "set ACL" — used `-s` instead, which is the correct flag for a fresh
+  dataset. `truenas_admin` had no working sudo automation path (interactive
+  TTY password required on every call, blocking non-interactive SSH
+  entirely); the user added passwordless sudo for that account themselves
+  after being walked through it — the agent did not see or type the sudo
+  password, consistent with never handling account credentials directly.
+  Container is authenticated and running. **Not yet complete as of this
+  writing:** the `10.0.0.0/24` subnet route is advertised but has not been
+  approved in the Tailscale admin console — confirmed by checking both a
+  Windows peer's and the container's own `PrimaryRoutes` (both empty) after
+  the user believed it was done. Split DNS and a genuine off-LAN
+  verification are also still open. See the 2026-07-26 section in
+  `HOMELAB-HANDOFF.md` for full detail and the exact remaining steps.
 - 2026-07-25 — Docs: rewrote `HOMELAB-GAMEPLAN.md` around a new "What to do
   next, in order" punch list so the user has one flat, prioritized view
   instead of needing to scan every phase for open checkboxes. Reordered by
