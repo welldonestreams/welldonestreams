@@ -9,24 +9,69 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-26 — Docs/security: added a phone-number regex check to
+  `.githooks/pre-commit` that blocks any commit staging content with `+1`
+  followed by a 10-digit US number (with or without common separators), or
+  the specific known-leaked digits. Rationale: two independent incidents on
+  this public repo already, both from pasted third-party session content
+  (a DeepSeek dump on 2026-07-25 and a Codex paste on 2026-07-26), where
+  the phone number was not caught before push. Documenting the risk in
+  `AGENTS.md` was not enough — this makes it a hard check, not a hopeful
+  norm. Bypassable with `--no-verify` when there's a legitimate need to
+  commit an example phone-shaped string.
+
+- 2026-07-26 — Docs: corrected the SHA in the "phone-number exposure in
+  git history" security flag entry below. Exposure is real — number
+  `+1REDACTED` appears four times in commit `3760f78` ("Revise WORKLOG
+  with latest monitoring updates"), not commit `e59be91` as originally
+  recorded. Verified by fetching both commits' `.diff` directly from
+  github.com. Underlying content is the July 25 DeepSeek session summary
+  that was cleaned out of the working tree the same day; the cleanup did
+  not touch history.
+
+- 2026-07-26 — Homelab: diagnosed and fixed Plex playback failing on the
+  user's iPhone and TV over LAN wifi (works on PC over wifi and on
+  cellular). Root cause was TrueNAS's Plex app running in Docker bridge
+  mode (`ix-plex_default`) with only `32400/tcp` published to the host —
+  GDM/broadcast discovery ports (`1900/udp`, `32410/udp`,
+  `32412-32414/udp`, `32469/tcp`) never reached the LAN, so native Plex
+  apps couldn't discover the server locally while browsers (which bypass
+  GDM and hit `plex.welldonestreams.com` directly through NPM) and
+  cellular (which skips LAN discovery entirely) both worked. Fix: enable
+  Host Network in the TrueNAS Plex app's Networking config. Verified via
+  `ss -tulnp` that Plex now binds `32400/tcp` and the GDM UDP ports
+  directly on the host, and playback confirmed on iPhone wifi via the
+  native app afterward. Full diagnosis chain — including five ruled-out
+  theories worth naming so a future session doesn't repeat them — is in
+  `HOMELAB-HANDOFF.md`. One durable side artifact: an AdGuard custom
+  filter rule `||steak^` was added during diagnosis after finding real
+  20-second DNS timeouts on DNS-SD queries under the OPNsense local
+  domain `steak.`. That rule was not the fix here (`plex.welldonestreams.com`
+  resolves via instant AdGuard rewrite, not through that upstream path),
+  but it's a legitimate keep — those timeouts were unrelated dead weight
+  slowing other queries.
+
 - 2026-07-26 — **Security flag, unresolved, needs the user's decision:** a
-  Codex commit pushed to `origin/main` tonight (SHA `e59be91`, "Document
-  Tailscale deployment process and updates") contained the user's phone
-  number in cleartext, twice, inside a pasted status update. This repo is
-  public. The current file content has been cleaned up in a later commit,
-  but **the number is still visible in that commit's diff in git history on
-  GitHub** — removing it from the working tree does not remove it from
-  history. This is a repeat of an incident already documented elsewhere in
-  this file (the July 25 Kuma/Signal cleanup entry, "leaked the user's phone
-  number three times into a public repo"). Deliberately not force-pushed or
-  history-rewritten here — that's a destructive, hard-to-reverse operation
-  on shared history that needs the user's explicit go-ahead, not an agent's
-  unilateral call, especially unattended overnight. If the user wants it
-  actually scrubbed: a `git filter-repo` (or BFG Repo-Cleaner) pass to strip
-  that string from all commits, followed by a force-push and everyone
-  re-cloning, would do it — but decide with the user first, and consider
-  whether the number itself needs to be treated as compromised regardless
-  (e.g. if it is not solely a Signal-relay burner number).
+  Codex commit pushed to `origin/main` (SHA `3760f78`, "Revise WORKLOG with
+  latest monitoring updates" — **SHA corrected from an earlier version of
+  this entry, which mis-attributed the leak to `e59be91`; verified by
+  fetching both commits' diffs**) contained the user's phone number in
+  cleartext **four times** inside a pasted DeepSeek session summary. This
+  repo is public. The working-tree content has been cleaned up in later
+  commits, but **the number is still visible in that commit's diff in git
+  history on GitHub** — removing it from the working tree does not remove
+  it from history. This is a repeat of an incident already documented
+  elsewhere in this file (the July 25 Kuma/Signal cleanup entry, "leaked
+  the user's phone number three times into a public repo") — same
+  underlying DeepSeek dump, same leak, caught after push not before.
+  Deliberately not force-pushed or history-rewritten by an agent — that's
+  a destructive, hard-to-reverse operation on shared history that needs
+  the user's explicit go-ahead. If the user wants it actually scrubbed:
+  `git filter-repo --replace-text` targeting that one string, followed by
+  a force-push and everyone re-cloning, would do it — but decide with the
+  user first, and consider whether the number itself needs to be treated
+  as compromised regardless (e.g. if it is not solely a Signal-relay
+  burner number).
 - 2026-07-26 — Homelab (user + Codex, earlier in the night than the entries
   below): finished the two remaining Phase 2 Kuma items — monitor
   dependencies configured (DNS/ping monitors as parents for hostname
