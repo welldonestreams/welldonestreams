@@ -21,8 +21,8 @@ entry — never below the `## Entry template` section at the bottom.**
   commit an example phone-shaped string.
 
 - 2026-07-26 — Docs: corrected the SHA in the "phone-number exposure in
-  git history" security flag entry below. Exposure is real — number
-  `+1REDACTED` appears four times in commit `3760f78` ("Revise WORKLOG
+  git history" security flag entry below. Exposure is real — the leaked
+  phone number appears four times in commit `3760f78` ("Revise WORKLOG
   with latest monitoring updates"), not commit `e59be91` as originally
   recorded. Verified by fetching both commits' `.diff` directly from
   github.com. Underlying content is the July 25 DeepSeek session summary
