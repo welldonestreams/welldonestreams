@@ -1,6 +1,48 @@
 #!/bin/sh
-# Blocks a commit that stages index.html without passing its invariant
-# checks. See scripts/check-landing-page.mjs and AGENTS.md for why.
+# Pre-commit checks for the welldonestreams repo.
+#
+# 1. Landing-page invariants (see scripts/check-landing-page.mjs and AGENTS.md)
+#    when index.html is staged. Prevents the three regressions from commit
+#    35478c6 from silently returning.
+#
+# 2. Phone-number scan on every staged change. Blocks any commit that stages
+#    a US phone number (with country code) or the specific number known to
+#    have leaked into public git history twice already (commit 3760f78 and
+#    a follow-up cleanup). Bypass with `git commit --no-verify` only when
+#    there is a genuine reason to commit an example phone-shaped string.
+
+# --- Landing-page checks ---------------------------------------------------
 if git diff --cached --name-only | grep -q '^index\.html$'; then
   node scripts/check-landing-page.mjs || exit 1
 fi
+
+# --- Phone-number scan -----------------------------------------------------
+# Grep the staged diff (added lines only, "^+" not "^+++") for:
+#   - the specific known-leaked digits, in any format
+#   - +1 followed by 10 digits with optional spaces/dashes/parens/dots
+STAGED_DIFF=$(git diff --cached --unified=0 -- ':(exclude).githooks/pre-commit')
+
+if [ -n "$STAGED_DIFF" ]; then
+  # Only look at added lines
+  ADDED=$(printf '%s\n' "$STAGED_DIFF" | grep '^+' | grep -v '^+++')
+
+  # Known-leaked digits, any formatting (strips separators before match)
+  DIGITS_ONLY=$(printf '%s' "$ADDED" | tr -d ' \t\-.()')
+  if printf '%s' "$DIGITS_ONLY" | grep -qE 'REDACTED'; then
+    echo "pre-commit: BLOCKED — staged content contains the previously-leaked" >&2
+    echo "phone number. If this is intentional (e.g. redaction test), bypass" >&2
+    echo "with: git commit --no-verify" >&2
+    exit 1
+  fi
+
+  # Generic +1 <10-digit> US number with common separators.
+  # Character classes list dash last so grep does not treat it as a range.
+  if printf '%s' "$ADDED" | grep -qE '\+1[ .-]?\(?[0-9]{3}\)?[ .-]?[0-9]{3}[ .-]?[0-9]{4}'; then
+    echo "pre-commit: BLOCKED — staged content matches a US phone number" >&2
+    echo "pattern (+1 followed by 10 digits). This repo is public. Redact" >&2
+    echo "or bypass with: git commit --no-verify" >&2
+    exit 1
+  fi
+fi
+
+exit 0

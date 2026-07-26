@@ -167,6 +167,82 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
 ## Completed maintenance
 
+### 2026-07-26 — Plex playback failure on iPhone/TV wifi — root cause and fix
+
+**Symptom.** User could not play movies on iPhone or TV when either device was
+on the home LAN wifi. Playing on PC wifi worked. Playing on the phone with
+wifi off (cellular) worked. Client-side error was Plex's generic dialog: *"An
+error occurred while attempting to play this video. Please check your
+connection and try again."* Plex dashboard on the server side showed
+`Unable to listen for events on welldonestreams` recurring every 1-2 minutes.
+
+**Root cause.** TrueNAS's Plex app was running in Docker bridge mode
+(`ix-plex_default`) with only `32400/tcp` published to the host. The GDM /
+broadcast discovery ports (`1900/udp`, `32410/udp`, `32412-32414/udp`,
+`32469/tcp`) were exposed inside the container but never mapped to the host,
+so local Plex clients on the LAN could not discover the server via
+broadcast. Browsers connecting directly to `plex.welldonestreams.com`
+bypassed discovery entirely and worked. Cellular connections skipped local
+discovery and went straight to Plex's own remote-relay path and also worked.
+Only native apps on the LAN hit the broken path and hard-failed instead of
+falling through cleanly.
+
+**Fix.** In TrueNAS UI → Apps → Installed Applications → Plex → Edit →
+Networking, checked **Host Network** and saved. Container restarted bound
+directly to the host network stack. Verified:
+
+```
+sudo docker inspect ix-plex-plex-1 --format '{{.HostConfig.NetworkMode}}'
+# host
+
+sudo ss -tulnp | grep -E '32400|32410|32412|32413|32414'
+# shows Plex Media Serv directly bound to 32400/tcp and the GDM UDP ports
+# on all interfaces (0.0.0.0)
+```
+
+The `Unable to listen for events` message stopped appearing in the
+dashboard within two minutes of the restart. Native Plex app on iPhone
+over LAN wifi then played the movie without issue.
+
+**Ruled-out theories, worth naming so a future session doesn't rerun them.**
+The path to the fix went through five wrong causes before finding the right
+one:
+
+- **inotify exhaustion.** `dmesg` and Plex's own log had zero matches for
+  `inotify_add_watch` or `unable to listen`. Limits are 123552 / 1024,
+  well above stock defaults. TrueNAS SCALE ships them pre-tuned.
+- **Server crash / restart.** `uptime` showed 11 days uninterrupted.
+  `docker events` for the failure window was empty. NPM up 8 days, AdGuard
+  up 10 days.
+- **AdGuard DNS blocking Plex domains.** Query log showed
+  `plex.welldonestreams.com` resolving via an instant (0.02 ms) local
+  rewrite — the resolver never touches upstream for this name. Separately
+  found real 20-second timeouts on DNS-SD queries against the OPNsense
+  local domain (`.steak`) and added `||steak^` to AdGuard's custom
+  filtering rules to short-circuit those. Legitimate fix for that class
+  of stall but not the cause of the Plex symptom.
+- **iOS Local Network permission.** Was already enabled for Plex.
+- **Plex Secure Connections = Required forcing `plex.direct` handshake.**
+  Was already set to Preferred. AdGuard query log had zero
+  `plex.direct` queries either way — native app wasn't attempting a
+  DNS-based `plex.direct` connection, ruling out this whole path.
+
+The decisive isolation test was hitting `http://10.0.0.162:32400/web`
+directly from the phone browser on wifi — worked immediately. That proved
+Plex Server, the file, transcoding, and basic LAN reachability were all
+fine, narrowing the problem to something the native app path used that a
+plain browser hitting the direct port did not: local broadcast discovery.
+
+**Small residual items.**
+
+- Startup log shows `Critical: libusb_init failed`. This is Plex looking
+  for USB tuner hardware (DVR/Live TV) and finding none. Cosmetic. Safe
+  to ignore unless a USB tuner is ever added.
+- `32469/tcp` (DLNA) and `1900/udp` (SSDP) did not appear in the `ss`
+  output after the host-network switch — Plex's DLNA server is probably
+  disabled in Settings rather than a networking problem. Not touched;
+  not needed unless the user wants Plex-to-generic-DLNA-client casting.
+
 ### 2026-07-25 — Uptime Kuma + Signal notification deployment
 
 - Deployed Uptime Kuma on TrueNAS. Dataset `tank/apps/uptime-kuma` created
