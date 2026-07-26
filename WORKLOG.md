@@ -8,6 +8,56 @@ commit an entry with the change it describes.
 entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
+-ADMIN ENTRY- PLEASE DELETE, REPHRASE AND UPDATE ALL OTHER PAGES LIKE THE GAMEPLAN
+
+SETUP KUMA, ADDED EVERYTHING TO IT, MADE EVERYTHING 3 ATTEMMPTS BEFORE NOTIFING ON SIGNAL.
+STARTED SETTTING UP ACTUAL BUDGET BUT ITS A PAIN IN THE ASS. ID LIKE TO CHANGE THE NAME FROM ACTUAL.WELLDONESTREAMS TO BUDGET.WELLDONESTREAMS.
+I MANUALLY IMPORTED BANKING CSVS BUT THE TOTALS WERE NOT COORRECT AFTER IMPORT. POTENTIALLY GOING TO PAY 1.50 FOR SIMPLEFIN IF I ONLY HAVE TO DO IT ONCE. ID LIKE TO PAY ONE TIME HAVE SIMPLEFIN IMPORT IT ALL THEN JUST DO MANUAL UPPLOADS AFTER THAT.
+
+HERE IS DEEPSEEKS SUMMARY FOR WHAT WE DID, TAKE IT WITH A GRAIN OF SALT CUZ DEEPSEEK IS RETARDED.
+# Homelab Monitoring & Alerting Setup – Work Log (2026-07-25)
+
+## 1. Signal REST API (10.0.0.162:9922)
+- Deployed `bbernhard/signal-cli-rest-api` container on TrueNAS SCALE.
+- Mode: `json-rpc-native` (working).
+- Volume: `/mnt/tank/apps/signal-api` mapped to `/home/.local/share/signal-cli`.
+- Port mapping: `9922:8080`.
+- Tested API: `/v1/about` → 200 OK.
+- Registered account: `+1REDACTED`.
+- Linked device: `kuma-alerts` via QR code (opened `http://10.0.0.162:9922/v1/qrcodelink?device_name=kuma-alerts`).
+- Test send: `curl -X POST ...` – message received on Signal app.
+
+## 2. Uptime Kuma (home.welldonestreams.com)
+- Already running, with 25+ monitors for all internal and external services.
+- Added custom Signal notification webhook:
+  - Post URL: `http://10.0.0.162:9922/v2/send`
+  - Number: `+1REDACTED`
+  - Recipients: `+1REDACTED`
+- Template: basic `{{ msg }}` (working).
+- Test alert triggered by creating a fake monitor (`10.0.0.253`) – received DOWN and UP notifications via Signal.
+
+## 3. DNS Monitor (home.welldonestreams.com)
+- Created to catch DNS failures.
+- Initial resolver `1.1.1.1` failed because the domain is internal (ENOTFOUND).
+- Corrected resolver to `10.0.0.162` (AdGuard Home on NAS).
+- Condition: `record equals 10.0.0.162`.
+- Now reporting UP (though still flapping – will increase Retries to 2).
+
+## 4. Added Missing Monitors
+- `mail-archiver.welldonestreams.com`
+- `10.0.0.162:30047` (Tautulli IP)
+- `10.0.0.162:8181` (NPM IP)
+- (Still to add: `https://welldonestreams.com/api/poll` – Worker API)
+
+## 5. Cleanup & Next Steps
+- Duplicate monitors (`home.welldonestreams.com` and `welldonestreams.com`) – will delete extras.
+- Set Retries to 1 or 2 on all monitors to avoid false alerts.
+- Set up monitor dependencies: DNS monitor + `10.0.0.162` ping as parents for all hostname-based monitors.
+- Enable Domain Expiry notifications (cert expiry warning) – set to 30 days.
+- External watcher (UptimeRobot) to be configured next for WAN/NAS total outage detection.
+
+-END OF ADMIN, PLEASE MAKE SURE EVERYTHING I TYPED ABOVE THIS IS GONE NEXT TIME YOU UPDATE. UPDATE ALL FILES WHERE NESSECARRY-
+
 
 - 2026-07-25 — Docs: rewrote `HOMELAB-GAMEPLAN.md` around a new "What to do
   next, in order" punch list so the user has one flat, prioritized view
