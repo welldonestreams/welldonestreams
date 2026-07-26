@@ -9,6 +9,24 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-26 — **Security flag, unresolved, needs the user's decision:** a
+  Codex commit pushed to `origin/main` tonight (SHA `e59be91`, "Document
+  Tailscale deployment process and updates") contained the user's phone
+  number in cleartext, twice, inside a pasted status update. This repo is
+  public. The current file content has been cleaned up in a later commit,
+  but **the number is still visible in that commit's diff in git history on
+  GitHub** — removing it from the working tree does not remove it from
+  history. This is a repeat of an incident already documented elsewhere in
+  this file (the July 25 Kuma/Signal cleanup entry, "leaked the user's phone
+  number three times into a public repo"). Deliberately not force-pushed or
+  history-rewritten here — that's a destructive, hard-to-reverse operation
+  on shared history that needs the user's explicit go-ahead, not an agent's
+  unilateral call, especially unattended overnight. If the user wants it
+  actually scrubbed: a `git filter-repo` (or BFG Repo-Cleaner) pass to strip
+  that string from all commits, followed by a force-push and everyone
+  re-cloning, would do it — but decide with the user first, and consider
+  whether the number itself needs to be treated as compromised regardless
+  (e.g. if it is not solely a Signal-relay burner number).
 - 2026-07-26 — Homelab (user + Codex, earlier in the night than the entries
   below): finished the two remaining Phase 2 Kuma items — monitor
   dependencies configured (DNS/ping monitors as parents for hostname
