@@ -21,11 +21,10 @@ entry — never below the `## Entry template` section at the bottom.**
   purge the number from any of its own resources outside this git repo
   (session memory, cached context, logs) — the git-level fix and the
   Support ticket only reach what's inside this repository.
-  **Status: considered closed on this repo's side.** Remaining open item is
-  entirely on GitHub's side (the cache purge) and is not actionable further
-  from here. If the cached views are still visible after a few days, file a
-  follow-up ticket referencing this one rather than repeating the full
-  history-rewrite process.
+  **Status: fully resolved.** GitHub Support confirmed the same day
+  (2026-07-26, ~20:11 UTC) — cache clearance was run, all four dangling
+  commit URLs now return 404, ticket marked Solved. Nothing further to do
+  on this incident.
 
 - 2026-07-26 — Docs/security: added a phone-number regex check to
   `.githooks/pre-commit` that blocks any commit staging content with `+1`
