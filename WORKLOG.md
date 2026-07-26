@@ -9,6 +9,22 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-26 — Homelab (user + Codex, earlier in the night than the entries
+  below): finished the two remaining Phase 2 Kuma items — monitor
+  dependencies configured (DNS/ping monitors as parents for hostname
+  monitors) and the two ~50%-uptime monitors fixed, confirmed via 3 Signal
+  notification test attempts before it worked as expected. Also added
+  monitors for `mail-archiver.welldonestreams.com` and raw-IP checks on
+  Tautulli/NPM. Not independently re-verified by Claude this session (no
+  Kuma login available); treat as user-reported until someone with console
+  access confirms the monitor list directly.
+  Separately, the user attempted setting up Actual Budget by manually
+  importing bank CSVs, but the resulting balances didn't match after
+  import. Considering paying a one-time $1.50 for SimpleFin to do the
+  initial import correctly, then handle ongoing updates via manual CSV
+  uploads after that. Also asked for the Actual Budget hostname to change
+  from `actual.welldonestreams.com` to `budget.welldonestreams.com` — done,
+  see the rename entry below.
 - 2026-07-26 — Homelab: deployed Beszel (host + container metrics dashboard)
   per `HOMELAB-GAMEPLAN.md` Phase 7's pre-approved "after uptime monitoring
   is stable" recommendation. Dataset `tank/apps/beszel` (standard ACL), hub

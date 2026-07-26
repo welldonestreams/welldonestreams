@@ -1,6 +1,6 @@
-# Homelab completion game plan
+﻿# Homelab completion game plan
 
-Last updated: 2026-07-25 (America/Los_Angeles)
+Last updated: 2026-07-26 (America/Los_Angeles)
 
 This is the shared operating plan for the remaining TrueNAS, networking, media,
 monitoring, and backup work. It is written for the user, Codex, and Claude. Keep
@@ -95,18 +95,17 @@ below. Everything not listed here in a phase is already done.
      the other apps.
    - Do a real off-LAN verification of the Tailscale path once the route is
      approved (phone on cellular hitting an internal hostname is easiest).
-2. **Check that the TrueNAS test alert email arrived** (check Spam/Promotions
-   too). Two-minute check; closes out Phase 3. *(Phase 3)*
-3. **Resolve the `Platonic` release in Sonarr's queue** via Manual Import —
-   verify the actual episode content before importing or blocklisting.
+2. ~~**Check that the TrueNAS test alert email arrived.**~~ **Done** —
+   confirmed received. *(Phase 3)*
+3. ~~**Resolve the `Platonic` release in Sonarr's queue.**~~ **Done.**
    *(Phase 1)*
 4. **Confirm the Elio WEB-DL replacement finished, imported, and plays in
    Plex.** *(Phase 1)*
-5. **Fix Kuma's two ~50%-uptime monitors and add monitor dependencies:**
-   delete or rebuild the `home.welldonestreams.com` DNS-type monitor, fix the
-   `tautulli` raw-IP monitor's URL/redirect handling, and set the
-   `10.0.0.162` ping monitor as the parent of every hostname monitor on that
-   host so one outage doesn't fire ~20 alerts. *(Phase 2)*
+5. ~~**Fix Kuma's two ~50%-uptime monitors and add monitor dependencies.**~~
+   **Reported done** by the user earlier on 2026-07-26 (monitor dependencies
+   configured, both flaky monitors fixed, confirmed via Signal test alerts).
+   Not independently re-verified by an agent this session — worth a quick
+   look in the Kuma UI to confirm next time someone's logged in. *(Phase 2)*
 6. **Decide the off-box backup provider.** Target window is roughly the first
    week of August 2026 — about a week out from this writing — so this is the
    next big decision, not a someday item. Once chosen: enable encryption, run
@@ -159,6 +158,11 @@ there is enough free space for download unpacking and media imports. **Met.**
 The release name contains `Platonic.2025...NF...`, while the expected series is
 `Platonic (2023)` and the known show is associated with Apple TV+, not Netflix.
 Treat this as suspicious even though episode titles may look plausible.
+
+**Reported resolved by the user on 2026-07-26** (see the punch list above);
+the checklist below wasn't updated with which resolution path was taken
+(manual-mapped and imported, vs. removed and blocklisted) — confirm the
+actual state in Sonarr before assuming either.
 
 - [ ] Open Sonarr > Activity > Queue > Manual Import for the affected release.
 - [ ] Inspect the actual video file, runtime, episode title, and content.
@@ -274,6 +278,12 @@ Duplicate monitors for `home.welldonestreams.com` and `welldonestreams.com`
 were removed in cleanup.
 
 ### Open items in Phase 2
+
+**User-reported resolved on 2026-07-26** (dependencies configured, both
+monitors below fixed), but not independently re-verified by an agent this
+session — the three checkboxes weren't updated with which specific fix was
+applied to each. Confirm directly in the Kuma UI next time someone's logged
+in, then check these off for real.
 
 - [ ] **Monitor dependencies not yet configured.** Set the `10.0.0.162` ping
       monitor as the parent of every hostname monitor hosted on `10.0.0.162`,
