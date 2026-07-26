@@ -9,6 +9,24 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-26 — Docs/security, closing this incident: filed a GitHub Support
+  ticket (via the Support Virtual Assistant flow, category "cached dangling
+  commit removal") requesting a purge of cached views for the four dangling
+  commits that showed the leaked phone number after the `git filter-repo`
+  history rewrite: `3760f78`, `988d446`, `fbab899`, `33bc3b6`. Confirmed no
+  forks of this repository exist and none of the four commits are referenced
+  by any pull request, so this ticket covers every remaining known exposure
+  surface GitHub controls. Ticket was accepted; no fixed SLA given. Also
+  added a direct note in `AGENTS.md`'s Security section asking Codex to
+  purge the number from any of its own resources outside this git repo
+  (session memory, cached context, logs) — the git-level fix and the
+  Support ticket only reach what's inside this repository.
+  **Status: considered closed on this repo's side.** Remaining open item is
+  entirely on GitHub's side (the cache purge) and is not actionable further
+  from here. If the cached views are still visible after a few days, file a
+  follow-up ticket referencing this one rather than repeating the full
+  history-rewrite process.
+
 - 2026-07-26 — Docs/security: added a phone-number regex check to
   `.githooks/pre-commit` that blocks any commit staging content with `+1`
   followed by a 10-digit US number (with or without common separators), or
