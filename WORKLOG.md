@@ -9,6 +9,121 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-26 — Homelab: standardized the library on 1080p (Radarr; Sonarr was
+  already correct). Full state and the one unfinished step are in
+  `HOMELAB-HANDOFF.md` under "1080p standardization". Durable reasoning:
+  Moving movies to a 1080p profile is **not sufficient on its own** — Radarr
+  ranks Remux/2160p *above* Bluray-1080p and never downgrades, so those
+  files show as cutoff-*met* and are silently left alone. Confirmed
+  empirically: after reassigning all 336 movies to profile 7, cutoff-unmet
+  returned 106 and every one was a movie with no file at all. Reaching
+  "strictly 1080p" therefore requires deleting the higher-tier files so
+  Radarr re-grabs within profile. Anyone revisiting this should not expect
+  a profile change alone to do anything to existing 4K/Remux media.
+  Second trap, worth knowing before trusting the API: `DELETE
+  /api/v3/moviefile/bulk` returned HTTP 200 and removed the database
+  records, but **left every file on disk**. The library looked clean from
+  Radarr's side while 2.28 TB of orphans remained in the movie folders.
+  Always verify on-disk state after that endpoint rather than trusting the
+  response code.
+  A recursive `tank/data/media@pre-1080p-standardize-20260726` snapshot was
+  taken before any deletion, deliberately converting an irreversible media
+  purge into a reversible one — the established pre-work-snapshot pattern in
+  this homelab, and the reason the unfinished cleanup is safe to leave
+  pending rather than urgent.
+
+- 2026-07-26 — Homelab: acted on the audit below. Full change list is in
+  `HOMELAB-HANDOFF.md` under "2026-07-26 — Audit remediation"; the durable
+  reasoning that the diff won't show:
+  The `apps`-pool fix is deliberately **local replication to `tank`, not a
+  second snapshot task**. Snapshots on a single-disk pool are worthless
+  against that disk dying, which was the actual risk — so the value is in
+  the copy landing on raidz2, and a snapshot task alone would have looked
+  like a fix without being one.
+  Radarr's BR-DISK fix was applied at **two layers on purpose**: import
+  lists repointed to the Recyclarr-managed profile 7 (fixes new additions),
+  *and* BR-DISK scored -10000 across profiles 1-6 (fixes the 332 movies
+  already assigned to the old profiles). Doing only the first would have
+  left the existing library still able to grab discs. Note that Radarr's
+  BR-DISK custom format is a title-regex heuristic — it caught 26 items but
+  is not a guarantee, so full-disc releases can still slip through under a
+  mis-parsed quality.
+  ARC was capped at 8 GB rather than left unset because this box is a
+  15.4 GB N100 with **no swap**; an unbounded ARC plus ~9 GB of containers
+  is how you get an OOM kill instead of cache eviction. Swap was
+  deliberately *not* added — swapfiles on ZFS risk deadlock, so capping ARC
+  is the correct lever here.
+  SSH password auth was disabled only after verifying key auth works; the
+  TrueNAS web shell is the documented fallback if a client ever loses keys.
+
+- 2026-07-26 — Homelab: ran a full read-only audit of the TrueNAS box and
+  cross-checked it against these documents. Findings recorded in
+  `HOMELAB-HANDOFF.md` under "2026-07-26 — Full system audit"; nothing was
+  changed on the system. Durable intent worth keeping out of that list:
+  the audit was prompted by wanting an optimization pass, but what it
+  actually surfaced were three data-durability gaps that outrank any new
+  app — `tank`/`apps` have never been scrubbed, the single-NVMe `apps` pool
+  holds three Postgres databases with no redundancy *and* no periodic
+  snapshot task, and there is still no off-box backup. Treat those as
+  blocking before installing anything else.
+  Two documentation claims were corrected in place rather than appended to,
+  per this repo's stale-contradiction rule: "TrueNAS has enabled SNMP" (the
+  SNMP *service* is stopped; only the SNMP Trap *alert service* is on, so
+  those alerts silently go nowhere) and "pool scrub tasks remain enabled"
+  (enabled, but never actually run on `tank` or `apps`).
+  Also recorded the hardware baseline for the first time — Intel N100, 4
+  cores, 15.4 GB RAM, no swap — because several findings (memory headroom,
+  ARC sizing, Immich lacking QuickSync passthrough) only make sense with
+  that context, and no prior document stated it.
+
+- 2026-07-26 — Homelab: deployed Paperless-ngx (document management/OCR) via
+  TrueNAS's middleware API directly (`midclt call app.create`), not the Apps
+  UI or raw `docker compose` — scripted equivalent of the UI flow, still
+  fully middleware-tracked (shows in Installed Apps, covered by ZFS
+  snapshots). Used the community catalog app (`paperless-ngx` 1.6.37 /
+  app 3.0.2), which bundles Postgres 18, Redis (Valkey), Tika, and
+  Gotenberg — no separate custom-compose stack needed. Pre-work recursive
+  snapshot `tank/apps@pre-paperless-20260726`. Dataset
+  `tank/apps/paperless` with host-path storage for `data/`, `media/`,
+  `consume/` (standard `Group-apps`/`truenas_admin` ACL); `trash` and
+  Postgres data use ixVolumes. DB/Redis/Django-secret-key values were
+  generated server-side and never left the TrueNAS host. Web UI on
+  `10.0.0.162:30070`.
+  Hit two issues getting it reachable at `https://paperless.welldonestreams.com`:
+  (1) the NPM proxy host's Forward Host was mistyped as `10.0.0.1`
+  (OPNsense) instead of `10.0.0.162` (TrueNAS) — found by reading NPM's
+  sqlite `proxy_host` table read-only, fixed in the NPM UI; (2) Django CSRF
+  verification failed behind the reverse proxy until `PAPERLESS_URL` (and
+  `PAPERLESS_CSRF_TRUSTED_ORIGINS`) were added via the app's
+  `additional_envs` config and applied with `app.update` — the catalog
+  app's schema has no dedicated field for this, so it has to go through
+  `additional_envs` for any Paperless instance deployed this way.
+  Admin bootstrap password was rotated by the user immediately after first
+  login, as intended.
+  Still open: Homepage tile, Kuma monitor, and the consume-folder SMB
+  share vs. API-token decision from the original deploy brief.
+
+- 2026-07-26 — Homelab: consolidated Beszel to a single hub. TrueNAS Apps had
+  spun up a second hub (`ix-beszel-hub-beszel-1`, port 30333, middleware-
+  managed) alongside the original raw `docker compose up -d` hub (`beszel`,
+  port 8090, dataset `tank/apps/beszel`) — both had empty "No systems found"
+  databases, so this was pure consolidation, not data migration. Kept the
+  TrueNAS-Apps-managed hub since it survives upgrades cleanly; the old raw
+  hub container is gone (removed outside this session, likely a manual
+  `docker compose down` — its compose file at
+  `/mnt/tank/apps/beszel/docker-compose.yml` is now stale reference only,
+  left on disk). Deployed a fresh `beszel-agent` container on the TrueNAS
+  host (`~/beszel-agent/docker-compose.yml`, host network, port 45876)
+  registered against the new hub via a per-system public key/token pair
+  generated from its "Add System" dialog (not reproduced here — treat as a
+  credential-shaped string, same discipline as the phone-number redaction
+  rule below). Repointed NPM's existing `beszel.welldonestreams.com` proxy
+  host from `10.0.0.162:8090` to `10.0.0.162:30333`, keeping the existing
+  cert and `LAN Only` access list. Verified `https://beszel.welldonestreams.com`
+  returns HTTP 200 against the new hub. Homepage's `services.yaml` beszel
+  widget already referenced the domain rather than a raw port, so it needed
+  no change.
+
 - 2026-07-26 — Docs/security, closing this incident: filed a GitHub Support
   ticket (via the Support Virtual Assistant flow, category "cached dangling
   commit removal") requesting a purge of cached views for the four dangling

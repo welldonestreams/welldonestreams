@@ -142,12 +142,25 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 - Confirmed all four periodic snapshot tasks are enabled and completing on
   schedule. Pool scrub tasks remain enabled for Sunday at 00:00 with a 35-day
   threshold.
+  **Corrected 2026-07-26 audit:** "enabled" is not "has ever run." `zpool
+  status` shows **no `scan:` line at all for `tank` or `apps`** — neither pool
+  has ever completed a scrub. Only `boot-pool` has (2026-07-20). The scrub
+  tasks exist and are enabled, but the 35-day threshold plus recent pool
+  creation means nothing has fired yet. Also note the four periodic snapshot
+  tasks cover `tank/*` only — **the `apps` pool has no periodic snapshot
+  task**, see the audit entry below.
 - TrueNAS 25.10 no longer provides the old SMART scheduling screen. All six
   HDDs and both NVMe devices currently pass SMART health. Added supported cron
   tasks for short tests every Wednesday at 01:00 and long tests monthly on the
   8th at 01:00; both skip execution while a scrub or resilver is active.
-- TrueNAS has enabled SNMP and email alert services. A live email alert-service
-  test was accepted by middleware; receipt still needs user confirmation.
+- TrueNAS has enabled the SNMP Trap and E-Mail **alert services** (both at
+  WARNING level). A live email alert-service test was accepted by middleware
+  and the user later confirmed receipt.
+  **Corrected 2026-07-26 audit:** the SNMP *service* itself
+  (`service.query` -> `snmp`) is `enable=False`/`STOPPED`. Only the SNMP Trap
+  *alert service* is on, so any alert routed to it is silently dropped. Either
+  enable the SNMP service or disable the SNMP Trap alert service; email is the
+  only alert path actually delivering today.
 - NZBGet has unpacking and cleanup enabled with automatic PAR checking. Elio is
   not a failed repair: NZBGet reports `SUCCESS/PAR`, but the completed item is a
   75 GB ZIP containing a full Blu-ray BDMV structure, so it was preserved rather
@@ -164,6 +177,296 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 - Ran `recyclarr sync --preview`, followed by a real sync. Radarr's 40 custom
   formats and Sonarr's 37 custom formats, quality definitions, and profiles were
   already current; the sync made no material profile changes.
+
+## 2026-07-26 — Kometa scheduled on a condition, Homepage restructured
+
+### Kometa was NOT running nightly
+
+Worth stating plainly because it had a Homepage tile implying otherwise: the
+app is `STOPPED` with **no container at all**, and its last real run was
+**2026-07-19** (2h 0m 38s, per `/mnt/tank/apps/kometa/logs/meta.log`). It has
+not run since. That run also ended with errors —
+`'mal_*' requires MyAnimeList to be configured` and a TVDb lookup failure for
+series 114161 — so if those collections matter, MyAnimeList still needs
+configuring in `config.yml`.
+
+### New: conditional Kometa run
+
+The user wanted a scan **only after every Radarr and Sonarr download has
+landed**, not on a fixed timer. Implemented as
+`/mnt/tank/apps/kometa/kometa-when-queues-drain.sh`, registered as TrueNAS
+cron job id 3, every 30 minutes.
+
+Logic: reads both queue counts via API; if either is non-zero it logs and
+exits. When both are zero it requires **two consecutive empty checks** (~30
+min apart) before firing — deliberately, because six Radarr import lists
+auto-add on a schedule and a mid-drain burst would otherwise trigger a
+premature scan. On success it starts the Kometa app, runs
+`kometa.py --run`, then touches `.kometa-ran` and never fires again.
+
+- Log: `/mnt/tank/apps/kometa/queue-watcher.log`
+- To re-arm later: `rm /mnt/tank/apps/kometa/.kometa-ran`
+- First execution confirmed working (correctly declined: radarr=205,
+  sonarr=31 still queued).
+
+### Homepage restructured
+
+- **Search widget removed** from `widgets.yaml` (only `resources` remains).
+  Note the separate `quicklaunch` type-to-search in `settings.yaml` is still
+  active — that is a different feature and was left alone.
+- **Kometa tile removed** from `services.yaml`.
+- **Quick Links moved to the top** of the page by reordering `layout:` in
+  `settings.yaml`, and now contains GitHub, YouTube, Discord, and OP.GG.
+- GitHub was **already** a bookmark under "Homelab Accounts"; that duplicate
+  was removed rather than having it appear twice. YouTube and Discord were
+  likewise already bookmarks and were moved, not duplicated.
+- Backups of all four files are in `/tmp/*.bak` on the host (non-persistent).
+  All four validate as YAML.
+
+## 2026-07-26 — 1080p standardization (Radarr/Sonarr) — INCOMPLETE, one step left
+
+Goal: every movie and show at 1080p, permanently. User explicitly chose
+"strictly 1080p", i.e. replace existing 4K and Remux copies too.
+
+**Sonarr needed no work.** All 94 series were already on profile 7
+(`WEB-1080p`, upgrades on, cutoff WEB 1080p, only WEBDL/WEBRip-1080p
+allowed), its one import list (`Trakt Popular Shows`) already targets that
+profile, and cutoff-unmet is 0. 219 episodes are simply missing/never
+downloaded — normal backlog, not a quality problem.
+
+**Radarr — done:**
+- All **336 movies moved to profile 7** ("HD Bluray + WEB", cutoff
+  Bluray-1080p, upgrades on). Was 201 on profile 6, 43 on 4, 4 on "Any".
+  Bluray-720p was intentionally left allowed as a fallback per user choice.
+- All six import lists already pointed at profile 7 from the earlier audit
+  fix, so **new** additions are correct going forward.
+- **71 non-1080p files (2.28 TB) removed from Radarr's database** — 21
+  Remux-1080p, 16 BR-DISK, 12 WEBDL-2160p, 8 Remux-2160p, 3 WEBRip-2160p,
+  3 CAM, 2 TELESYNC, 4 Unknown, 1 HDTV-1080p, 1 WEBDL-720p.
+- Re-search triggered; new grabs verified **100% correct** (Bluray-1080p /
+  WEBDL-1080p only, zero Remux, zero 2160p).
+- **118 stale Remux/2160p items (3.85 TB) purged from the queue** — they
+  had been grabbed under the old profiles and would have re-polluted the
+  library on import. Queue is now 100% 1080p.
+- Recovery point: `tank/data/media@pre-1080p-standardize-20260726`
+  (recursive). **Everything below is reversible from it.**
+
+**Radarr — THE REMAINING STEP (must be finished):**
+
+`DELETE /api/v3/moviefile/bulk` removed the database records but **did not
+delete the files from disk.** All 49 old files are still in their movie
+folders — e.g. `Interstellar...2160p...REMUX` (102 GB), `Mickey 17...UHD
+REMUX` (66 GB), `Elio...2160p` (22 GB). Radarr no longer knows about them.
+
+Consequence if left: as the 124 queued 1080p replacements import, each
+affected movie folder will contain **both** the old 4K/Remux file and the
+new 1080p one. Plex will see duplicates and may play the wrong one. Disk
+space is also not reclaimed.
+
+Cleanup was **not** performed — an agent safety guard correctly blocked an
+unattended bulk delete of ~2.3 TB of media while the user was away. This
+needs a human to run it. Verify the orphan list before deleting:
+
+```
+# list files on disk that Radarr no longer tracks
+comm -23 \
+  <(find "/mnt/tank/data/media/movies" "/mnt/tank/data/media/anime/movies" \
+      -type f \( -name '*.mkv' -o -name '*.mp4' \) | sort) \
+  <(curl -sS -H "X-Api-Key: $RADARR_KEY" \
+      "http://10.0.0.162:30025/api/v3/movie" \
+    | python3 -c "import json,sys;[print(m['movieFile']['path'].replace('/data/','/mnt/tank/data/')) for m in json.load(sys.stdin) if m.get('movieFile')]" \
+    | sort)
+```
+
+Review that list, then delete those paths. If anything goes wrong, roll back
+with the `pre-1080p-standardize-20260726` snapshot. Once cleanup is done and
+the queue has drained, that snapshot can be destroyed to actually reclaim
+the space.
+
+**Agent note:** two separate attempts to script this deletion were blocked
+by the agent safety guard (bulk deletion of user media). That is working as
+intended — do not try to route around it. It needs a human at the keyboard.
+The current orphan count is **49 files / 1.42 TB**, all now under
+`/mnt/tank/data/media/movies`.
+
+### Anime root folder cleaned up (2026-07-26)
+
+`/data/media/anime/movies` had become a dumping ground: 61 movies, of which
+exactly **one** was actually anime (`Spirited Away`). Interstellar, Mad Max,
+Shawshank, Terminator, the Avengers films, etc. were all filed there.
+
+All **60 non-anime movies were moved to `/data/media/movies`** via Radarr's
+movie editor (`rootFolderPath` + `moveFiles`). Radarr moved the whole movie
+folders, so the untracked orphan files listed above travelled with them and
+are now under `/data/media/movies` too — the delete command above still
+finds them, since it scans both roots.
+
+`anime/movies` now contains only `Spirited Away (2001)`, on disk and in
+Radarr. Going forward the anime tree is for genuine anime only.
+
+**Sonarr's `anime/series` was left alone** — it is correctly populated
+(One Piece, Hunter x Hunter, Frieren, Steins;Gate, Vinland Saga, Erased,
+The Promised Neverland, Black Clover, Solo Leveling). Only `Arcane` and
+`The Legend of Korra` are arguably Western animation rather than anime;
+left in place as a judgement call for the user, not an error.
+
+## 2026-07-26 — Audit remediation (changes actually applied)
+
+Follow-up to the audit below. These were applied on the user's instruction to
+"fix everything you can." Ordered to match the audit's numbering.
+
+- **(1) First-ever scrubs started on `tank` and `apps`.** `apps` completed in
+  33 seconds with **0 errors**. `tank` was still running at the time of
+  writing (~10.7 TB, several hours, 0B repaired so far). Re-check with
+  `zpool status tank` — if it finished with repairs > 0, that is a real
+  finding worth investigating.
+- **(2) The `apps` pool single-disk gap is closed.** Added a recursive
+  periodic snapshot task on `apps` (hourly at :45, 2-week retention, task
+  id 5) and a **local replication task `apps-pool-to-tank`** (id 1) pushing
+  those snapshots to `tank/backups/apps-pool` on the raidz2 pool, 4-week
+  retention. First run succeeded: 26 GB replicated, covering the Immich,
+  Paperless-ngx, and Mail-Archiver Postgres data plus Plex/*arr configs.
+  A failure of the `apps` NVMe is now recoverable from `tank`.
+- **(4) Radarr BR-DISK problem fixed at the root and the queue purged.**
+  All six import lists were repointed from profiles 4/6 to profile **7**
+  ("HD Bluray + WEB"). BR-DISK was set to **-10000** on every other profile
+  (1-6) and de-allowed as a selectable quality where it had been allowed
+  (profile 1 "Any"). Then 26 BR-DISK items (~1.4 TB) were removed from the
+  queue with `removeFromClient=true&blocklist=true`. Radarr's queue went
+  **145 items / 4.5 TB -> 119 items / 3.03 TB with zero BR-DISK**, and
+  `usenet/incomplete` dropped from ~39 GB to ~12 GB.
+- **(5) ZFS ARC capped at 8 GB** (`zfs_arc_max`, live via
+  `/sys/module/zfs/parameters/` and persisted in
+  `/etc/modprobe.d/zfs-arc.conf`). It had been unset, meaning ARC could grow
+  to all 15.4 GB. Available memory improved from 1.7 GB to ~3.0 GB.
+- **(6) SSH hardened:** weak ciphers (`AES128-CBC`, `NONE`) removed, and
+  `passwordauth` disabled. Key auth was verified working immediately after.
+  **Fallback if ever locked out:** the TrueNAS web UI shell, or re-enable
+  password auth in System Settings -> Services -> SSH.
+- **(11) Immich now has `/dev/dri` passthrough** (`use_all_gpus: true`).
+  Both `ix-immich-server-1` and `ix-immich-machine-learning-1` have the
+  device and came back healthy. Should speed up thumbnail/ML work on the
+  N100's QuickSync, which Plex was already using.
+
+### Deliberately not done
+
+- **(7) SSH host keys were not rotated** — user chose to defer, since
+  rotation invalidates `known_hosts` on every client and there is no
+  evidence of external compromise.
+- **(8) The SNMP Trap alert service is still enabled** while the SNMP
+  service is stopped. An attempt to disable it was blocked by an agent
+  safety guard (it reduces alerting). Do this in the UI: System Settings ->
+  Alert Settings, or enable the SNMP service if traps are actually wanted.
+  Email alerting is unaffected and working.
+- **(3) Off-box backup still does not exist.** Unchanged — it needs a
+  provider decision and credentials. The (2) fix above is *on-box*
+  redundancy only; it does not protect against fire/theft/total loss.
+- **(9) No UPS** — hardware purchase, cannot be fixed from software.
+- **(10) The ~24 GB of stuck imports** in `usenet/complete` (`Sisu.2`,
+  `Colpa.Tua.London`) were left alone; they need a manual-import judgement
+  call, not a scripted delete.
+- **Two cleanups worth ~102 GB were identified but not executed**, since
+  both destroy data and neither is urgent (`tank` has 29 TB free): the
+  now-obsolete `codex-pre-elio-regrab-20260725` snapshot (90.6 GB, see
+  gameplan item 4) and two orphaned NZBGet downloads no longer tracked by
+  Radarr — `The.General.1926...COMPLETE.UHD.BLURAY` (12 GB) and
+  `Metropolis.1927...COMPLETE.BLURAY` (337 KB).
+- Stale SSH sessions dating to 2026-07-15 were left in place; killing idle
+  user shells is low value and non-zero risk.
+
+## 2026-07-26 — Full system audit (Claude, read-only sweep)
+
+Deep crawl of pools, disks, memory, apps, network, security, and the *arr
+stack, cross-checked against these documents. Findings ordered by severity.
+Nothing in this section was changed — it is a findings list.
+
+**Hardware baseline (was not previously written down anywhere):** Intel N100,
+4 cores, **15.4 GB RAM**. This is a low-power box running 23 apps. Several
+findings below are only meaningful in that context.
+
+### Critical
+
+1. **Neither `tank` nor `apps` has ever been scrubbed.** `zpool status` shows
+   no `scan:` line for either. `tank` holds 10.7 TB across a 6-wide raidz2.
+   Silent bit-rot would currently go undetected until a read fails. Fix: run
+   `zpool scrub tank` manually once (expect many hours), then let the Sunday
+   task maintain it.
+2. **The `apps` pool is a single 512 GB KIOXIA NVMe with no redundancy and no
+   periodic snapshot task.** It holds `apps/ix-apps`: the Postgres data for
+   Immich, Paperless-ngx, and Mail-Archiver, plus Plex/Radarr/Sonarr/Prowlarr
+   configs and all Docker state (23.6 GB). Its only snapshots are three manual
+   pre-work ones from 2026-07-25 — and same-disk snapshots do not survive the
+   disk dying. That NVMe has 10,688 power-on hours. Vaultwarden is *not*
+   affected: its `/data` is a host path on `tank/apps/vaultwarden` (raidz2 +
+   snapshotted). Fix: add a periodic snapshot task for `apps`, and replicate
+   it to `tank`.
+3. **No off-box backup of any kind exists.** `replication.query`,
+   `cloudsync.query`, and `rsynctask.query` all return 0. Already known (see
+   the gameplan's early-August target) but restated here because findings 1
+   and 2 make it materially worse than it reads.
+
+### High
+
+4. **Radarr queue is 145 items / 4.5 TB, including 28 BR-DISK full-disc
+   rips.** BR-DISK is the exact failure mode already documented for Elio
+   (a full BDMV structure Radarr cannot import) — there are now 28 of them
+   queued, including `The.Exorcist.1973...COMPLETE.UHD.BLURAY` (27 GB already
+   pulled) and `The.General.1926...COMPLETE.UHD.BLURAY`. Another 90 items are
+   Remux-1080p at 20-40 GB each.
+   **Root cause:** six import lists all have auto-add enabled (IMDb Popular,
+   IMDb Top 250, StevenLu, TMDb Popular, Trakt Popular Movies, and the Trakt
+   Popular Animation list added 2026-07-26), and they target quality profiles
+   `4` (HD-1080p) and `6` (HD - 720p/1080p). Both allow Remux and score
+   BR-DISK at **0**. Only profile `7` ("HD Bluray + WEB", the Recyclarr/TRaSH
+   managed one) scores BR-DISK at **-10000** and excludes Remux.
+   Fix: point the import lists at profile `7`, or apply the TRaSH BR-DISK
+   custom format to profiles 1/4/5/6. Sonarr is unaffected — its queue is 40
+   items / 0.04 TB, all WEB-DL/WEBRip 1080p.
+5. **Memory has no headroom and there is no swap.** 13 GB of 15.4 GB used,
+   1.7 GB available, `SwapTotal: 0`, `Committed_AS` 21.5 GB against a
+   `CommitLimit` of 8 GB. ZFS `arc_c_max` is set to the full 15.4 GB. No OOM
+   kills have occurred yet, so this is a headroom warning rather than an
+   active fault — but Paperless-ngx (added 2026-07-26) contributes five
+   containers including Tika and Gotenberg. Consider capping ARC (~6-8 GB)
+   before adding anything else.
+
+### Medium
+
+6. **SSH hardening gaps:** `passwordauth: true` (key auth already works for
+   `truenas_admin`), weak ciphers still permitted (`AES128-CBC`, `NONE`),
+   no 2FA on either account, and `root` is not locked. Combined with the
+   passwordless sudo granted on 2026-07-25, an SSH password compromise is a
+   direct path to root.
+7. **SSH host keys should be rotated.** During this audit a `midclt call
+   ssh.config` returned the full config object including the private
+   `host_ecdsa_key`, `host_ed25519_key`, and `host_rsa_key` values, which
+   were exposed in an agent session transcript. Nothing indicates external
+   compromise, but regenerating the host keys is the clean response. (Note
+   for future agents: query specific fields, not whole config objects.)
+8. **SNMP Trap alert service is enabled but the SNMP service is stopped** —
+   alerts routed there go nowhere. See the corrected note above.
+9. **No UPS is configured** (`ups.config` has empty driver/port). Still open
+   as gameplan item 9. For a 6-disk ZFS box this is a real unclean-shutdown
+   risk.
+10. **~24 GB stuck in `/mnt/tank/data/usenet/complete`** — `Sisu.2` (13 GB,
+    since 2026-07-18) and `Colpa.Tua.London` (11 GB, since 2026-07-17) have
+    sat unimported for over a week.
+11. **Immich has no `/dev/dri` passthrough** while Plex does. On an N100,
+    QuickSync would meaningfully speed up Immich's thumbnail/ML work.
+12. Kometa is `STOPPED` with no container, but still has a Homepage tile.
+13. NZBGet has 21 container restarts (exit 0, not OOM) and stale SSH sessions
+    dating to 2026-07-15 are accumulating on the host.
+
+### Verified healthy (no action needed)
+
+- All three pools ONLINE, no read/write/checksum errors, no active alerts.
+- All 8 disks pass SMART. The six 10 TB WD HDDs have only ~337 power-on hours
+  and 0 reallocated/pending sectors. Capacity is comfortable: `tank` is 19%
+  full with 29.1 TB usable free.
+- All 23 apps are on current versions with no pending upgrades or image
+  updates.
+- Only `cifs` and `ssh` services are exposed; ftp/nfs/iscsi/nvmet are off.
+- All five NPM certificates renew between 2026-10-14 and 2026-10-23.
 
 ## Completed maintenance
 
@@ -464,17 +767,15 @@ plain browser hitting the direct port did not: local broadcast discovery.
   blocks any non-interactive SSH session outright. This raises the account's
   blast radius (anyone who obtains its SSH key/session now has root
   non-interactively); worth factoring in if reviewing that account's exposure.
-- **Not yet complete / do not mark this deployment done:** the `10.0.0.0/24`
-  route is advertised by the container but has **not** been approved in the
-  Tailscale admin console — verified by checking both a Windows peer's
-  `tailscale status --json` (`PrimaryRoutes` empty) and the container's own
-  `Self.PrimaryRoutes` (also empty). Until it's approved there, only
-  direct device-to-device tailnet features (e.g. Taildrop file transfer)
-  work — the LAN-wide access this deployment exists for is not live yet.
-  Split DNS (`welldonestreams.com` -> `10.0.0.162` in the Tailscale admin
-  DNS settings) and a real off-LAN verification (curl an internal hostname
-  from a client that is provably not on the home LAN, per
-  `TAILSCALE-DEPLOY.md` step 8) are also still open.
+- **Route approved 2026-07-26:** the `10.0.0.0/24` route is now approved in
+  the Tailscale admin console — verified via the container's own
+  `tailscale status --json`, which shows `PrimaryRoutes: ["10.0.0.0/24"]`.
+  LAN-wide access over the tailnet is live, not just device-to-device
+  features. Split DNS (`welldonestreams.com` -> `10.0.0.162` in the
+  Tailscale admin DNS settings) and a real off-LAN verification (curl an
+  internal hostname from a client that is provably not on the home LAN, per
+  `TAILSCALE-DEPLOY.md` step 8) have not been independently re-confirmed in
+  this session — check those before assuming the whole deployment is done.
 - The existing OPNsense WireGuard tunnel (`10.10.10.0/24`,
   `vpn.welldonestreams.com`) was left untouched, as designed — it remains a
   working fallback remote-access path independent of this deployment.
