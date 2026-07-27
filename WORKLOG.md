@@ -9,6 +9,20 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-27 — Homelab: measured the disputed 1080p orphan count on the box.
+  **8 files remain, so both documents were wrong** — the handoff claimed all
+  49 were still on disk, the gameplan claimed all 49 were deleted, and the
+  deletion had actually run against ~41 of them and stopped short. Durable
+  lesson, worth more than the number: when two agent-written documents
+  disagree about physical state, the answer is usually a third thing, and
+  neither is worth trusting even as a starting guess. The verification-first
+  structure added earlier the same day is what surfaced it; a coin-flip
+  between the two claims would have been wrong either way. Consequence
+  recorded in the handoff: the `pre-1080p-standardize-20260726` snapshot must
+  **not** be destroyed on the ~2026-08-09 expiry assumption while the count is
+  non-zero — it is still the rollback for an unfinished purge, not dead weight
+  holding 1.4 TB.
+
 - 2026-07-27 — Homelab docs: reconciled a contradiction that could have cost
   1.4 TB, and recorded three verified facts. Durable reasoning:
   `HOMELAB-HANDOFF.md` said the 1080p orphan files were still on disk awaiting

@@ -84,12 +84,13 @@ Written at the end of a long 2026-07-26 session. In priority order:
   2026-07-27 02:15 PDT: `repaired 0B in 06:01:46 with 0 errors`, all six
   raidz2 members ONLINE with zero read/write/cksum errors. No bit-rot. This
   item is closed; scrubs now run on their existing schedule.
-- [ ] **Confirm the 1080p orphan cleanup state.** Do this before touching any
-  media or destroying any snapshot. `HOMELAB-HANDOFF.md` -> "1080p
+- [ ] **Finish the 1080p orphan cleanup — 8 files left** (measured
+  2026-07-27; the earlier "49 remaining" and "all deleted" claims were both
+  wrong). Identify them, then delete by hand. **Do not destroy the
+  `pre-1080p-standardize-20260726` snapshot until the count reads 0** — it is
+  still the rollback for an unfinished purge. `HOMELAB-HANDOFF.md` -> "1080p
   standardization" -> "Orphan cleanup status" is the **single source of
-  truth**; run the verification command there. Do not restate on-disk status
-  in this file — that is exactly the drift that nearly caused a completed
-  1.4 TB deletion to be re-run.
+  truth**; do not restate on-disk status in this file.
 - [ ] **Let the download queue drain.** ~205 Radarr + ~31 Sonarr items, all
   1080p. Nothing to do but wait; Kometa fires itself afterwards.
 - [ ] **Confirm Kometa auto-ran.** After the queues empty, check

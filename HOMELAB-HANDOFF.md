@@ -271,37 +271,53 @@ import, each affected movie folder contains **both** the old 4K/Remux file
 and the new 1080p one. Plex sees duplicates and may play the wrong one, and
 the space is not reclaimed.
 
-### Orphan cleanup status — VERIFY BEFORE ACTING
+### Orphan cleanup status — PARTIALLY DONE, 8 files left
 
-This is the one part of the operation whose state was recorded inconsistently
-across documents on 2026-07-26 and must be confirmed live rather than read.
-It takes ten seconds:
+**Measured live 2026-07-27 16:07 PDT: 8 files remain.** Neither document was
+correct. `HOMELAB-HANDOFF.md` had claimed all 49 were still on disk;
+`HOMELAB-GAMEPLAN.md` had claimed all 49 were deleted. The deletion actually
+ran against most of the set and stopped short — roughly 41 of 49 gone, 8 left.
+Treat this as the lesson: neither file knew, and the only reliable answer came
+from the box.
 
-Quickest check, no API key needed — every remaining file should be 1080p, so
-any hit here is a leftover:
+The 8 have **not** been identified by file or size yet. Do that before
+deleting anything, and before destroying the recovery snapshot.
+
+Re-run the count any time — every remaining file should be 1080p, so any hit
+here is a leftover (no API key needed):
 
 ```
 sudo find /mnt/tank/data/media/movies /mnt/tank/data/media/anime/movies \
   -type f \( -iname '*remux*' -o -iname '*2160p*' -o -iname '*.iso' \) | wc -l
 ```
 
-- **`0`** → the deletion already ran. The 1.42 TB is now held only by the
-  `tank/data/media@pre-1080p-standardize-20260726` snapshot (and
-  `tank/data/media/movies@auto-2026-07-25_03-00`). Those expire on their own by
-  **~2026-08-09** under the 2-week retention; destroy them earlier only after
-  spot-checking the new 1080p copies in Plex, because that is the point of no
-  return.
-- **Non-zero** → cleanup has not been done. Get the authoritative list, which
-  also separates out the CAMs you must keep:
+**Next step — identify the 8 before touching them:**
 
-  ```
-  export RADARR_KEY=...        # Radarr -> Settings -> General
-  sudo -E python3 scripts/orphans.py
-  ```
+```
+sudo find /mnt/tank/data/media/movies /mnt/tank/data/media/anime/movies \
+  -type f \( -iname '*remux*' -o -iname '*2160p*' -o -iname '*.iso' \) \
+  -printf '%s\t%p\n' | sort -rn
+```
 
-  `scripts/orphans.py` lives in this repo (copy it to the box). It is
-  read-only — review its output, then delete those paths by hand. The six
-  intentional CAMs are listed separately under "do NOT delete".
+Then get the authoritative view, which cross-checks against Radarr and
+separates the CAMs you must keep:
+
+```
+export RADARR_KEY=...        # Radarr -> Settings -> General
+sudo -E python3 scripts/orphans.py
+```
+
+`scripts/orphans.py` lives in this repo (copy it to the box). It is
+read-only — review its output, then delete those paths by hand. The six
+intentional CAMs are listed separately under "do NOT delete"; note they are
+CAM/720p releases and so do *not* match the remux/2160p/iso count above.
+
+**Do not destroy the recovery snapshots until the count reads `0`.**
+`tank/data/media@pre-1080p-standardize-20260726` and
+`tank/data/media/movies@auto-2026-07-25_03-00` expire on their own by
+**~2026-08-09** under the 2-week retention. Destroying them earlier is the
+point of no return, and right now they are still the rollback for a purge
+that is not finished.
 
 Roll back from `pre-1080p-standardize-20260726` if anything goes wrong; the
 snapshot exists precisely so this purge is reversible.
