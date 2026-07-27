@@ -505,3 +505,7 @@ entry — never below the `## Entry template` section at the bottom.**
 ```text
 - YYYY-MM-DD — Scope: decision, reason, and any important follow-up.
 ```
+- 2026-07-27 — Homelab: live TrueNAS review found only the enabled E-Mail
+  alert service; the stale SNMP Trap warning was closed without changing alert
+  delivery. OPNsense DHCP DNS enforcement remains intentionally unchanged
+  pending a focused lease-options review.

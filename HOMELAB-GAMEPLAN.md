@@ -107,11 +107,10 @@ Written at the end of a long 2026-07-26 session. In priority order:
   data cable and configure System Settings -> Services -> UPS, then set the
   shutdown threshold. Until then the hardware protects against a brief
   brownout but the box still hard-cuts on a long outage.
-- [ ] **Re-enable alerting that is currently dead.** The SNMP Trap alert
-  service is enabled while the SNMP service is stopped, so anything routed
-  there is silently dropped. Either enable SNMP or disable that alert service
-  in System Settings -> Alert Settings. Email alerting works and is
-  unaffected.
+- [x] **Verify the formerly reported SNMP Trap alert route.** Live TrueNAS
+  review on 2026-07-27 found only the enabled E-Mail alert service; no SNMP
+  Trap alert service is currently configured, so there is no dead route to
+  disable. Email alerting remains the active delivery path.
 - [ ] Optional cleanup: the Kometa app itself is still installed-but-stopped,
   and `/mnt/tank/apps/kometa` holds a 52 MB `config.cache` plus old logs.
   Its Homepage tile is gone but the "Kometa Wiki" bookmark remains.
