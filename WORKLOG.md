@@ -528,3 +528,5 @@ entry — never below the `## Entry template` section at the bottom.**
 ```text
 - YYYY-MM-DD — Scope: decision, reason, and any important follow-up.
 ```
+- 2026-07-27 — Homelab: applied OPNsense Dnsmasq DHCP option 6 to distribute
+  AdGuard Home (`10.0.0.162`) as the DNS server to renewed client leases.

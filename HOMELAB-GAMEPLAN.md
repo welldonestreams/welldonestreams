@@ -170,8 +170,9 @@ number** (for example `HOMELAB-HANDOFF.md` refers to "punch-list item 4" and
    Settings -> Services -> UPS (pick the driver matching the model, usually
    `usbhid-ups`), enable "Shutdown mode", and record the model and shutdown
    threshold here once set. *(Phase 3)*
-10. **Next time you're in OPNsense:** confirm DHCP can't hand out a
-    DNS server other than the intended one, and schedule the 26.7 upgrade
+10. **OPNsense DHCP DNS assignment: complete 2026-07-27.** Dnsmasq DHCP
+    option 6 (`dns-server`) is explicitly set to `10.0.0.162` for all clients,
+    so renewed leases use AdGuard Home. Schedule the 26.7 upgrade only in a
     maintenance window. **SSH: confirmed disabled by the user 2026-07-27.**
     *(Phase 6)*
 11. **Non-homelab, whenever you get to it:** the GPU crash investigation
