@@ -1,4 +1,4 @@
-﻿# Homelab completion game plan
+# Homelab completion game plan
 
 Last updated: 2026-07-26 (America/Los_Angeles)
 
@@ -44,9 +44,14 @@ secrets — both `welldonestreams` and `welldonestreams-worker` are public.
   provider selection is deferred to roughly the first week of August 2026.
 - Tailscale is deployed as a subnet router (dataset `tank/apps/tailscale`,
   container `truenas-subnet-router`, advertising `10.0.0.0/24`) alongside the
-  existing OPNsense WireGuard tunnel. The subnet route is not yet approved in
-  the Tailscale admin console, so LAN-wide remote access is not live yet — see
-  the 2026-07-26 section in `HOMELAB-HANDOFF.md` and item 1 below.
+  existing OPNsense WireGuard tunnel. **Live since 2026-07-26:** the
+  `10.0.0.0/24` route is approved in the admin console (`PrimaryRoutes`
+  populated), split DNS is set, and off-LAN reachability was confirmed by the
+  user. See the 2026-07-26 section in `HOMELAB-HANDOFF.md`.
+- A UPS is physically installed, but TrueNAS is **not** talking to it —
+  `ups.config` has an empty driver and port, so there is no battery
+  monitoring and no graceful shutdown on power loss. Connect the UPS data
+  cable and configure System Settings -> Services -> UPS to close this.
 
 ## Rules for both agents
 
@@ -75,43 +80,46 @@ below. Everything not listed here in a phase is already done.
 
 Written at the end of a long 2026-07-26 session. In priority order:
 
-1. **Check the `tank` scrub result.** `sudo zpool status tank`. It was the
-   pool's **first ever scrub**, ~50% done and `0B repaired` at handoff. If it
-   finished clean, nothing to do. **If `repaired` is non-zero or any device
-   shows read/write/cksum errors, stop and deal with that before anything
-   else** — that would mean real bit-rot on a 6-wide raidz2 holding 10.7 TB.
-2. **Let the download queue drain.** ~205 Radarr + ~31 Sonarr items, all
-   1080p. Nothing to do but wait; Kometa fires itself afterwards (below).
-3. **Confirm Kometa auto-ran.** After the queues empty, check
-   `/mnt/tank/apps/kometa/queue-watcher.log`. If it ran, `.kometa-ran` exists
-   and it will not repeat. If the log shows the MyAnimeList errors again,
-   configure MAL in `config.yml` or drop those `mal_*` collections.
-4. **Reclaim ~1.4 TB when ready.** The old 4K/Remux originals are still held
-   by snapshots. They expire on their own by **~2026-08-09** (2-week
-   retention). To reclaim sooner — and only once you've spot-checked the new
-   1080p copies in Plex, since this is the point of no return:
-   `sudo zfs destroy -r tank/data/media@pre-1080p-standardize-20260726`
-   and `sudo zfs destroy tank/data/media/movies@auto-2026-07-25_03-00`.
-5. **Six theatrical CAMs are deliberately still on disk** (Toy Story 5,
-   Moana 2026, The Invite, The Odyssey, Evil Dead Burn, Minions & Monsters,
-   ~24 GB). No 1080p release exists yet. `sudo python3 /tmp/orphans.py` will
-   list them as deletable automatically once Radarr grabs real releases.
-   Note `/tmp` does not survive a reboot — re-create the script from
-   `HOMELAB-HANDOFF.md` if it's gone.
-6. **Off-box backup is now the single biggest remaining risk.** Everything
-   done on 2026-07-26 improved *on-box* redundancy only. A fire, theft, or
-   total-loss event still loses everything. This was already targeted for
-   early August — it is now overdue relative to how much irreplaceable data
-   is on the box (Immich photos, Paperless documents, Vaultwarden).
-7. **Re-enable alerting that is currently dead.** The SNMP Trap alert service
-   is enabled while the SNMP service is stopped, so anything routed there is
-   silently dropped. Either enable SNMP or disable that alert service in
-   System Settings -> Alert Settings. Email alerting works and is unaffected.
-8. **Still no UPS.** Hardware purchase; a 6-disk ZFS box with no protection
-   against an abrupt power cut is a standing risk.
-9. Optional cleanup: the Kometa app itself is still installed-but-stopped,
-   and `/mnt/tank/apps/kometa` holds a 52 MB `config.cache` plus old logs.
-   Its Homepage tile is gone but the "Kometa Wiki" bookmark remains.
+- [x] **`tank` scrub result — CLEAN.** The pool's first ever scrub finished
+  2026-07-27 02:15 PDT: `repaired 0B in 06:01:46 with 0 errors`, all six
+  raidz2 members ONLINE with zero read/write/cksum errors. No bit-rot. This
+  item is closed; scrubs now run on their existing schedule.
+- [ ] **Confirm the 1080p orphan cleanup state.** Do this before touching any
+  media or destroying any snapshot. `HOMELAB-HANDOFF.md` -> "1080p
+  standardization" -> "Orphan cleanup status" is the **single source of
+  truth**; run the verification command there. Do not restate on-disk status
+  in this file — that is exactly the drift that nearly caused a completed
+  1.4 TB deletion to be re-run.
+- [ ] **Let the download queue drain.** ~205 Radarr + ~31 Sonarr items, all
+  1080p. Nothing to do but wait; Kometa fires itself afterwards.
+- [ ] **Confirm Kometa auto-ran.** After the queues empty, check
+  `/mnt/tank/apps/kometa/queue-watcher.log`. If it ran, `.kometa-ran` exists
+  and it will not repeat. If the log shows the MyAnimeList errors again,
+  configure MAL in `config.yml` or drop those `mal_*` collections.
+- [ ] **Off-box backup is now the single biggest remaining risk.** Everything
+  done on 2026-07-26 improved *on-box* redundancy only. A fire, theft, or
+  total-loss event still loses everything. This was already targeted for
+  early August — it is now overdue relative to how much irreplaceable data
+  is on the box (Immich photos, Paperless documents, Vaultwarden).
+- [ ] **Wire the UPS into TrueNAS.** The UPS itself is installed; TrueNAS
+  just isn't reading it (`ups.config` driver/port empty). Connect the USB
+  data cable and configure System Settings -> Services -> UPS, then set the
+  shutdown threshold. Until then the hardware protects against a brief
+  brownout but the box still hard-cuts on a long outage.
+- [ ] **Re-enable alerting that is currently dead.** The SNMP Trap alert
+  service is enabled while the SNMP service is stopped, so anything routed
+  there is silently dropped. Either enable SNMP or disable that alert service
+  in System Settings -> Alert Settings. Email alerting works and is
+  unaffected.
+- [ ] Optional cleanup: the Kometa app itself is still installed-but-stopped,
+  and `/mnt/tank/apps/kometa` holds a 52 MB `config.cache` plus old logs.
+  Its Homepage tile is gone but the "Kometa Wiki" bookmark remains.
+
+### Standing punch list
+
+These are the long-lived numbered items. **Other documents cite them by
+number** (for example `HOMELAB-HANDOFF.md` refers to "punch-list item 4" and
+"punch-list item 9") — renumber them only if you also update those references.
 
 1. ~~**Finish last night's (2026-07-26) unattended work — five quick items:**~~
    **All done 2026-07-26.** For the record:
@@ -153,11 +161,18 @@ Written at the end of a long 2026-07-26 session. In priority order:
 8. **Replace the 720p CAM copy of The Invite (2026)** when a legitimate
    WEB-DL or better release is available. Not urgent; opportunistic. *(Phase
    1)*
-9. **Record UPS status and shutdown behavior**, or record explicitly that no
-   UPS is connected. *(Phase 3)*
+9. **Connect the UPS to TrueNAS.** Confirmed 2026-07-27: a UPS **is**
+   physically installed, correcting the earlier "no UPS" claim. What is
+   missing is the software half — `ups.config` has an empty driver and port,
+   so TrueNAS cannot see battery state and will not shut down gracefully on a
+   long outage. Connect the UPS USB data cable, then configure System
+   Settings -> Services -> UPS (pick the driver matching the model, usually
+   `usbhid-ups`), enable "Shutdown mode", and record the model and shutdown
+   threshold here once set. *(Phase 3)*
 10. **Next time you're in OPNsense:** confirm DHCP can't hand out a
-    DNS server other than the intended one, confirm SSH is still disabled, and
-    schedule the 26.7 upgrade maintenance window. *(Phase 6)*
+    DNS server other than the intended one, and schedule the 26.7 upgrade
+    maintenance window. **SSH: confirmed disabled by the user 2026-07-27.**
+    *(Phase 6)*
 11. **Non-homelab, whenever you get to it:** the GPU crash investigation
     (controlled load test with HWiNFO64). Doesn't block the homelab
     baseline. The craps prop-bet UI was built 2026-07-26 (Worker + frontend,
@@ -360,8 +375,10 @@ Local snapshots are already configured. Verify the remaining layers:
       Email delivery now targets the user's requested Gmail address and a fresh
       live send-side test completed; user receipt confirmation remains part of
       the exit condition.
-- [ ] Review UPS status and shutdown behavior if a UPS is connected; otherwise
-      record UPS coverage as an open infrastructure task.
+- [ ] Review UPS status and shutdown behavior. **A UPS is installed
+      (confirmed 2026-07-27)**, but TrueNAS is not integrated with it —
+      `ups.config` driver and port are empty, so there is no battery
+      monitoring and no graceful shutdown. See punch-list item 9.
 
 **Exit condition:** snapshots, scrubs, SMART tests, and alert delivery are all
 scheduled and their most recent results are visible.
@@ -444,7 +461,18 @@ rename, and appear in Plex without manual intervention.
       competing for the same listener.
 - [ ] Confirm clients cannot bypass intended DNS using DHCP-provided alternatives,
       except where explicitly allowed. Not verifiable from a LAN client;
-      requires OPNsense DHCP config access.
+      requires OPNsense DHCP config access. **How to check** (OPNsense web UI,
+      `https://10.0.0.1`):
+      1. *Services -> ISC DHCPv4 -> [LAN]* (or *Services -> Dnsmasq DNS & DHCP
+         -> DHCP ranges* on 25.x+). Look at the **DNS servers** field. It
+         should list only `10.0.0.162` (AdGuard). If it is blank, clients get
+         the firewall's own resolver instead — set it explicitly.
+      2. Check there is no second DHCP server on the LAN and no extra DNS
+         entry in *System -> Settings -> General*.
+      3. Optional hardening: *Firewall -> NAT -> Port Forward*, redirect LAN
+         TCP/UDP port 53 to `10.0.0.162` so a device with hardcoded
+         `8.8.8.8` is transparently forced back to AdGuard. Note this does
+         not catch DNS-over-HTTPS, which needs separate blocking.
 - [x] Re-test both LAN-only admin hostnames from a LAN client. Expanded scope:
       re-tested all 17 configured internal hostnames, not just the original
       two. All resolve and respond over HTTPS. `plex` and `nzbget` return HTTP
@@ -454,9 +482,8 @@ rename, and appear in Plex without manual intervention.
       Verified (Claude, 2026-07-25): queried a public resolver (1.1.1.1)
       directly for a representative sample — all return NXDOMAIN, confirming
       no public Cloudflare A/AAAA record exists for any of them.
-- [ ] Keep OPNsense SSH disabled unless a specific maintenance task requires it.
-      Not independently re-verified this session; relies on prior documented
-      state.
+- [x] Keep OPNsense SSH disabled unless a specific maintenance task requires it.
+      **Confirmed disabled by the user, 2026-07-27.**
 - [ ] Defer the OPNsense 26.7 feature upgrade until a scheduled maintenance
       window with a current configuration export.
 

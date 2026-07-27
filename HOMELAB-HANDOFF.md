@@ -223,7 +223,13 @@ premature scan. On success it starts the Kometa app, runs
 - Backups of all four files are in `/tmp/*.bak` on the host (non-persistent).
   All four validate as YAML.
 
-## 2026-07-26 — 1080p standardization (Radarr/Sonarr) — INCOMPLETE, one step left
+## 2026-07-26 — 1080p standardization (Radarr/Sonarr)
+
+> **Single source of truth for this operation.** `HOMELAB-GAMEPLAN.md` points
+> here and must not restate on-disk status independently — the two files
+> disagreed once already (see "Orphan cleanup status" below) and nearly caused
+> a 1.4 TB deletion to be re-run.
+
 
 Goal: every movie and show at 1080p, permanently. User explicitly chose
 "strictly 1080p", i.e. replace existing 4K and Remux copies too.
@@ -251,43 +257,63 @@ downloaded — normal backlog, not a quality problem.
 - Recovery point: `tank/data/media@pre-1080p-standardize-20260726`
   (recursive). **Everything below is reversible from it.**
 
-**Radarr — THE REMAINING STEP (must be finished):**
+**The orphan-file trap (durable, applies to any future run):**
 
-`DELETE /api/v3/moviefile/bulk` removed the database records but **did not
-delete the files from disk.** All 49 old files are still in their movie
-folders — e.g. `Interstellar...2160p...REMUX` (102 GB), `Mickey 17...UHD
-REMUX` (66 GB), `Elio...2160p` (22 GB). Radarr no longer knows about them.
+`DELETE /api/v3/moviefile/bulk` returned HTTP 200 and removed the database
+records but **did not delete the files from disk.** Radarr's library looked
+clean while 49 old files (1.42 TB) remained in their movie folders — e.g.
+`Interstellar...2160p...REMUX` (102 GB), `Mickey 17...UHD REMUX` (66 GB),
+`Elio...2160p` (22 GB). Never trust that endpoint's status code; always
+re-check on-disk state afterwards.
 
-Consequence if left: as the 124 queued 1080p replacements import, each
-affected movie folder will contain **both** the old 4K/Remux file and the
-new 1080p one. Plex will see duplicates and may play the wrong one. Disk
-space is also not reclaimed.
+Consequence if orphans are left in place: as the queued 1080p replacements
+import, each affected movie folder contains **both** the old 4K/Remux file
+and the new 1080p one. Plex sees duplicates and may play the wrong one, and
+the space is not reclaimed.
 
-Cleanup was **not** performed — an agent safety guard correctly blocked an
-unattended bulk delete of ~2.3 TB of media while the user was away. This
-needs a human to run it. Verify the orphan list before deleting:
+### Orphan cleanup status — VERIFY BEFORE ACTING
+
+This is the one part of the operation whose state was recorded inconsistently
+across documents on 2026-07-26 and must be confirmed live rather than read.
+It takes ten seconds:
+
+Quickest check, no API key needed — every remaining file should be 1080p, so
+any hit here is a leftover:
 
 ```
-# list files on disk that Radarr no longer tracks
-comm -23 \
-  <(find "/mnt/tank/data/media/movies" "/mnt/tank/data/media/anime/movies" \
-      -type f \( -name '*.mkv' -o -name '*.mp4' \) | sort) \
-  <(curl -sS -H "X-Api-Key: $RADARR_KEY" \
-      "http://10.0.0.162:30025/api/v3/movie" \
-    | python3 -c "import json,sys;[print(m['movieFile']['path'].replace('/data/','/mnt/tank/data/')) for m in json.load(sys.stdin) if m.get('movieFile')]" \
-    | sort)
+sudo find /mnt/tank/data/media/movies /mnt/tank/data/media/anime/movies \
+  -type f \( -iname '*remux*' -o -iname '*2160p*' -o -iname '*.iso' \) | wc -l
 ```
 
-Review that list, then delete those paths. If anything goes wrong, roll back
-with the `pre-1080p-standardize-20260726` snapshot. Once cleanup is done and
-the queue has drained, that snapshot can be destroyed to actually reclaim
-the space.
+- **`0`** → the deletion already ran. The 1.42 TB is now held only by the
+  `tank/data/media@pre-1080p-standardize-20260726` snapshot (and
+  `tank/data/media/movies@auto-2026-07-25_03-00`). Those expire on their own by
+  **~2026-08-09** under the 2-week retention; destroy them earlier only after
+  spot-checking the new 1080p copies in Plex, because that is the point of no
+  return.
+- **Non-zero** → cleanup has not been done. Get the authoritative list, which
+  also separates out the CAMs you must keep:
+
+  ```
+  export RADARR_KEY=...        # Radarr -> Settings -> General
+  sudo -E python3 scripts/orphans.py
+  ```
+
+  `scripts/orphans.py` lives in this repo (copy it to the box). It is
+  read-only — review its output, then delete those paths by hand. The six
+  intentional CAMs are listed separately under "do NOT delete".
+
+Roll back from `pre-1080p-standardize-20260726` if anything goes wrong; the
+snapshot exists precisely so this purge is reversible.
 
 **Agent note:** two separate attempts to script this deletion were blocked
 by the agent safety guard (bulk deletion of user media). That is working as
 intended — do not try to route around it. It needs a human at the keyboard.
-The current orphan count is **49 files / 1.42 TB**, all now under
-`/mnt/tank/data/media/movies`.
+
+**Six theatrical CAMs are intentionally retained** (Toy Story 5, Moana 2026,
+The Invite, The Odyssey, Evil Dead Burn, Minions & Monsters, ~24 GB). No 1080p
+release exists yet. `scripts/orphans.py` classifies them separately and will
+only list them as deletable once Radarr has grabbed real releases.
 
 ### Anime root folder cleaned up (2026-07-26)
 
@@ -315,11 +341,12 @@ left in place as a judgement call for the user, not an error.
 Follow-up to the audit below. These were applied on the user's instruction to
 "fix everything you can." Ordered to match the audit's numbering.
 
-- **(1) First-ever scrubs started on `tank` and `apps`.** `apps` completed in
-  33 seconds with **0 errors**. `tank` was still running at the time of
-  writing (~10.7 TB, several hours, 0B repaired so far). Re-check with
-  `zpool status tank` — if it finished with repairs > 0, that is a real
-  finding worth investigating.
+- **(1) First-ever scrubs on `tank` and `apps` — both CLEAN.** `apps`
+  completed in 33 seconds with **0 errors**. `tank` finished 2026-07-27
+  02:15 PDT: **`repaired 0B in 06:01:46 with 0 errors`**, all six raidz2
+  members ONLINE with zero read/write/cksum errors. 10.7 TB verified
+  bit-for-bit against checksums — no silent corruption. Scrubs continue on
+  their existing schedule.
 - **(2) The `apps` pool single-disk gap is closed.** Added a recursive
   periodic snapshot task on `apps` (hourly at :45, 2-week retention, task
   id 5) and a **local replication task `apps-pool-to-tank`** (id 1) pushing
@@ -361,14 +388,19 @@ Follow-up to the audit below. These were applied on the user's instruction to
 - **(3) Off-box backup still does not exist.** Unchanged — it needs a
   provider decision and credentials. The (2) fix above is *on-box*
   redundancy only; it does not protect against fire/theft/total loss.
-- **(9) No UPS** — hardware purchase, cannot be fixed from software.
+- **(9) UPS not integrated with TrueNAS.** **Corrected 2026-07-27:** a UPS
+  *is* physically installed — the earlier "no UPS" reading came from
+  `ups.config` having an empty driver/port, which means TrueNAS cannot see
+  the battery, not that no battery exists. Remaining work is software:
+  connect the USB data cable and configure Services -> UPS so the box shuts
+  down gracefully instead of hard-cutting on a long outage.
 - **(10) The ~24 GB of stuck imports** in `usenet/complete` (`Sisu.2`,
   `Colpa.Tua.London`) were left alone; they need a manual-import judgement
   call, not a scripted delete.
 - **Two cleanups worth ~102 GB were identified but not executed**, since
   both destroy data and neither is urgent (`tank` has 29 TB free): the
   now-obsolete `codex-pre-elio-regrab-20260725` snapshot (90.6 GB, see
-  gameplan item 4) and two orphaned NZBGet downloads no longer tracked by
+  gameplan punch-list item 4) and two orphaned NZBGet downloads no longer tracked by
   Radarr — `The.General.1926...COMPLETE.UHD.BLURAY` (12 GB) and
   `Metropolis.1927...COMPLETE.BLURAY` (337 KB).
 - Stale SSH sessions dating to 2026-07-15 were left in place; killing idle
@@ -441,13 +473,16 @@ findings below are only meaningful in that context.
    ssh.config` returned the full config object including the private
    `host_ecdsa_key`, `host_ed25519_key`, and `host_rsa_key` values, which
    were exposed in an agent session transcript. Nothing indicates external
-   compromise, but regenerating the host keys is the clean response. (Note
-   for future agents: query specific fields, not whole config objects.)
+   compromise, but regenerating the host keys is the clean response. The
+   general lesson — query specific fields, never whole config objects — has
+   been promoted to a standing rule in `AGENTS.md` under Security.
 8. **SNMP Trap alert service is enabled but the SNMP service is stopped** —
    alerts routed there go nowhere. See the corrected note above.
-9. **No UPS is configured** (`ups.config` has empty driver/port). Still open
-   as gameplan item 9. For a 6-disk ZFS box this is a real unclean-shutdown
-   risk.
+9. **No UPS is configured in TrueNAS** (`ups.config` has empty driver/port).
+   **Clarified 2026-07-27:** a UPS is physically installed; TrueNAS simply
+   isn't reading it, so there is no graceful shutdown. Still open as gameplan
+   punch-list item 9. For a 6-disk ZFS box this remains a real
+   unclean-shutdown risk until the data cable and Services -> UPS are set up.
 10. **~24 GB stuck in `/mnt/tank/data/usenet/complete`** — `Sisu.2` (13 GB,
     since 2026-07-18) and `Colpa.Tua.London` (11 GB, since 2026-07-17) have
     sat unimported for over a week.
