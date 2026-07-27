@@ -1,6 +1,6 @@
 # Homelab handoff
 
-Last verified: 2026-07-26 (America/Los_Angeles)
+Last verified: 2026-07-27 (America/Los_Angeles)
 
 This file records durable homelab state for Codex and Claude. It intentionally
 contains no passwords, API keys, tokens, cookies, or certificate credentials.
@@ -153,14 +153,16 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   HDDs and both NVMe devices currently pass SMART health. Added supported cron
   tasks for short tests every Wednesday at 01:00 and long tests monthly on the
   8th at 01:00; both skip execution while a scrub or resilver is active.
-- TrueNAS has enabled the SNMP Trap and E-Mail **alert services** (both at
-  WARNING level). A live email alert-service test was accepted by middleware
-  and the user later confirmed receipt.
-  **Corrected 2026-07-26 audit:** the SNMP *service* itself
-  (`service.query` -> `snmp`) is `enable=False`/`STOPPED`. Only the SNMP Trap
-  *alert service* is on, so any alert routed to it is silently dropped. Either
-  enable the SNMP service or disable the SNMP Trap alert service; email is the
-  only alert path actually delivering today.
+- TrueNAS alert delivery is **E-Mail only, and it works.** A live email
+  alert-service test was accepted by middleware and the user later confirmed
+  receipt.
+  **Resolved 2026-07-27 (Codex, live review):** the Alert Services page
+  contains only the enabled E-Mail service. There is **no SNMP Trap alert
+  service configured**, so nothing is being silently dropped. This supersedes
+  the 2026-07-25 claim that SNMP Trap was enabled and the 2026-07-26 audit's
+  "enable SNMP or disable the trap service" follow-up — both are closed, no
+  action needed. The SNMP *service* itself remains `enable=False`/`STOPPED`,
+  which is correct and expected.
 - NZBGet has unpacking and cleanup enabled with automatic PAR checking. Elio is
   not a failed repair: NZBGet reports `SUCCESS/PAR`, but the completed item is a
   75 GB ZIP containing a full Blu-ray BDMV structure, so it was preserved rather
@@ -396,11 +398,12 @@ Follow-up to the audit below. These were applied on the user's instruction to
 - **(7) SSH host keys were not rotated** — user chose to defer, since
   rotation invalidates `known_hosts` on every client and there is no
   evidence of external compromise.
-- **(8) The SNMP Trap alert service is still enabled** while the SNMP
-  service is stopped. An attempt to disable it was blocked by an agent
-  safety guard (it reduces alerting). Do this in the UI: System Settings ->
-  Alert Settings, or enable the SNMP service if traps are actually wanted.
-  Email alerting is unaffected and working.
+- ~~**(8) The SNMP Trap alert service is still enabled** while the SNMP
+  service is stopped.~~ **Closed 2026-07-27** — a live review of the Alert
+  Services page found only the enabled E-Mail service; no SNMP Trap alert
+  service exists to disable. The agent safety guard that blocked the
+  attempted disable turned out to be protecting a no-op. Email alerting is
+  the sole delivery path and is working.
 - **(3) Off-box backup still does not exist.** Unchanged — it needs a
   provider decision and credentials. The (2) fix above is *on-box*
   redundancy only; it does not protect against fire/theft/total loss.
@@ -492,8 +495,11 @@ findings below are only meaningful in that context.
    compromise, but regenerating the host keys is the clean response. The
    general lesson — query specific fields, never whole config objects — has
    been promoted to a standing rule in `AGENTS.md` under Security.
-8. **SNMP Trap alert service is enabled but the SNMP service is stopped** —
-   alerts routed there go nowhere. See the corrected note above.
+8. ~~**SNMP Trap alert service is enabled but the SNMP service is stopped** —
+   alerts routed there go nowhere.~~ **Not reproducible 2026-07-27** — a live
+   review found no SNMP Trap alert service configured at all. This audit
+   finding is withdrawn; see "Verified health" and the alert-delivery note
+   above.
 9. **No UPS is configured in TrueNAS** (`ups.config` has empty driver/port).
    **Clarified 2026-07-27:** a UPS is physically installed; TrueNAS simply
    isn't reading it, so there is no graceful shutdown. Still open as gameplan
