@@ -717,6 +717,14 @@ plain browser hitting the direct port did not: local broadcast discovery.
 
 ## Verified health
 
+- TrueNAS alert-service review (2026-07-27): the live Alert Services page
+  contains only enabled E-Mail delivery. The previously reported SNMP Trap
+  route is absent, so it cannot silently drop alerts in the current config.
+- OPNsense DHCP/DNS review (2026-07-27): Dnsmasq remains the active DNS/DHCP
+  service. Its DHCP-range/options settings need a deliberate lease-options
+  review before enforcing DNS-bypass policy; no DHCP or firewall change was
+  made during this check.
+
 - OPNsense DNS service review (2026-07-25): Dnsmasq DNS/DHCP is enabled on the
   LAN interface and listens on port 5354. AdGuard Home's documented upstream is
   `10.0.0.1:5353`, so these services are deliberately separated by port and no
