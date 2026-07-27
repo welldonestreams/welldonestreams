@@ -9,6 +9,40 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-27 — Homelab docs: reconciled a contradiction that could have cost
+  1.4 TB, and recorded three verified facts. Durable reasoning:
+  `HOMELAB-HANDOFF.md` said the 1080p orphan files were still on disk awaiting
+  a human delete; `HOMELAB-GAMEPLAN.md`, written later the same session, said
+  they were already deleted and only snapshot-held. Both described the same
+  49 files / 1.42 TB. An agent reading the handoff first would have re-run a
+  completed bulk media deletion. **Structural fix, not just a text fix:** the
+  handoff is now the single source of truth for that operation and the
+  gameplan is forbidden from restating on-disk status — one operation's state
+  living in three sections across two files is what allowed the drift, and the
+  same shape will cause it again. The status is written as a live verification
+  command with both branches spelled out, because neither document could be
+  trusted to know the answer.
+  `/tmp/orphans.py` was promoted to `scripts/orphans.py` in this repo. The
+  punch list depended on a script in `/tmp` — one reboot from gone — with a
+  recovery pointer to a script that was never actually in the handoff. It is
+  read-only by design and takes `RADARR_KEY` from the environment, since
+  deleting user media is correctly a human action and the key must never be
+  committed.
+  Verified facts recorded: `tank`'s first-ever scrub finished clean
+  (`0B repaired`, 0 errors, 10.7 TB) — the top-priority open risk is closed;
+  a UPS **is** physically installed, correcting "no UPS" (that reading came
+  from an empty `ups.config`, which only proves TrueNAS isn't reading the
+  battery — the remaining gap is graceful shutdown, not hardware); and
+  OPNsense SSH is confirmed disabled.
+  Also promoted the audit's `midclt call ssh.config` lesson from a buried
+  finding to a standing `AGENTS.md` security rule. It leaked private SSH host
+  keys into a transcript, and "query specific fields, not whole config
+  objects" generalizes past that one call — same category as the phone-number
+  incident, so it belongs where agents actually read it.
+  Stripped a UTF-8 BOM from `HOMELAB-GAMEPLAN.md` (PowerShell
+  `Out-File -Encoding utf8` adds one; use `utf8NoBOM`). Same class of
+  invisible-character bug as the U+2060 that got mobile uploads banned.
+
 - 2026-07-26 — Homelab: standardized the library on 1080p (Radarr; Sonarr was
   already correct). Full state and the one unfinished step are in
   `HOMELAB-HANDOFF.md` under "1080p standardization". Durable reasoning:
