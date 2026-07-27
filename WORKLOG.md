@@ -9,25 +9,28 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
-- 2026-07-27 — Homelab docs: amended three stale SNMP Trap claims in place and
-  relocated a worklog entry. Codex's live review (commit `966dab9`) correctly
-  found **no SNMP Trap alert service configured at all** — the 2026-07-25
-  "SNMP Trap enabled" note and the 2026-07-26 audit's finding 8 were both
-  wrong, and the safety guard that blocked disabling it was protecting a
-  no-op. But that commit recorded the correction only as a new "Verified
-  health" bullet, leaving three contradicting claims live in
-  `HOMELAB-HANDOFF.md`. Those are now struck through and dated in place per
-  this repo's stale-contradiction rule; a reader landing on any of them now
-  gets the correction rather than the retracted claim. Its `WORKLOG.md` entry
-  was also appended below `## Entry template` at the bottom of the file, which
-  the file's own header explicitly forbids — moved to the top of `## Entries`.
-  Both are the same class of drift as the 1080p contradiction fixed earlier
-  today: the finding was right, the bookkeeping was what would have misled the
-  next agent.
-  Unresolved and worth not papering over: no one knows *why* the SNMP Trap
-  service is absent now when two prior sessions recorded it as enabled. Either
-  it was removed between sessions or both earlier readings were wrong. Not
-  chased because the current state is correct and the risk is zero either way.
+- 2026-07-27 — Homelab: audit finding 8 (dead SNMP Trap alert route) closed —
+  **the user disabled SNMP.** Durable lesson, and it is the opposite of what
+  the docs briefly said: an agent safety guard blocked the unattended disable
+  on 2026-07-26 because it reduces alerting, the item was left for a human,
+  and the human did it a day later. The guard worked exactly as designed.
+  Recording that because the interim reading was that the finding had been a
+  false alarm and the guard had protected a no-op — wrong on both counts, and
+  a future agent drawing that conclusion would learn to distrust both the
+  audit findings and the guards.
+  How the wrong reading happened is the transferable part. Codex's live review
+  (commit `966dab9`) observed only the enabled E-Mail alert service and
+  correctly recorded the observation, but inferred from it that the earlier
+  "SNMP Trap enabled" claims had been mistaken. The state had simply *changed*
+  between the two observations, via a user action neither agent saw. **A
+  disappeared finding is more often a fixed finding than a false one** — check
+  whether someone acted before concluding the earlier reading was wrong.
+  Bookkeeping fixed alongside: that commit recorded its correction only as a
+  new "Verified health" bullet, leaving three contradicting claims live in
+  `HOMELAB-HANDOFF.md` (now amended in place per the stale-contradiction
+  rule), and appended its `WORKLOG.md` entry below `## Entry template` at the
+  bottom of the file, which the file's own header explicitly forbids (moved to
+  the top of `## Entries`).
 
 - 2026-07-27 — Homelab: measured the disputed 1080p orphan count on the box.
   **8 files remain, so both documents were wrong** — the handoff claimed all

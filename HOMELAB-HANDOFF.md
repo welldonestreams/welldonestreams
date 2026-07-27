@@ -156,12 +156,13 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 - TrueNAS alert delivery is **E-Mail only, and it works.** A live email
   alert-service test was accepted by middleware and the user later confirmed
   receipt.
-  **Resolved 2026-07-27 (Codex, live review):** the Alert Services page
-  contains only the enabled E-Mail service. There is **no SNMP Trap alert
-  service configured**, so nothing is being silently dropped. This supersedes
-  the 2026-07-25 claim that SNMP Trap was enabled and the 2026-07-26 audit's
-  "enable SNMP or disable the trap service" follow-up — both are closed, no
-  action needed. The SNMP *service* itself remains `enable=False`/`STOPPED`,
+  **Resolved 2026-07-27 — the user disabled SNMP.** The 2026-07-25 note and
+  the 2026-07-26 audit finding were both **correct** when written: the SNMP
+  Trap alert service was enabled while the SNMP service was stopped, so
+  anything routed there was silently dropped. The user disabled it in the UI
+  on 2026-07-27, which is why a live review the same day found only the
+  enabled E-Mail service on the Alert Services page. Fixed by user action, not
+  a false alarm. The SNMP *service* itself remains `enable=False`/`STOPPED`,
   which is correct and expected.
 - NZBGet has unpacking and cleanup enabled with automatic PAR checking. Elio is
   not a failed repair: NZBGet reports `SUCCESS/PAR`, but the completed item is a
@@ -399,11 +400,11 @@ Follow-up to the audit below. These were applied on the user's instruction to
   rotation invalidates `known_hosts` on every client and there is no
   evidence of external compromise.
 - ~~**(8) The SNMP Trap alert service is still enabled** while the SNMP
-  service is stopped.~~ **Closed 2026-07-27** — a live review of the Alert
-  Services page found only the enabled E-Mail service; no SNMP Trap alert
-  service exists to disable. The agent safety guard that blocked the
-  attempted disable turned out to be protecting a no-op. Email alerting is
-  the sole delivery path and is working.
+  service is stopped.~~ **Closed 2026-07-27 — the user disabled it.** This is
+  the intended resolution of the finding: an agent safety guard correctly
+  blocked the unattended disable (it reduces alerting), the item was left for
+  a human, and the human did it. Email alerting is the sole delivery path and
+  is working.
 - **(3) Off-box backup still does not exist.** Unchanged — it needs a
   provider decision and credentials. The (2) fix above is *on-box*
   redundancy only; it does not protect against fire/theft/total loss.
@@ -496,10 +497,9 @@ findings below are only meaningful in that context.
    general lesson — query specific fields, never whole config objects — has
    been promoted to a standing rule in `AGENTS.md` under Security.
 8. ~~**SNMP Trap alert service is enabled but the SNMP service is stopped** —
-   alerts routed there go nowhere.~~ **Not reproducible 2026-07-27** — a live
-   review found no SNMP Trap alert service configured at all. This audit
-   finding is withdrawn; see "Verified health" and the alert-delivery note
-   above.
+   alerts routed there go nowhere.~~ **Fixed 2026-07-27 — the user disabled
+   SNMP.** The finding was accurate; it is closed because it was acted on, not
+   withdrawn. See the alert-delivery note above.
 9. **No UPS is configured in TrueNAS** (`ups.config` has empty driver/port).
    **Clarified 2026-07-27:** a UPS is physically installed; TrueNAS simply
    isn't reading it, so there is no graceful shutdown. Still open as gameplan
@@ -725,7 +725,8 @@ plain browser hitting the direct port did not: local broadcast discovery.
 
 - TrueNAS alert-service review (2026-07-27): the live Alert Services page
   contains only enabled E-Mail delivery. The previously reported SNMP Trap
-  route is absent, so it cannot silently drop alerts in the current config.
+  route is gone **because the user disabled SNMP earlier that day**, closing
+  audit finding 8. It cannot silently drop alerts in the current config.
 - OPNsense DHCP/DNS review (2026-07-27): Dnsmasq remains the active DNS/DHCP
   service. Its DHCP-range/options settings need a deliberate lease-options
   review before enforcing DNS-bypass policy; no DHCP or firewall change was
