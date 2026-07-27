@@ -71,36 +71,72 @@ secrets — both `welldonestreams` and `welldonestreams-worker` are public.
 This is the flat punch list. Each item links to its full detail in the phase
 below. Everything not listed here in a phase is already done.
 
-1. **Finish last night's (2026-07-26) unattended work — five quick items:**
-   - Approve the `10.0.0.0/24` route for `truenas-subnet-router` at
-     https://login.tailscale.com/admin/machines (toggle it on, then disable
-     key expiry on that machine), then set split DNS
-     (`welldonestreams.com` -> `10.0.0.162`) at
-     https://login.tailscale.com/admin/dns. Without this the Tailscale
-     deployment doesn't actually grant LAN-wide remote access yet.
-   - Update the Uptime Kuma monitor still pointed at the old
-     `actual.welldonestreams.com` (now `budget.welldonestreams.com`) —
-     Kuma needs its own login the agent didn't have.
-   - Finish Beszel setup: create the hub's first admin account at
-     https://beszel.welldonestreams.com, use "Add System" for the TrueNAS
-     host to get a real token/key, put those in
-     `/mnt/tank/apps/beszel/docker-compose.yml` (replacing the two
-     `PASTE_..._FROM_HUB_ADD_SYSTEM` placeholders), then
-     `docker compose up -d --force-recreate beszel-agent` (it's currently
-     stopped on purpose, not crash-looping). Also add
-     `HOMEPAGE_VAR_BESZEL_USER`/`_PASS` to Homepage once the account exists.
-   - Consider redeploying Beszel through TrueNAS's Apps UI (Discover Apps ->
-     Custom App, same compose content) instead of the current plain
-     `docker compose` deployment, if you want it middleware-managed like
-     the other apps.
-   - Do a real off-LAN verification of the Tailscale path once the route is
-     approved (phone on cellular hitting an internal hostname is easiest).
+### START HERE — morning of 2026-07-27
+
+Written at the end of a long 2026-07-26 session. In priority order:
+
+1. **Check the `tank` scrub result.** `sudo zpool status tank`. It was the
+   pool's **first ever scrub**, ~50% done and `0B repaired` at handoff. If it
+   finished clean, nothing to do. **If `repaired` is non-zero or any device
+   shows read/write/cksum errors, stop and deal with that before anything
+   else** — that would mean real bit-rot on a 6-wide raidz2 holding 10.7 TB.
+2. **Let the download queue drain.** ~205 Radarr + ~31 Sonarr items, all
+   1080p. Nothing to do but wait; Kometa fires itself afterwards (below).
+3. **Confirm Kometa auto-ran.** After the queues empty, check
+   `/mnt/tank/apps/kometa/queue-watcher.log`. If it ran, `.kometa-ran` exists
+   and it will not repeat. If the log shows the MyAnimeList errors again,
+   configure MAL in `config.yml` or drop those `mal_*` collections.
+4. **Reclaim ~1.4 TB when ready.** The old 4K/Remux originals are still held
+   by snapshots. They expire on their own by **~2026-08-09** (2-week
+   retention). To reclaim sooner — and only once you've spot-checked the new
+   1080p copies in Plex, since this is the point of no return:
+   `sudo zfs destroy -r tank/data/media@pre-1080p-standardize-20260726`
+   and `sudo zfs destroy tank/data/media/movies@auto-2026-07-25_03-00`.
+5. **Six theatrical CAMs are deliberately still on disk** (Toy Story 5,
+   Moana 2026, The Invite, The Odyssey, Evil Dead Burn, Minions & Monsters,
+   ~24 GB). No 1080p release exists yet. `sudo python3 /tmp/orphans.py` will
+   list them as deletable automatically once Radarr grabs real releases.
+   Note `/tmp` does not survive a reboot — re-create the script from
+   `HOMELAB-HANDOFF.md` if it's gone.
+6. **Off-box backup is now the single biggest remaining risk.** Everything
+   done on 2026-07-26 improved *on-box* redundancy only. A fire, theft, or
+   total-loss event still loses everything. This was already targeted for
+   early August — it is now overdue relative to how much irreplaceable data
+   is on the box (Immich photos, Paperless documents, Vaultwarden).
+7. **Re-enable alerting that is currently dead.** The SNMP Trap alert service
+   is enabled while the SNMP service is stopped, so anything routed there is
+   silently dropped. Either enable SNMP or disable that alert service in
+   System Settings -> Alert Settings. Email alerting works and is unaffected.
+8. **Still no UPS.** Hardware purchase; a 6-disk ZFS box with no protection
+   against an abrupt power cut is a standing risk.
+9. Optional cleanup: the Kometa app itself is still installed-but-stopped,
+   and `/mnt/tank/apps/kometa` holds a 52 MB `config.cache` plus old logs.
+   Its Homepage tile is gone but the "Kometa Wiki" bookmark remains.
+
+1. ~~**Finish last night's (2026-07-26) unattended work — five quick items:**~~
+   **All done 2026-07-26.** For the record:
+   - Tailscale `10.0.0.0/24` route approved (`PrimaryRoutes` now populated),
+     split DNS set, and off-LAN reachability confirmed by the user.
+   - The Kuma monitor is on `budget.welldonestreams.com` (id 19).
+   - Beszel was **redeployed through TrueNAS Apps** as `beszel-hub` (port
+     30333) and the old raw `docker compose` hub on 8090 was torn down —
+     the "consider redeploying" item is therefore settled, not pending. A
+     `beszel-agent` container registered against the new hub, NPM's
+     `beszel.welldonestreams.com` was repointed to 30333, and Homepage's
+     widget credentials are set. See `WORKLOG.md` 2026-07-26.
 2. ~~**Check that the TrueNAS test alert email arrived.**~~ **Done** —
    confirmed received. *(Phase 3)*
 3. ~~**Resolve the `Platonic` release in Sonarr's queue.**~~ **Done.**
    *(Phase 1)*
-4. **Confirm the Elio WEB-DL replacement finished, imported, and plays in
-   Plex.** *(Phase 1)*
+4. ~~**Confirm the Elio WEB-DL replacement finished, imported, and plays in
+   Plex.**~~ **Confirmed imported 2026-07-26** — Radarr reports `hasFile=true`,
+   `Elio.2025.2160p.MA.WEB-DL...H.265-TheFarm.mkv`, 20.5 GB, WEBDL-2160p.
+   Plex playback itself still unverified, but the download/import half is
+   done. **Consequence:** the
+   `tank/data/usenet/complete@codex-pre-elio-regrab-20260725` snapshot was
+   only a recovery point for the removed 75 GB disc job, and it is holding
+   **90.6 GB**. It can be destroyed now that the replacement imported.
+   *(Phase 1)*
 5. ~~**Fix Kuma's two ~50%-uptime monitors and add monitor dependencies.**~~
    **Reported done** by the user earlier on 2026-07-26 (monitor dependencies
    configured, both flaky monitors fixed, confirmed via Signal test alerts).
