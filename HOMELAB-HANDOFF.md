@@ -723,6 +723,11 @@ plain browser hitting the direct port did not: local broadcast discovery.
 
 ## Verified health
 
+- OPNsense DHCP DNS assignment (2026-07-27): added and applied Dnsmasq DHCP
+  option 6 (`dns-server`) with value `10.0.0.162` for Any interface. DHCP
+  clients will receive AdGuard Home as their DNS server upon lease renewal;
+  no port-53 redirect rule was added.
+
 - TrueNAS alert-service review (2026-07-27): the live Alert Services page
   contains only enabled E-Mail delivery. The previously reported SNMP Trap
   route is gone **because the user disabled SNMP earlier that day**, closing
