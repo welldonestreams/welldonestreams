@@ -755,7 +755,14 @@ plain browser hitting the direct port did not: local broadcast discovery.
 - Usenet host path: `/mnt/tank/data/usenet`.
 - Shared media-container path: `/data/usenet`.
 - Recyclarr configuration/data lives under `/mnt/tank/apps/recyclarr` and is run
-  with Docker.
+  with Docker (`ix-recyclarr-recyclarr-1`, image `recyclarr/recyclarr:8.7.0`).
+- **Recyclarr has no web UI.** The container exposes no ports, and
+  `recyclarr.welldonestreams.com` is NXDOMAIN by design — there is no NPM proxy
+  host or AdGuard rewrite for it, and there is nothing to proxy to. Do not
+  create one. An agent proposed exactly that Homepage link on 2026-07-27; its
+  Homepage tile (Automation group, added 2026-07-27) deliberately points at
+  `https://recyclarr.dev` instead, since a tile needs a destination that
+  actually loads.
 - Sonarr currently reports some releases as matched by grab-history ID and unable
   to import automatically. Manual Import is required after verifying the actual
   file; suspicious or incorrect releases should be removed and blocklisted.

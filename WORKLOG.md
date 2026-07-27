@@ -9,6 +9,25 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-27 — Homelab: added a Recyclarr tile to Homepage's Automation group,
+  but **not** the way it was proposed. Another agent supplied a snippet with
+  `href: https://recyclarr.welldonestreams.com`. That hostname is NXDOMAIN
+  (verified against AdGuard), has no NPM proxy host, and could not have one:
+  Recyclarr is a scheduled CLI container that exposes **no ports at all**
+  (`docker inspect` shows no `ExposedPorts`). The snippet would have produced a
+  permanently dead tile, and following it further would have meant creating a
+  proxy host for a backend that does not exist.
+  Durable point beyond this one tile: `*.welldonestreams.com` naming has been
+  applied so consistently to this stack that a nonexistent name reads as
+  plausible. Confirm a service actually serves HTTP before giving it a
+  hostname — the trusted-name list in `HOMELAB-GAMEPLAN.md` is the set that
+  does, and Recyclarr is deliberately absent from it.
+  The tile points at `https://recyclarr.dev` instead, matching how Trakt/TMDb
+  are handled — a reference destination that loads, rather than a LAN link that
+  404s. Config backed up to
+  `services.yaml.bak-before-recyclarr-20260727`; Homepage hot-reloaded it with
+  no restart and the entry is live in `/api/services`.
+
 - 2026-07-27 — Homelab: audit finding 8 (dead SNMP Trap alert route) closed —
   **the user disabled SNMP.** Durable lesson, and it is the opposite of what
   the docs briefly said: an agent safety guard blocked the unattended disable
