@@ -1,6 +1,6 @@
 # Homelab completion game plan
 
-Last updated: 2026-07-26 (America/Los_Angeles)
+Last updated: 2026-07-27 (America/Los_Angeles)
 
 This is the shared operating plan for the remaining TrueNAS, networking, media,
 monitoring, and backup work. It is written for the user, Codex, and Claude. Keep

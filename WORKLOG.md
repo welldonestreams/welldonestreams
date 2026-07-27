@@ -9,6 +9,26 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-27 — Homelab docs: amended three stale SNMP Trap claims in place and
+  relocated a worklog entry. Codex's live review (commit `966dab9`) correctly
+  found **no SNMP Trap alert service configured at all** — the 2026-07-25
+  "SNMP Trap enabled" note and the 2026-07-26 audit's finding 8 were both
+  wrong, and the safety guard that blocked disabling it was protecting a
+  no-op. But that commit recorded the correction only as a new "Verified
+  health" bullet, leaving three contradicting claims live in
+  `HOMELAB-HANDOFF.md`. Those are now struck through and dated in place per
+  this repo's stale-contradiction rule; a reader landing on any of them now
+  gets the correction rather than the retracted claim. Its `WORKLOG.md` entry
+  was also appended below `## Entry template` at the bottom of the file, which
+  the file's own header explicitly forbids — moved to the top of `## Entries`.
+  Both are the same class of drift as the 1080p contradiction fixed earlier
+  today: the finding was right, the bookkeeping was what would have misled the
+  next agent.
+  Unresolved and worth not papering over: no one knows *why* the SNMP Trap
+  service is absent now when two prior sessions recorded it as enabled. Either
+  it was removed between sessions or both earlier readings were wrong. Not
+  chased because the current state is correct and the risk is zero either way.
+
 - 2026-07-27 — Homelab: measured the disputed 1080p orphan count on the box.
   **8 files remain, so both documents were wrong** — the handoff claimed all
   49 were still on disk, the gameplan claimed all 49 were deleted, and the
@@ -505,7 +525,3 @@ entry — never below the `## Entry template` section at the bottom.**
 ```text
 - YYYY-MM-DD — Scope: decision, reason, and any important follow-up.
 ```
-- 2026-07-27 — Homelab: live TrueNAS review found only the enabled E-Mail
-  alert service; the stale SNMP Trap warning was closed without changing alert
-  delivery. OPNsense DHCP DNS enforcement remains intentionally unchanged
-  pending a focused lease-options review.
