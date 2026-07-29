@@ -9,6 +9,15 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-28 — Plex: corrected an unsafe database-cache setting. The requested
+  50,000 MB cache exceeded both the TrueNAS host's 15 GB RAM and Plex's 4 GB
+  container limit while the host had under 1 GB available. Set it to 512 MB,
+  retained enabled Intel hardware transcoding, moved intro/credit detection to
+  the overnight maintenance window, and disabled ad detection, chapter-preview
+  generation, deep media analysis, and automatic trash emptying. This keeps
+  playback responsive and protects library metadata from a transient mount
+  issue without changing media files.
+
 - 2026-07-28 — Homelab: replaced the previously fragmented Sonarr/Radarr
   quality-profile setup with one intentional policy in each app, at the user's
   request: `1080p with 720p Fallback`. It is assigned to all 92 series and 361
