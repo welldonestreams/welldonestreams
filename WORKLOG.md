@@ -9,6 +9,15 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-28 — Renewals: extended the self-hosted app's billing model with a
+  `Custom months` cycle (1–120 months). It now stores the selected interval,
+  displays it on the renewal card, and annualizes the price correctly instead
+  of treating every nonstandard interval as yearly. Added only statement-backed
+  recurring records to the live tracker; existing entries were de-duplicated.
+  Transfers, loan payments, utility usage, ordinary purchases, and ambiguous
+  repeat merchants were deliberately excluded. No statement exports or
+  financial identifiers were copied into this public repository.
+
 - 2026-07-28 — AdGuard Home: verified local DNS forwarding through OPNsense
   (`10.0.0.1:5353`), DNSSEC, and the current managed blocklists. Tuned only
   the cache: raised it from 4 MB to 32 MB and enabled optimistic caching. This
