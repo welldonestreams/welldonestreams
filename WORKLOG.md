@@ -14,6 +14,8 @@ entry — never below the `## Entry template` section at the bottom.**
   displays it on the renewal card, and annualizes the price correctly instead
   of treating every nonstandard interval as yearly. Added only statement-backed
   recurring records to the live tracker; existing entries were de-duplicated.
+  A historical payment is not proof that a bill remains active: one closed
+  payment was removed immediately after the user confirmed its status.
   Transfers, loan payments, utility usage, ordinary purchases, and ambiguous
   repeat merchants were deliberately excluded. No statement exports or
   financial identifiers were copied into this public repository.
