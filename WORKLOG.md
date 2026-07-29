@@ -9,6 +9,13 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-29 — Homepage's Seerr/Requests widget was returning HTTP 403 because
+  its environment credential no longer matched Seerr's active API key. Rotated
+  that credential, synchronized the Homepage deployment and Seerr settings,
+  recreated only Homepage, and verified the request-count endpoint returns
+  HTTP 200. The credential remains an environment reference in
+  `services.yaml`; no secret was added to this repository.
+
 - 2026-07-28 — Plex overnight maintenance: retained the existing 2:00–5:00 AM
   maintenance window and its database backup, database optimization, bundle and
   cache cleanup, and metadata refresh tasks. Seek-preview and chapter thumbnails
