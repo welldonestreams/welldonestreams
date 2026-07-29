@@ -363,12 +363,11 @@ only list them as deletable once Radarr has grabbed real releases.
 
 > **Current state:** The old Anime movie and series child datasets have been
 > permanently removed after a clean copy comparison of all 216 source files.
-> Anime now lives directly under one root. Sonarr's 11 affected series and
-> Radarr's remaining anime film record use that root; their obsolete child-root
-> entries were removed. Plex now has exactly Movies, TV Shows, and Anime. Anime
-> deliberately uses Plex's Other Videos type so one library can hold both anime
-> films and series; matching is therefore less automatic than separate library
-> types. Regular Movies and TV Shows were not changed. The historical record
+> Anime now lives directly under one root. Sonarr's 11 affected series use that
+> root. The remaining anime film was moved into Movies and its
+> Radarr record now uses the Movies root. Plex now has exactly Movies, TV Shows,
+> and Anime; Anime is a normal Plex TV Shows library for correct series matching
+> and episode metadata. The historical record
 > below describes the earlier intermediate layout and is not current.
 
 `/data/media/anime/movies` had become a dumping ground: 61 movies, of which
