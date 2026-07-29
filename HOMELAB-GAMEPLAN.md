@@ -92,9 +92,9 @@ Written at the end of a long 2026-07-26 session. In priority order:
   standardization" -> "Orphan cleanup status" is the **single source of
   truth**; do not restate on-disk status in this file.
 - [x] **Unify Anime storage and Plex.** Anime is now one root rather than
-  separate movie and series datasets. Its managed Sonarr and Radarr records
-  use that root, and Plex has one intentional mixed-type Anime library beside
-  Movies and TV Shows. This is separate from the regular-movie orphan cleanup.
+  separate movie and series datasets. Sonarr uses that root; the remaining
+  anime film lives in Movies. Plex has a normal Anime TV library beside Movies
+  and TV Shows. This is separate from the regular-movie orphan cleanup.
 - [ ] **Let the download queue drain.** ~205 Radarr + ~31 Sonarr items, all
   1080p. Nothing to do but wait; Kometa fires itself afterwards.
 - [ ] **Confirm Kometa auto-ran.** After the queues empty, check
