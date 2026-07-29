@@ -14,6 +14,11 @@ entry — never below the `## Entry template` section at the bottom.**
   displays it on the renewal card, and annualizes the price correctly instead
   of treating every nonstandard interval as yearly. Added only statement-backed
   recurring records to the live tracker; existing entries were de-duplicated.
+  Cards now show the renewal cadence and charge followed by the calculated
+  monthly average. The backend persists both custom intervals and lifetime
+  purchase dates; lifetime purchases are excluded from both the UI and
+  `/api/next` totals while their on-card monthly average falls over time from
+  the original purchase amount.
   The bulk editor was patched to preserve custom interval values as well, after
   the initial version exposed a lost-interval regression during verification.
   A historical payment is not proof that a bill remains active: one closed
