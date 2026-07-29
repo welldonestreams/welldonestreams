@@ -9,6 +9,16 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-28 — Plex overnight maintenance: retained the existing 2:00–5:00 AM
+  maintenance window and its database backup, database optimization, bundle and
+  cache cleanup, and metadata refresh tasks. Seek-preview and chapter thumbnails
+  are now generated only during that window, preserving timeline and chapter
+  browsing without competing with daytime use. Intro and credit markers remain
+  scheduled overnight. Ad markers, voice activity data, and extensive analysis
+  remain disabled; automatic trash emptying remains off so a temporary storage
+  outage cannot purge valid library entries. Empty Plex trash manually only
+  after verifying a completed media change.
+
 - 2026-07-28 — Anime storage and Plex were consolidated at the user's request.
   After a clean copy comparison, the old Anime movie and series child datasets
   (and their snapshots) were removed; ordinary Movies and TV Shows were not
