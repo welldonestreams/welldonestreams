@@ -9,6 +9,14 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-28 — Homelab: verified the media-import hardlink constraint before
+  treating it as a defect. `zfs list -r -o name,mountpoint tank/data` confirms
+  `tank/data/usenet` and `tank/data/media` are separate ZFS datasets. Hardlinks
+  cannot cross a dataset boundary, so Sonarr/Radarr imports from the completed
+  Usenet area are copies under the current design. Added the fact and a
+  deliberate future migration decision to Phase 5 of `HOMELAB-GAMEPLAN.md`;
+  no media, dataset, application, or path configuration was changed.
+
 - 2026-07-27 — Homelab: added a Recyclarr tile to Homepage's Automation group,
   but **not** the way it was proposed. Another agent supplied a snippet with
   `href: https://recyclarr.welldonestreams.com`. That hostname is NXDOMAIN

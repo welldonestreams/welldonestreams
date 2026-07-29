@@ -1,6 +1,6 @@
 # Homelab completion game plan
 
-Last updated: 2026-07-27 (America/Los_Angeles)
+Last updated: 2026-07-28 (America/Los_Angeles)
 
 This is the shared operating plan for the remaining TrueNAS, networking, media,
 monitoring, and backup work. It is written for the user, Codex, and Claude. Keep
@@ -431,6 +431,15 @@ Prioritize irreplaceable and configuration data, not replaceable media:
 
 - [x] Confirm NZBGet's `/downloads` path and Sonarr/Radarr's `/data/usenet` path
       are connected by matching remote-path mappings to the same host dataset.
+- [x] Confirm whether imports can use hardlinks. **Verified 2026-07-28:**
+      `tank/data/usenet` and `tank/data/media` are separate ZFS datasets, so
+      Sonarr/Radarr cannot hardlink a completed download into the media
+      library; imports are copies. This is expected for the current layout,
+      not a broken remote-path mapping.
+- [ ] Decide whether the temporary duplicate storage during imports is worth a
+      future dataset-layout migration. Do not merge or move these datasets just
+      to enable hardlinks without a separate migration plan, snapshots, and
+      a tested import/rollback path.
 - [x] Confirm completed download handling is enabled in Sonarr and Radarr.
 - [x] Verify category names in NZBGet match the download-client definitions in
       Sonarr and Radarr.
