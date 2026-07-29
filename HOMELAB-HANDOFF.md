@@ -315,14 +315,14 @@ Re-run the count any time — every remaining file should be 1080p, so any hit
 here is a leftover (no API key needed):
 
 ```
-sudo find /mnt/tank/data/media/movies /mnt/tank/data/media/anime/movies \
+sudo find /mnt/tank/data/media/movies \
   -type f \( -iname '*remux*' -o -iname '*2160p*' -o -iname '*.iso' \) | wc -l
 ```
 
 **Next step — identify the 8 before touching them:**
 
 ```
-sudo find /mnt/tank/data/media/movies /mnt/tank/data/media/anime/movies \
+sudo find /mnt/tank/data/media/movies \
   -type f \( -iname '*remux*' -o -iname '*2160p*' -o -iname '*.iso' \) \
   -printf '%s\t%p\n' | sort -rn
 ```
@@ -359,7 +359,17 @@ The Invite, The Odyssey, Evil Dead Burn, Minions & Monsters, ~24 GB). No 1080p
 release exists yet. `scripts/orphans.py` classifies them separately and will
 only list them as deletable once Radarr has grabbed real releases.
 
-### Anime root folder cleaned up (2026-07-26)
+### Anime root folder cleaned up (2026-07-26) — superseded 2026-07-28
+
+> **Current state:** The old Anime movie and series child datasets have been
+> permanently removed after a clean copy comparison of all 216 source files.
+> Anime now lives directly under one root. Sonarr's 11 affected series and
+> Radarr's remaining anime film record use that root; their obsolete child-root
+> entries were removed. Plex now has exactly Movies, TV Shows, and Anime. Anime
+> deliberately uses Plex's Other Videos type so one library can hold both anime
+> films and series; matching is therefore less automatic than separate library
+> types. Regular Movies and TV Shows were not changed. The historical record
+> below describes the earlier intermediate layout and is not current.
 
 `/data/media/anime/movies` had become a dumping ground: 61 movies, of which
 exactly **one** was actually anime (`Spirited Away`). Interstellar, Mad Max,

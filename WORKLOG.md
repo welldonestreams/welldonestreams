@@ -9,6 +9,18 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-28 — Anime storage and Plex were consolidated at the user's request.
+  After a clean copy comparison, the old Anime movie and series child datasets
+  (and their snapshots) were removed; ordinary Movies and TV Shows were not
+  modified. Sonarr's 11 affected series and Radarr's remaining anime film
+  record were moved to the unified root through their local APIs, with database
+  backups made first. Plex was reduced to exactly Movies, TV Shows, and Anime;
+  Anime is intentionally an Other Videos library so it can hold both anime
+  films and series. Kometa's separate Anime/Anime Movies mappings were disabled
+  because that mixed Plex library is not a normal movie or TV library. The
+  parent media snapshot remains relevant to the separate regular movie-orphan
+  cleanup, but no longer represents an Anime rollback point.
+
 - 2026-07-28 — Renewals: extended the self-hosted app's billing model with a
   `Custom months` cycle (1–120 months). It now stores the selected interval,
   displays it on the renewal card, and annualizes the price correctly instead
