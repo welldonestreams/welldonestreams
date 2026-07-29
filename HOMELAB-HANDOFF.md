@@ -1,10 +1,32 @@
 # Homelab handoff
 
-Last verified: 2026-07-27 (America/Los_Angeles)
+Last verified: 2026-07-28 (America/Los_Angeles)
 
 This file records durable homelab state for Codex and Claude. It intentionally
 contains no passwords, API keys, tokens, cookies, or certificate credentials.
 The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
+
+## 2026-07-28 — unified HD quality policy
+
+- The user chose one library-wide policy: **1080p preferred, with 720p as the
+  only fallback**. Sonarr and Radarr now each expose only one quality profile,
+  `1080p with 720p Fallback`; it permits normal 720p/1080p HDTV, WEB, and
+  Blu-ray releases, permits upgrades, and excludes 2160p and Remux qualities.
+  Existing media files were not deleted by this profile change.
+- Applied the policy to all 92 Sonarr series and 361 Radarr movies, plus the
+  one Sonarr and six Radarr automatic import lists and all 114 Radarr
+  collection rules. This prevents future automatic additions from silently
+  reverting to a different quality policy.
+- Black Clover's failure to grab was traced to its prior WEB-only profile:
+  valid 1080p HDTV releases were rejected solely because HDTV was disallowed.
+  The unified profile accepts that legitimate fallback while retaining the
+  existing custom-format safety exclusions. A verification search downloaded
+  episode 170 to NZBGet, and a small follow-up batch was started using the
+  three active Prowlarr indexers. DOGnzb remains removed after its repeated
+  rate-limit failures.
+- The user reports deleting the approximately 1 TB 4K-media snapshot. A
+  follow-up snapshot inventory query did not complete during this update, so
+  treat the deletion as user-confirmed rather than independently re-verified.
 
 ## 2026-07-25 follow-up
 
@@ -237,7 +259,10 @@ premature scan. On success it starts the Kometa app, runs
 Goal: every movie and show at 1080p, permanently. User explicitly chose
 "strictly 1080p", i.e. replace existing 4K and Remux copies too.
 
-**Sonarr needed no work.** All 94 series were already on profile 7
+**Historical state, superseded 2026-07-28.** Sonarr initially needed no work
+for the earlier strict-WEB target, but the user later selected the unified
+1080p-first/720p-fallback policy recorded at the top of this file. Historical
+configuration: all 94 series were already on profile 7
 (`WEB-1080p`, upgrades on, cutoff WEB 1080p, only WEBDL/WEBRip-1080p
 allowed), its one import list (`Trakt Popular Shows`) already targets that
 profile, and cutoff-unmet is 0. 219 episodes are simply missing/never

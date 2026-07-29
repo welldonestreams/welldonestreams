@@ -9,6 +9,23 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-28 — Homelab: replaced the previously fragmented Sonarr/Radarr
+  quality-profile setup with one intentional policy in each app, at the user's
+  request: `1080p with 720p Fallback`. It is assigned to all 92 series and 361
+  movies, the one Sonarr and six Radarr import lists, and all 114 Radarr
+  collection rules; the old selectors were removed only after those references
+  moved. This is deliberately more than renaming profiles: automatic list and
+  collection additions must inherit the same policy or the library drifts back
+  to old settings. It allows normal 720p/1080p HDTV, WEB, and Blu-ray releases,
+  retains the managed safety custom formats, allows upgrades, and excludes
+  2160p and Remux qualities. Existing media was left untouched.
+  The immediate Black Clover failure was thereby resolved: the old WEB-only
+  Sonarr profile rejected otherwise-valid 1080p HDTV anime releases. A real
+  episode-170 search then sent a valid release to NZBGet; only a small
+  follow-up search batch was used, rather than repeating the rate-limit-prone
+  full-series search. DOGnzb remains intentionally removed after repeated
+  rate-limit failures.
+
 - 2026-07-28 — Homelab: verified the media-import hardlink constraint before
   treating it as a defect. `zfs list -r -o name,mountpoint tank/data` confirms
   `tank/data/usenet` and `tank/data/media` are separate ZFS datasets. Hardlinks
