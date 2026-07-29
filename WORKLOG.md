@@ -9,6 +9,13 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-28 — AdGuard Home: verified local DNS forwarding through OPNsense
+  (`10.0.0.1:5353`), DNSSEC, and the current managed blocklists. Tuned only
+  the cache: raised it from 4 MB to 32 MB and enabled optimistic caching. This
+  reduces repeat local-name lookups without changing rewrites, upstreams,
+  filters, or client access. Filter protection remains enabled and all active
+  lists had updated successfully the same day.
+
 - 2026-07-28 — Plex: corrected an unsafe database-cache setting. The requested
   50,000 MB cache exceeded both the TrueNAS host's 15 GB RAM and Plex's 4 GB
   container limit while the host had under 1 GB available. Set it to 512 MB,
