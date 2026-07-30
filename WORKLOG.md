@@ -18,9 +18,11 @@ entry — never below the `## Entry template` section at the bottom.**
   credential-free DeepSeek launcher on Windows, and added a local embedding
   model. Revalidated a complete TrueNAS-to-Windows Ollama turn over Tailscale.
   Declined a duplicate TrueNAS Ollama deployment after the Apps page showed
-  only about 3 GiB of free host memory. DeepSeek Flash/Pro activation remains
-  pending the user's one-time secret paste and live smoke tests; no key or
-  private endpoint was written to Git.
+  only about 3 GiB of free host memory. DeepSeek V4 Flash is now the canonical
+  Hermes main and automatic auxiliary model; Claude Code uses V4 Pro with Flash
+  subagents. Live tests passed on both routes. The Windows credential is
+  DPAPI-encrypted and the TrueNAS credential remains in Hermes's secret store;
+  no key or private endpoint was written to Git.
 
 - 2026-07-29 — Moved both Hermes installations to a private local-LLM route.
   Windows Ollama now serves a 64K-context `gpt-oss:20b` derivative as the

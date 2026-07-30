@@ -534,16 +534,17 @@ Install these only when they solve a defined problem:
   are done.~~ **Deployed 2026-07-29** as the TrueNAS community app and a
   native Windows fallback. Windows Hermes Desktop now attaches to TrueNAS as
   its canonical remote backend, so normal desktop and browser use shares the
-  same sessions and built-in memory. Both default to a 64K-context local
-  `gpt-oss:20b` derivative served by Ollama on Windows; TrueNAS reaches it only
-  over the existing private Tailscale network. Independent OpenAI Codex OAuth
-  remains a manual cloud alias. Claude Code and two safety/delegation skills are
-  installed. Remaining DeepSeek work is narrowly scoped: save the user's V4 API
-  key through the Hermes key UI, add Flash/Pro routing, and run harmless live
-  tests from Hermes and the Windows Claude Code launcher. Do not put the key in
+  same sessions and built-in memory. Both surfaces retain a 64K-context local
+  `gpt-oss:20b` route served by Ollama on Windows; TrueNAS reaches it only over
+  the existing private Tailscale network. Independent OpenAI Codex OAuth remains
+  a manual cloud alias. Claude Code and two safety/delegation skills are
+  installed. DeepSeek V4 Flash is the canonical main and automatic auxiliary
+  model; the Windows Claude Code launcher uses V4 Pro with Flash subagents. Both
+  routes passed harmless live tests. The Windows credential is DPAPI-encrypted
+  and the TrueNAS credential remains in Hermes's key store; neither belongs in
   this public repository. Do not deploy a duplicate TrueNAS Ollama instance
-  while host memory is this constrained; local inference requires the desktop
-  to be on.
+  while host memory is this constrained. The private local fallback still
+  requires the desktop to be on.
 
 # Definition of done for the homelab baseline
 
