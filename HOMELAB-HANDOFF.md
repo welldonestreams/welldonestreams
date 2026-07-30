@@ -17,10 +17,10 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 - Deployed the TrueNAS community `hermes-agent` app (catalog 1.0.9,
   Hermes 0.19.0). Its gateway and authenticated dashboard are running on the
   LAN; public webhook binding remains disabled.
-- Installed Ollama on Windows and set a 64K-context `gpt-oss:20b` derivative as
-  the default model for both Hermes instances. TrueNAS reaches it only through
-  the existing private Tailscale network; no public listener or LAN firewall
-  exception was added. A full TrueNAS turn completed against the local model.
+- Installed Ollama on Windows and kept a 64K-context `gpt-oss:20b` derivative
+  as the private `local` route for both Hermes surfaces. TrueNAS reaches it only
+  through the existing private Tailscale network; no public listener or LAN
+  firewall exception was added. A full TrueNAS turn completed against it.
 - Installed Hermes 0.19.0 natively on Windows with desktop and Start Menu
   shortcuts plus a login-started gateway. Ollama also starts at login.
 - Installed Claude Code on Windows and added validated `deepseek-claude-code`
@@ -28,8 +28,9 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   TrueNAS Hermes backend. The coding launcher keeps credentials out of prompts
   and repositories, restricts execution to an explicit Git repository, uses
   DeepSeek V4 Pro for the main coding process, and reserves V4 Flash for
-  subagents. The DeepSeek provider still requires the user's one-time secret
-  paste and a live smoke test before it is enabled as the default.
+  subagents. The Windows copy is protected with user-bound DPAPI encryption;
+  the TrueNAS copy remains in Hermes's secret store. Both V4 routes passed live
+  smoke tests without exposing the credential.
 - Added the local embedding model needed for a future self-hosted semantic
   memory layer. A separate Ollama app was deliberately not installed on the
   TrueNAS host: the server had only about 3 GiB free memory during review, and
@@ -39,12 +40,13 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   `cloud` aliases rather than defaults. `deepseek-r1:14b` is available as an
   optional reasoning alias, but is not the agent default because it was much
   slower and failed a structured tool-call test.
-- No paid Claude backend was enabled. A DeepSeek API credential was created by
-  the user but is not recorded here or in Git; provider activation remains
-  pending until the credential is saved through Hermes's key UI.
-- The local route depends on the Windows desktop being powered on with Ollama
-  and Tailscale running. Ollama's normal idle unload releases GPU memory before
-  gaming; the TrueNAS Hermes cloud alias remains usable if the desktop is off.
+- No paid Claude backend was enabled. DeepSeek V4 Flash is the canonical Hermes
+  default and its automatic auxiliary-task model; Claude Code uses DeepSeek V4
+  Pro with Flash for subagents. The credential is not recorded here or in Git.
+- The optional local route depends on the Windows desktop being powered on with
+  Ollama and Tailscale running. Ollama's normal idle unload releases GPU memory
+  before gaming; DeepSeek Flash and the manual cloud alias remain available if
+  the desktop is off.
 - The initial dashboard credential appeared in automation output and was
   immediately rotated. The replacement is stored in the user's browser
   password manager; no password, token, or OAuth credential is in this repo.
