@@ -8,6 +8,12 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
 ## 2026-07-29 — Hermes Agent and local-model deployment
 
+- Windows Hermes Desktop now uses the authenticated TrueNAS Hermes gateway as
+  its default remote backend. The desktop and web dashboard therefore show the
+  same TrueNAS sessions and built-in memory instead of maintaining two writable
+  Hermes homes. The native Windows gateway remains an independent offline
+  fallback, not a synchronized second writer.
+
 - Deployed the TrueNAS community `hermes-agent` app (catalog 1.0.9,
   Hermes 0.19.0). Its gateway and authenticated dashboard are running on the
   LAN; public webhook binding remains disabled.
@@ -17,13 +23,25 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
   exception was added. A full TrueNAS turn completed against the local model.
 - Installed Hermes 0.19.0 natively on Windows with desktop and Start Menu
   shortcuts plus a login-started gateway. Ollama also starts at login.
+- Installed Claude Code on Windows and added validated `deepseek-claude-code`
+  and `safe-homelab-operator` skills to both the Windows fallback and canonical
+  TrueNAS Hermes backend. The coding launcher keeps credentials out of prompts
+  and repositories, restricts execution to an explicit Git repository, uses
+  DeepSeek V4 Pro for the main coding process, and reserves V4 Flash for
+  subagents. The DeepSeek provider still requires the user's one-time secret
+  paste and a live smoke test before it is enabled as the default.
+- Added the local embedding model needed for a future self-hosted semantic
+  memory layer. A separate Ollama app was deliberately not installed on the
+  TrueNAS host: the server had only about 3 GiB free memory during review, and
+  duplicating inference there would add pressure without improving the current
+  private Windows-over-Tailscale route.
 - Preserved the independently authorized OpenAI Codex OAuth routes as manual
   `cloud` aliases rather than defaults. `deepseek-r1:14b` is available as an
   optional reasoning alias, but is not the agent default because it was much
   slower and failed a structured tool-call test.
-- No metered API keys or paid Claude backend were enabled. Hermes's Anthropic
-  OAuth path does not consume the ordinary Claude subscription allowance, so
-  enabling it would conflict with the user's no-extra-cost requirement.
+- No paid Claude backend was enabled. A DeepSeek API credential was created by
+  the user but is not recorded here or in Git; provider activation remains
+  pending until the credential is saved through Hermes's key UI.
 - The local route depends on the Windows desktop being powered on with Ollama
   and Tailscale running. Ollama's normal idle unload releases GPU memory before
   gaming; the TrueNAS Hermes cloud alias remains usable if the desktop is off.
