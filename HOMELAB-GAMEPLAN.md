@@ -532,12 +532,18 @@ Install these only when they solve a defined problem:
   metadata/collection goal.
 - ~~**Hermes Agent/local AI tooling:** deploy only after backups and monitoring
   are done.~~ **Deployed 2026-07-29** as the TrueNAS community app and a
-  separate native Windows installation. Both default to a 64K-context local
+  native Windows fallback. Windows Hermes Desktop now attaches to TrueNAS as
+  its canonical remote backend, so normal desktop and browser use shares the
+  same sessions and built-in memory. Both default to a 64K-context local
   `gpt-oss:20b` derivative served by Ollama on Windows; TrueNAS reaches it only
   over the existing private Tailscale network. Independent OpenAI Codex OAuth
-  sessions remain available as manual cloud aliases. No paid API keys or Claude
-  backend are enabled; the dashboard remains authenticated and the public
-  webhook bind is disabled. Local inference requires the desktop to be on.
+  remains a manual cloud alias. Claude Code and two safety/delegation skills are
+  installed. Remaining DeepSeek work is narrowly scoped: save the user's V4 API
+  key through the Hermes key UI, add Flash/Pro routing, and run harmless live
+  tests from Hermes and the Windows Claude Code launcher. Do not put the key in
+  this public repository. Do not deploy a duplicate TrueNAS Ollama instance
+  while host memory is this constrained; local inference requires the desktop
+  to be on.
 
 # Definition of done for the homelab baseline
 
