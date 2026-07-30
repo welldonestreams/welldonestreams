@@ -1,10 +1,28 @@
 # Homelab handoff
 
-Last verified: 2026-07-28 (America/Los_Angeles)
+Last verified: 2026-07-29 (America/Los_Angeles)
 
 This file records durable homelab state for Codex and Claude. It intentionally
 contains no passwords, API keys, tokens, cookies, or certificate credentials.
 The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
+
+## 2026-07-29 — Hermes Agent deployment
+
+- Deployed the TrueNAS community `hermes-agent` app (catalog 1.0.9,
+  Hermes 0.19.0). Its gateway and authenticated dashboard are running on the
+  LAN; public webhook binding remains disabled.
+- Authorized the TrueNAS instance through OpenAI Codex OAuth using the user's
+  ChatGPT plan. Set `openai-codex` as the provider and `gpt-5.6-sol` as the
+  default model. A live CLI test returned `HERMES_TRUENAS_OK`.
+- Installed Hermes 0.19.0 natively on Windows with desktop and Start Menu
+  shortcuts plus a login-started gateway. Its independent OpenAI Codex OAuth
+  session and `gpt-5.6-sol` model also passed a live response test.
+- No metered API keys or paid Claude backend were enabled. Hermes's Anthropic
+  OAuth path does not consume the ordinary Claude subscription allowance, so
+  enabling it would conflict with the user's no-extra-cost requirement.
+- The initial dashboard credential appeared in automation output and was
+  immediately rotated. The replacement is stored in the user's browser
+  password manager; no password, token, or OAuth credential is in this repo.
 
 ## 2026-07-28 — unified HD quality policy
 

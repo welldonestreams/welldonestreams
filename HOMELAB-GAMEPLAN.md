@@ -530,8 +530,12 @@ Install these only when they solve a defined problem:
 - **Unpackerr:** not currently recommended because NZBGet handles Usenet unpacking.
 - **Kometa:** keep stopped until the core stack is stable and there is a specific
   metadata/collection goal.
-- **Hermes Agent/local AI tooling:** separate project; deploy only in an isolated
-  VM/container with minimum permissions after backups and monitoring are done.
+- ~~**Hermes Agent/local AI tooling:** deploy only after backups and monitoring
+  are done.~~ **Deployed 2026-07-29** as the TrueNAS community app and a
+  separate native Windows installation. Both use independent OpenAI Codex OAuth
+  sessions with `gpt-5.6-sol` and passed live response tests. No paid API keys
+  or Claude backend are enabled; the dashboard remains authenticated and the
+  public webhook bind is disabled.
 
 # Definition of done for the homelab baseline
 
