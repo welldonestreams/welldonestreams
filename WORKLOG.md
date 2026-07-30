@@ -9,6 +9,19 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-29 — Moved both Hermes installations to a private local-LLM route.
+  Windows Ollama now serves a 64K-context `gpt-oss:20b` derivative as the
+  default model; the existing Codex OAuth route remains available as a manual
+  `cloud` alias. TrueNAS reaches that model only through the existing private
+  Tailscale network, with no public listener or LAN firewall exception added.
+  Direct validation kept the model fully GPU-resident on the RX 7800 XT,
+  produced a valid structured tool call, and generated about 94 tokens/second.
+  A full TrueNAS Hermes turn also completed locally with a 14.5K-token prompt.
+  `deepseek-r1:14b` remains an optional reasoning alias because it split across
+  CPU/GPU, ran at about 14 tokens/second, and failed the structured tool-call
+  test. Local inference requires the desktop, Ollama, and Tailscale to be on;
+  Ollama's normal idle unload releases VRAM before gaming.
+
 - 2026-07-29 — Deployed Hermes Agent 0.19.0 on both TrueNAS and Windows. The
   TrueNAS community app runs an authenticated LAN dashboard and gateway with
   public webhook binding disabled; Windows has desktop/Start Menu shortcuts and
