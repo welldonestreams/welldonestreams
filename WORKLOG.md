@@ -9,6 +9,15 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-29 — Deployed Hermes Agent 0.19.0 on both TrueNAS and Windows. The
+  TrueNAS community app runs an authenticated LAN dashboard and gateway with
+  public webhook binding disabled; Windows has desktop/Start Menu shortcuts and
+  a login-started gateway. Each installation has its own OpenAI Codex OAuth
+  session, uses `gpt-5.6-sol`, and passed a live response test. No paid API keys
+  or Claude backend were enabled. Rotated the dashboard credential after its
+  initial value appeared in automation output and saved the replacement in the
+  user's browser password manager; no credential was committed.
+
 - 2026-07-29 — Homepage's Seerr/Requests widget was returning HTTP 403 because
   its environment credential no longer matched Seerr's active API key. Rotated
   that credential, synchronized the Homepage deployment and Seerr settings,
