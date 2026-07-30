@@ -532,10 +532,12 @@ Install these only when they solve a defined problem:
   metadata/collection goal.
 - ~~**Hermes Agent/local AI tooling:** deploy only after backups and monitoring
   are done.~~ **Deployed 2026-07-29** as the TrueNAS community app and a
-  separate native Windows installation. Both use independent OpenAI Codex OAuth
-  sessions with `gpt-5.6-sol` and passed live response tests. No paid API keys
-  or Claude backend are enabled; the dashboard remains authenticated and the
-  public webhook bind is disabled.
+  separate native Windows installation. Both default to a 64K-context local
+  `gpt-oss:20b` derivative served by Ollama on Windows; TrueNAS reaches it only
+  over the existing private Tailscale network. Independent OpenAI Codex OAuth
+  sessions remain available as manual cloud aliases. No paid API keys or Claude
+  backend are enabled; the dashboard remains authenticated and the public
+  webhook bind is disabled. Local inference requires the desktop to be on.
 
 # Definition of done for the homelab baseline
 

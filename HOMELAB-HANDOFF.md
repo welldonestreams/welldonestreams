@@ -6,20 +6,27 @@ This file records durable homelab state for Codex and Claude. It intentionally
 contains no passwords, API keys, tokens, cookies, or certificate credentials.
 The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
-## 2026-07-29 — Hermes Agent deployment
+## 2026-07-29 — Hermes Agent and local-model deployment
 
 - Deployed the TrueNAS community `hermes-agent` app (catalog 1.0.9,
   Hermes 0.19.0). Its gateway and authenticated dashboard are running on the
   LAN; public webhook binding remains disabled.
-- Authorized the TrueNAS instance through OpenAI Codex OAuth using the user's
-  ChatGPT plan. Set `openai-codex` as the provider and `gpt-5.6-sol` as the
-  default model. A live CLI test returned `HERMES_TRUENAS_OK`.
+- Installed Ollama on Windows and set a 64K-context `gpt-oss:20b` derivative as
+  the default model for both Hermes instances. TrueNAS reaches it only through
+  the existing private Tailscale network; no public listener or LAN firewall
+  exception was added. A full TrueNAS turn completed against the local model.
 - Installed Hermes 0.19.0 natively on Windows with desktop and Start Menu
-  shortcuts plus a login-started gateway. Its independent OpenAI Codex OAuth
-  session and `gpt-5.6-sol` model also passed a live response test.
+  shortcuts plus a login-started gateway. Ollama also starts at login.
+- Preserved the independently authorized OpenAI Codex OAuth routes as manual
+  `cloud` aliases rather than defaults. `deepseek-r1:14b` is available as an
+  optional reasoning alias, but is not the agent default because it was much
+  slower and failed a structured tool-call test.
 - No metered API keys or paid Claude backend were enabled. Hermes's Anthropic
   OAuth path does not consume the ordinary Claude subscription allowance, so
   enabling it would conflict with the user's no-extra-cost requirement.
+- The local route depends on the Windows desktop being powered on with Ollama
+  and Tailscale running. Ollama's normal idle unload releases GPU memory before
+  gaming; the TrueNAS Hermes cloud alias remains usable if the desktop is off.
 - The initial dashboard credential appeared in automation output and was
   immediately rotated. The replacement is stored in the user's browser
   password manager; no password, token, or OAuth credential is in this repo.
