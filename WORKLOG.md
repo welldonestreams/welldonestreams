@@ -9,6 +9,20 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-07-31 — Off-box backup is now live: Backblaze B2 bucket
+  `Homelab-critical-welldonestreams`, restic repo created with native
+  `/usr/bin/restic` on TrueNAS (no container). Scope: `/mnt/tank/apps` +
+  `/mnt/tank/photos` only; the ~10.7T media is deliberately excluded.
+  Retention 7 daily / 4 weekly / 6 monthly via nightly cron (pending).
+  Repo password exists ONLY in Vaultwarden + paper — never in this repo.
+  Acceptance gate still open: restore test (pull Vaultwarden DB + a photo
+  back from B2 and open them) — do not mark done until it passes.
+  Also added vault-export docs (HOMELAB-KB, HERMES-CONFIG-DECISIONS,
+  HERMES-COST-REPORT, RUNBOOK-ANIME-CONSOLIDATION, RUNBOOK-BACKUP-STRATEGY)
+  for cross-agent review. Anime consolidation verified live: `anime/movies`
+  and `anime/series` subdirs are gone; Sonarr root re-point + Plex trash
+  still pending desk-side.
+
 - 2026-07-29 — Made TrueNAS the canonical Hermes backend and attached Windows
   Hermes Desktop to it through the authenticated remote-gateway flow. The
   Windows app now displays TrueNAS sessions and uses the same built-in memory;
