@@ -15,8 +15,10 @@ Consolidate the anime library so anime TV lives under one root with correct Sona
 - **`anime/movies` subdir: GONE** — anime-films migration to main Movies is done at the filesystem level.
 - **`anime/series` subdir: GONE** — shows live at the anime dataset top level.
 - Main movies dataset: 5.26 TiB; series: 1.87 TiB; media total 7.4 TiB.
-- **Remaining unknowns (need app-level check, not filesystem):** (a) Sonarr anime root folder — if it still points at `/data/media/anime/series`, it's stale and must be re-pointed to `/data/media/anime`; (b) Plex library state — old entries/trash may still reference removed paths; empty trash manually after verifying.
-- Status: **mostly complete; app-level verification pending.**
+- **Radarr (verified + fixed 2026-07-31):** single root folder `/data/media/movies`; **22 collections** that still pointed at the dead `/data/media/anime/movies` were re-pointed to `/data/media/movies` via API (full-object PUT with movies array — minimal-body PUT hits a UNIQUE TmdbId upsert bug). 0 anime refs remain.
+- **Sonarr (verified 2026-07-31):** root folders `/data/media/series` + `/data/media/anime` (both accessible); 11 series under `/data/media/anime/*` — no stale `/data/media/anime/series` root.
+- **Remaining:** Plex trash — old entries may still reference removed paths; empty trash manually after confirming libraries (Plex auto-trash is OFF).
+- Status: **complete except Plex trash check.**
 
 ## Rules / gotchas
 - TV directory is `series` NOT `tv` anywhere in the stack.
@@ -32,8 +34,8 @@ Consolidate the anime library so anime TV lives under one root with correct Sona
 5. Update this runbook + WELL-DONE-HOMELAB.md after each verified step; trust live state over docs.
 
 ## Open questions to resolve live
-- Sonarr anime root folder: still `/data/media/anime/series` or re-pointed to `/data/media/anime`? (filesystem shows no `series` subdir — root likely stale)
-- Plex: do old anime paths still appear in libraries/trash? (Plex auto-trash is OFF — manual check needed)
+- ~~Sonarr anime root folder~~ — RESOLVED 2026-07-31: roots are `/data/media/series` + `/data/media/anime`, both accessible.
+- Plex: do old anime paths still appear in libraries/trash? (Plex auto-trash is OFF — manual check needed; the only remaining item.)
 - Anime dataset usage at last check: 277.42 GiB.
 
 ## Related
