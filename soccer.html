@@ -120,6 +120,14 @@ var pollData={colors:[]},roster=[],config={phase:'submissions',submissionDeadlin
 var selectedFileDataUrl=null;
 var pollInterval=null,countdownInterval=null;
 
+// Remember voter name across refreshes
+(function(){
+  var vi=document.getElementById('voter-name');
+  var saved=localStorage.getItem('soccer-voter')||'';
+  if(saved)vi.value=saved;
+  vi.addEventListener('input',function(){localStorage.setItem('soccer-voter',vi.value.trim())})
+})();
+
 document.querySelectorAll('.tab-btn').forEach(function(b){b.addEventListener('click',function(){
   document.querySelectorAll('.tab-btn,.panel').forEach(function(e){e.classList.remove('active')});
   b.classList.add('active');
