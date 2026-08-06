@@ -157,24 +157,12 @@ async function refreshConfig(){
 function updatePhaseUI(){
   var b=document.getElementById('phase-badge');
   var c=document.getElementById('countdown');
-  var s=document.getElementById('suggest-box');
   var h=document.getElementById('poll-header');
-  var n=Date.now(),d=config.submissionDeadline,p=config.phase;
-  var rem=Math.max(0,d-n);
-  b.className='phase-badge '+p;
-  b.textContent=p==='submissions'?'Submissions Open':'Voting Open';
-  if(p==='submissions'&&rem>0){
-    c.className='countdown submissions';
-    var H=Math.floor(rem/3600000),M=Math.floor((rem%3600000)/60000),S=Math.floor((rem%60000)/1000);
-    c.textContent='Submissions close in '+H+'h '+M+'m '+S+'s';
-    s.style.display='';
-    h.textContent='Suggest a jersey color with a reference image. Voting opens when submissions close.';
-  }else if(p==='voting'){
-    c.className='countdown voting';
-    c.textContent='Voting is OPEN! Tap a color to vote.';
-    s.style.display='none';
-    h.textContent='Submissions are closed. Vote for your favorite jersey color!';
-  }else{c.className='countdown ended';c.textContent='Poll ended'}
+  b.className='phase-badge voting';
+  b.textContent='Voting Open';
+  c.className='countdown voting';
+  c.textContent='Vote for your favorite — or suggest a new one!';
+  h.textContent='Tap a color to vote, or suggest a new jersey color with a reference image.';
 }
 
 function renderPoll(){
@@ -184,7 +172,7 @@ function renderPoll(){
   var maxV=Math.max(1,co.reduce(function(a,c){return Math.max(a,c.votes.length)},0));
   var lead=co.reduce(function(a,b){return a.votes.length>=b.votes.length?a:b},co[0]);
   var voter=(document.getElementById('voter-name').value.trim()||'').toLowerCase();
-  var canVote=config.phase==='voting';
+  var canVote=true;
   list.innerHTML=co.map(function(c){
     var pct=Math.round(c.votes.length/maxV*100);
     var isLead=c===lead&&c.votes.length>0;
@@ -227,14 +215,12 @@ async function pollAction(body){
 document.getElementById('color-list').addEventListener('click',function(ev){
   var card=ev.target.closest('.color-card');
   if(!card||card.classList.contains('disabled'))return;
-  if(config.phase!=='voting'){msg('poll','Voting opens after submissions close.',1);return}
   var voter=document.getElementById('voter-name').value.trim();
   if(!voter){msg('poll','Enter your name first.',1);return}
   pollAction({action:'vote',color:card.dataset.color,voter:voter})
 });
 
 document.getElementById('add-color').addEventListener('click',function(){
-  if(config.phase!=='submissions'){msg('poll','Submissions are closed.',1);return}
   var color=document.getElementById('new-color').value.trim();
   var hex=document.getElementById('new-hex').value;
   if(!color){msg('poll','Enter a color name.',1);return}
