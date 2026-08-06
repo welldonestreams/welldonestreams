@@ -251,6 +251,7 @@ function renderRoster(){
   var tb=document.getElementById('roster-tbody');
   if(!roster.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:#555;padding:16px">No players yet</td></tr>';return}
   tb.innerHTML=roster.map(function(p){return '<tr><td>'+e(p.name)+'</td><td class="num">'+e(p.number)+'</td><td><span class="size-badge">'+e(p.size||'')+'</span></td><td class="edit-cell"><button class="roster-edit-btn" data-name="'+ea(p.name)+'" data-number="'+ea(p.number)+'" data-size="'+ea(p.size||'')+'">Edit</button></td></tr>'}).join('')
+  var delBtn=document.getElementById('roster-delete');
   // Edit button clicks — fill the form with that player's data
   tb.querySelectorAll('.roster-edit-btn').forEach(function(btn){
     btn.addEventListener('click',function(){
@@ -258,6 +259,7 @@ function renderRoster(){
       form.querySelector('[name=name]').value=btn.dataset.name;
       form.querySelector('[name=number]').value=btn.dataset.number;
       form.querySelector('[name=size]').value=btn.dataset.size;
+      delBtn.classList.add('show');
     })
   })
 }
