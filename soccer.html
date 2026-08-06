@@ -105,13 +105,15 @@ h1{font-size:1.4rem;text-align:center;margin-bottom:2px;color:#fff}
 </div>
 <div class="panel" id="panel-roster">
   <table class="roster-table">
-    <thead><tr><th>Player</th><th>#</th><th>Size</th><th></th><th></th></tr></thead>
+    <thead><tr><th>Player</th><th>#</th><th>Size</th><th>Sleeve</th><th>Shorts</th><th></th></tr></thead>
     <tbody id="roster-tbody"></tbody>
   </table>
   <div class="roster-form">
     <input type="text" name="name" placeholder="Your name" maxlength="60">
     <input type="text" name="number" placeholder="#" maxlength="10" inputmode="numeric">
     <select name="size"><option value="">Size?</option><option>XS</option><option>Small</option><option>Medium</option><option>Large</option><option>XL</option><option>XXL</option></select>
+    <select name="sleeve"><option value="">Sleeve?</option><option>Short Sleeve</option><option>Long Sleeve</option></select>
+    <select name="shorts"><option value="">Shorts?</option><option>Yes</option><option>No</option></select>
     <button id="roster-add">Add / Update</button>
     <button id="roster-delete" class="delete-btn">Delete</button>
   </div>
@@ -249,16 +251,17 @@ async function refreshPoll(){
 
 function renderRoster(){
   var tb=document.getElementById('roster-tbody');
-  if(!roster.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:#555;padding:16px">No players yet</td></tr>';return}
-  tb.innerHTML=roster.map(function(p){return '<tr><td>'+e(p.name)+'</td><td class="num">'+e(p.number)+'</td><td><span class="size-badge">'+e(p.size||'')+'</span></td><td class="edit-cell"><button class="roster-edit-btn" data-name="'+ea(p.name)+'" data-number="'+ea(p.number)+'" data-size="'+ea(p.size||'')+'">Edit</button></td></tr>'}).join('')
+  if(!roster.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#555;padding:16px">No players yet</td></tr>';return}
+  tb.innerHTML=roster.map(function(p){return '<tr><td>'+e(p.name)+'</td><td class="num">'+e(p.number)+'</td><td><span class="size-badge">'+e(p.size||'')+'</span></td><td>'+e(p.sleeve||'')+'</td><td>'+e(p.shorts||'')+'</td><td class="edit-cell"><button class="roster-edit-btn" data-name="'+ea(p.name)+'" data-number="'+ea(p.number)+'" data-size="'+ea(p.size||'')+'" data-sleeve="'+ea(p.sleeve||'')+'" data-shorts="'+ea(p.shorts||'')+'">Edit</button></td></tr>'}).join('')
   var delBtn=document.getElementById('roster-delete');
-  // Edit button clicks — fill the form with that player's data
+  var form=document.querySelector('.roster-form');
   tb.querySelectorAll('.roster-edit-btn').forEach(function(btn){
     btn.addEventListener('click',function(){
-      var form=document.querySelector('.roster-form');
       form.querySelector('[name=name]').value=btn.dataset.name;
       form.querySelector('[name=number]').value=btn.dataset.number;
       form.querySelector('[name=size]').value=btn.dataset.size;
+      form.querySelector('[name=sleeve]').value=btn.dataset.sleeve;
+      form.querySelector('[name=shorts]').value=btn.dataset.shorts;
       delBtn.classList.add('show');
     })
   })
@@ -283,9 +286,11 @@ document.getElementById('roster-add').addEventListener('click',async function(){
   var n=form.querySelector('[name=name]').value.trim();
   var nu=form.querySelector('[name=number]').value.trim();
   var si=form.querySelector('[name=size]').value;
+  var sl=form.querySelector('[name=sleeve]').value;
+  var sh=form.querySelector('[name=shorts]').value;
   if(!n||!nu){msg('roster','Name and number required.',1);return}
   try{
-    var r=await fetch(API+'/roster',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,number:nu,size:si})});
+    var r=await fetch(API+'/roster',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,number:nu,size:si,sleeve:sl,shorts:sh})});
     var d=await r.json();
     if(!r.ok){msg('roster',d.error||'Error',1);return}
     roster=d;roster.sort(function(a,b){return a.name.localeCompare(b.name)});renderRoster();
