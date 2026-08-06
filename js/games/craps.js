@@ -26,7 +26,7 @@ window.Games.craps = function () {
 
     <div class="table-felt">
       <h2>Craps</h2>
-      <p style="opacity:.85;font-size:.95rem;margin-top:4px;">Come out with 7 or 11 — or make your point before a 7!</p>
+      <p style="opacity:.85;font-size:.95rem;margin-top:4px;">Re-roll your point before a 7!</p>
 
       <div class="cr-picks">
         <button class="cr-pick sel" data-t="pass">PASS LINE<small>true odds</small></button>
@@ -78,7 +78,7 @@ window.Games.craps = function () {
   function renderNums() {
     if (betType === 'place') {
       numsEl.style.display = 'flex';
-      numsEl.innerHTML = PLACE_NUMBERS.map(p => `<button type="button" class="cr-num${number === p.n ? ' sel' : ''}" data-n="${p.n}">${p.n}<small>${p.label}</small></button>`).join('');
+      numsEl.innerHTML = PLACE_NUMBERS.map(p => `<button type="button" class="cr-num${number === p.n ? ' sel' : ''}" data-n="${p.n}">${p.n}</button>`).join('');
     } else if (betType === 'prop') {
       numsEl.style.display = 'flex';
       numsEl.innerHTML = PROP_NUMBERS.map(p => `<button type="button" class="cr-num${number === p.n ? ' sel' : ''}" data-n="${p.n}">${p.n}<small>${p.label}</small></button>`).join('');

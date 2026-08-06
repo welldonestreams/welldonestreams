@@ -177,6 +177,23 @@ window.Games.trivia = function () {
   nextBtn.addEventListener('click', loadQuestion);
   cashBtn.addEventListener('click', cashOut);
 
+  // Keep the question visible when the mobile keyboard opens: the keyboard
+  // shrinks the visual viewport and can push the question out of view.
+  function keepQuestionVisible() {
+    const vv = window.visualViewport;
+    const vh = vv ? vv.height : window.innerHeight;
+    const qr = qEl.getBoundingClientRect();
+    if (qr.top < 0 || qr.bottom > vh) {
+      qEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+  ansEl.addEventListener('focus', () => setTimeout(keepQuestionVisible, 250));
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+      if (document.activeElement === ansEl) setTimeout(keepQuestionVisible, 100);
+    });
+  }
+
   window.addEventListener('casino:game-leave', () => {
     disposed = true;
     active = false;
@@ -189,7 +206,7 @@ window.Games.trivia = function () {
     title: 'More info',
     html: `
       <p>Questions include easy general knowledge, pop culture, games, animals, food, sports, and quick math. The Worker prevents the immediately previous question from appearing again.</p>
-      <p>Math prompts use two-digit numbers, except addition, which may use three-digit numbers. You have 15 seconds to answer.</p>
+      <p>Multiplication and division use a 2-digit number with a 1-digit number. Addition uses 1–3 digit numbers; subtraction uses 3-3, 3-2, 2-2, or 2-1 digit combinations. You have 15 seconds to answer.</p>
       <p>Correct answers grow the pot. Cash out whenever you like; a wrong answer, timeout, or skipped active question loses the current pot.</p>`
   });
 };
