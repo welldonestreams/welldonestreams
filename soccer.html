@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soccer — Jersey Poll &amp; Roster</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f0f0f;color:#e0e0e0;min-height:100dvh;padding:16px}
+a{color:#7aa2f7;text-decoration:none}
+h1{font-size:1.5rem;text-align:center;margin-bottom:4px;color:#fff}
+.subhead{text-align:center;color:#999;font-size:.85rem;margin-bottom:16px}
+
+/* Tabs */
+.tabs{display:flex;gap:0;margin-bottom:16px;border-radius:10px;overflow:hidden;background:#1a1a1a}
+.tab-btn{flex:1;padding:12px 8px;border:none;background:transparent;color:#888;font-size:1rem;font-weight:600;cursor:pointer;transition:all .15s}
+.tab-btn.active{background:#2a2a3a;color:#fff;box-shadow:inset 0 -3px 0 #7aa2f7}
+.panel{display:none}
+.panel.active{display:block}
+
+/* Poll cards */
+.poll-header{text-align:center;margin-bottom:12px;color:#aaa;font-size:.9rem}
+.color-list{display:flex;flex-direction:column;gap:10px}
+.color-card{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#1a1a1a;border-radius:10px;cursor:pointer;transition:all .15s;border:2px solid transparent;position:relative}
+.color-card:hover{border-color:#444}
+.color-card.voted{border-color:#4caf50;background:#1a2a1a}
+.color-card.lead{border-color:#ffd700;background:#1a1a0a}
+.swatch{width:40px;height:40px;border-radius:8px;flex-shrink:0;border:2px solid #333}
+.color-info{flex:1;min-width:0}
+.color-name{font-weight:600;font-size:1rem;margin-bottom:2px}
+.color-voters{font-size:.75rem;color:#888}
+.vote-bar-wrap{width:100%;height:6px;background:#2a2a2a;border-radius:3px;margin-top:4px;overflow:hidden}
+.vote-bar{height:100%;background:#7aa2f7;border-radius:3px;transition:width .3s}
+.vote-count{font-weight:700;font-size:1.1rem;color:#7aa2f7;min-width:28px;text-align:center}
+.lead-badge{position:absolute;top:-8px;right:12px;background:#ffd700;color:#000;font-size:.65rem;padding:2px 8px;border-radius:10px;font-weight:700}
+
+/* Suggest + vote inputs */
+.suggest-box{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.suggest-box input{flex:1;min-width:100px;padding:10px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#fff;font-size:.9rem}
+.suggest-box input[type=color]{flex:0 0 44px;padding:4px;height:44px;border:none;cursor:pointer}
+.suggest-box button{padding:10px 16px;background:#7aa2f7;color:#000;border:none;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer}
+.suggest-box button:disabled{opacity:.4;cursor:default}
+.voter-line{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.voter-line input{flex:1;min-width:120px;padding:10px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#fff;font-size:.9rem}
+.voter-line .hint{font-size:.75rem;color:#777}
+.msg{text-align:center;font-size:.8rem;margin-top:8px;min-height:20px;color:#f7768e}
+
+/* Roster */
+.roster-table{width:100%;border-collapse:collapse;margin-bottom:16px}
+.roster-table th,.roster-table td{padding:10px 8px;text-align:left;border-bottom:1px solid #222}
+.roster-table th{font-size:.75rem;text-transform:uppercase;color:#777;font-weight:600}
+.roster-table td{font-size:.9rem}
+.roster-table tr:hover{background:#1a1a1a}
+.num{font-weight:700;color:#7aa2f7}
+.size-badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:.75rem;font-weight:600;background:#2a2a2a;color:#aaa}
+.size-badge:empty{display:none}
+
+.roster-form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.roster-form input,.roster-form select{padding:10px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#fff;font-size:.9rem}
+.roster-form select{flex:0 0 auto}
+.roster-form input[name=name]{flex:2;min-width:100px}
+.roster-form input[name=number]{flex:1;min-width:60px;max-width:80px}
+.roster-form button{padding:10px 18px;background:#7aa2f7;color:#000;border:none;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;white-space:nowrap}
+
+.deploy-note{position:fixed;bottom:8px;right:8px;background:#1a1a1a;padding:6px 12px;border-radius:6px;font-size:.7rem;color:#666;z-index:10}
+.loading{opacity:.5;pointer-events:none}
+</style>
+</head>
+<body>
+<h1>⚽ Work Soccer Team</h1>
+<p class="subhead">Jersey color poll · Roster sign-up</p>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="poll">🎨 Jersey Poll</button>
+  <button class="tab-btn" data-tab="roster">👕 Roster</button>
+</div>
+
+<!-- POLL PANEL -->
+<div class="panel active" id="panel-poll">
+  <div class="poll-header">Tap a color to vote. One vote per person per color.</div>
+  <div class="voter-line">
+    <input type="text" id="voter-name" placeholder="Your name (to vote)" maxlength="60">
+    <span class="hint">required to vote</span>
+  </div>
+  <div class="color-list" id="color-list"></div>
+  <div class="suggest-box">
+    <input type="text" id="new-color" placeholder="Suggest a color…" maxlength="60">
+    <input type="color" id="new-hex" value="#7aa2f7">
+    <button id="add-color">Suggest</button>
+  </div>
+  <div class="msg" id="poll-msg"></div>
+</div>
+
+<!-- ROSTER PANEL -->
+<div class="panel" id="panel-roster">
+  <table class="roster-table">
+    <thead><tr><th>Player</th><th>#</th><th>Size</th></tr></thead>
+    <tbody id="roster-tbody"></tbody>
+  </table>
+  <div class="roster-form">
+    <input type="text" name="name" placeholder="Your name" maxlength="60">
+    <input type="text" name="number" placeholder="#" maxlength="10" inputmode="numeric">
+    <select name="size">
+      <option value="">Size?</option><option>XS</option><option>Small</option><option>Medium</option><option>Large</option><option>XL</option><option>XXL</option>
+    </select>
+    <button id="roster-add">Add / Update</button>
+  </div>
+  <div class="msg" id="roster-msg"></div>
+</div>
+
+<script>
+const API = 'https://welldonestreams.com/api/soccer';
+
+// --- Tabs ---
+document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tab-btn,.panel').forEach(e => e.classList.remove('active'));
+  b.classList.add('active');
+  document.getElementById('panel-' + b.dataset.tab).classList.add('active');
+  b.dataset.tab === 'poll' ? refreshPoll() : refreshRoster();
+}));
+
+// --- Poll ---
+let pollData = { colors: [] };
+
+function renderPoll() {
+  const list = document.getElementById('color-list');
+  const colors = pollData.colors;
+  if (!colors.length) { list.innerHTML = '<p style="text-align:center;color:#555;padding:20px">No colors yet — suggest one below!</p>'; return; }
+  const maxVotes = Math.max(1, ...colors.map(c => c.votes.length));
+  const leader = colors.reduce((a, b) => a.votes.length >= b.votes.length ? a : b, colors[0]);
+  list.innerHTML = colors.map(c => {
+    const pct = Math.round(c.votes.length / maxVotes * 100);
+    const isLead = c === leader && c.votes.length > 0;
+    const voted = !!c.votes.find(v => v.toLowerCase() === (document.getElementById('voter-name').value.trim().toLowerCase() || ''));
+    return `<div class="color-card${voted?' voted':''}${isLead?' lead':''}" data-color="${c.name}" title="Click to vote">
+      ${isLead ? '<span class="lead-badge">LEAD</span>' : ''}
+      <div class="swatch" style="background:${c.hex}"></div>
+      <div class="color-info">
+        <div class="color-name">${esc(c.name)}</div>
+        <div class="color-voters">${c.votes.length ? c.votes.join(', ') : 'no votes yet'}</div>
+        <div class="vote-bar-wrap"><div class="vote-bar" style="width:${pct}%"></div></div>
+      </div>
+      <div class="vote-count">${c.votes.length}</div>
+    </div>`;
+  }).join('');
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+async function refreshPoll() {
+  try {
+    const r = await fetch(API + '/poll');
+    pollData = await r.json();
+    if (!pollData.colors) pollData.colors = [];
+    renderPoll();
+  } catch (e) { document.getElementById('poll-msg').textContent = 'Could not load poll.'; }
+}
+
+async function pollAction(body) {
+  document.getElementById('poll-msg').textContent = '';
+  try {
+    const r = await fetch(API + '/poll', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (!r.ok) { document.getElementById('poll-msg').textContent = d.error || 'Error'; return; }
+    pollData = d;
+    renderPoll();
+  } catch (e) { document.getElementById('poll-msg').textContent = 'Network error.'; }
+}
+
+document.getElementById('color-list').addEventListener('click', (e) => {
+  const card = e.target.closest('.color-card');
+  if (!card) return;
+  const voter = document.getElementById('voter-name').value.trim();
+  if (!voter) { document.getElementById('poll-msg').textContent = 'Enter your name first.'; return; }
+  const color = card.dataset.color;
+  pollAction({ action: 'vote', color, voter });
+});
+
+document.getElementById('add-color').addEventListener('click', () => {
+  const color = document.getElementById('new-color').value.trim();
+  const hex = document.getElementById('new-hex').value;
+  if (!color) { document.getElementById('poll-msg').textContent = 'Enter a color name.'; return; }
+  const suggester = document.getElementById('voter-name').value.trim() || 'Anon';
+  pollAction({ action: 'add', color, hex, suggester });
+  document.getElementById('new-color').value = '';
+});
+
+// --- Roster ---
+let roster = [];
+
+function renderRoster() {
+  const tbody = document.getElementById('roster-tbody');
+  tbody.innerHTML = roster.map(p => `<tr>
+    <td>${esc(p.name)}</td>
+    <td class="num">${esc(p.number)}</td>
+    <td><span class="size-badge">${esc(p.size || '')}</span></td>
+  </tr>`).join('');
+}
+
+async function refreshRoster() {
+  try {
+    const r = await fetch(API + '/roster');
+    roster = await r.json();
+    if (!Array.isArray(roster)) roster = [];
+    roster.sort((a, b) => a.name.localeCompare(b.name));
+    renderRoster();
+  } catch (e) { document.getElementById('roster-msg').textContent = 'Could not load roster.'; }
+}
+
+document.getElementById('roster-add').addEventListener('click', async () => {
+  const msg = document.getElementById('roster-msg');
+  const form = document.querySelector('.roster-form');
+  const name = form.querySelector('[name=name]').value.trim();
+  const number = form.querySelector('[name=number]').value.trim();
+  const size = form.querySelector('[name=size]').value;
+  if (!name || !number) { msg.textContent = 'Name and number are required.'; return; }
+  msg.textContent = '';
+  try {
+    const r = await fetch(API + '/roster', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, number, size }) });
+    const d = await r.json();
+    if (!r.ok) { msg.textContent = d.error || 'Error'; return; }
+    roster = d;
+    roster.sort((a, b) => a.name.localeCompare(b.name));
+    renderRoster();
+    form.querySelector('[name=name]').value = '';
+    form.querySelector('[name=number]').value = '';
+    form.querySelector('[name=size]').value = '';
+    msg.textContent = 'Saved!';
+  } catch (e) { msg.textContent = 'Network error.'; }
+});
+
+// Init
+refreshPoll();
+refreshRoster();
+</script>
+</body>
+</html>
