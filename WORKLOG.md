@@ -511,12 +511,14 @@ entry — never below the `## Entry template` section at the bottom.**
   Uptime Kuma is a plain link (no Kuma status-page slug exists yet, and Kuma
   "does not yet have a full API" per its own Homepage widget docs, so no
   live-stats widget was possible without one). Tailscale uses Homepage's
-  official `tailscale` widget (`deviceid: nzXB3KcLVg11CNTRL`, a non-secret
-  stable identifier, plus `{{HOMEPAGE_VAR_TAILSCALE_KEY}}` for the actual API
-  access token, which the user added themselves as a new Homepage
-  environment variable — not typed in by the agent). Verified live after a
-  Homepage container restart: the Tailscale tile renders real device data
-  (address, last-seen, key-expiry countdown).
+  official `tailscale` widget (`deviceid: nzXB3KcLVg11CNTRL` originally,
+  a non-secret stable identifier, plus `{{HOMEPAGE_VAR_TAILSCALE_KEY}}` for
+  the actual API access token, which the user added themselves as a new
+  Homepage environment variable — not typed in by the agent). Verified live
+  after a Homepage container restart: the Tailscale tile renders real device
+  data (address, last-seen, key-expiry countdown). 2026-08-05: that deviceid
+  went stale after the Tailscale node was recreated (custom app → official
+  catalog app migration); widget updated to `deviceid: 7164212265981532`.
 - 2026-07-26 — Homelab: deployed Tailscale as a subnet router on TrueNAS
   (container `tailscale`, dataset `tank/apps/tailscale`, advertising
   `10.0.0.0/24`), per a user-authored deployment brief now saved at

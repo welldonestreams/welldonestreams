@@ -944,10 +944,17 @@ plain browser hitting the direct port did not: local broadcast discovery.
   no widget (no status-page slug exists yet, and Kuma "does not yet have a
   full API" per Homepage's own widget docs — create a status page and give
   it a slug if live up/down counts are wanted on the tile later). Tailscale
-  uses Homepage's official widget with `deviceid: nzXB3KcLVg11CNTRL` (a
+  uses Homepage's official widget with `deviceid: 7164212265981532` (a
   stable, non-secret identifier) and `{{HOMEPAGE_VAR_TAILSCALE_KEY}}`; the
   user generated the actual API access token and added it as a Homepage env
   var themselves. Verified live: the tile renders real device data.
+  NOTE (2026-08-05): the original `deviceid: nzXB3KcLVg11CNTRL` went stale —
+  the node was recreated when the official catalog app replaced the old
+  custom-app Tailscale container (new node created 2026-08-01), so the old
+  device ID 404s on the API. Current ID `7164212265981532` =
+  `truenas-subnet-router` (100.81.253.117). If the Tailscale node is ever
+  recreated again, re-fetch the ID from the device list before trusting the
+  widget.
 - Renamed the Actual Budget hostname from `actual.welldonestreams.com` to
   `budget.welldonestreams.com` per user request: AdGuard rewrite edited in
   place, NPM proxy host's domain swapped (same backend
