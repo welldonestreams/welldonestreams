@@ -133,11 +133,21 @@ var fr=document.getElementById('file-remove');
 function clearFile(){selectedFileDataUrl=null;fi.value='';fl.classList.remove('has-file')}
 fi.addEventListener('change',function(){
   var f=fi.files[0];if(!f)return;
-  if(f.size>3500000){msg('poll','Image too large (max 3.5MB).',1);return}
   fl.classList.add('has-file');
-  var r=new FileReader();
-  r.onload=function(){selectedFileDataUrl=r.result};
-  r.readAsDataURL(f)
+  var reader=new FileReader();
+  reader.onload=function(){
+    var img=new Image();
+    img.onload=function(){
+      var maxW=1024,maxH=1024;
+      var w=img.width,h=img.height;
+      if(w>maxW||h>maxH){var ratio=Math.min(maxW/w,maxH/h);w=Math.round(w*ratio);h=Math.round(h*ratio)}
+      var canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+      var ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);
+      selectedFileDataUrl=canvas.toDataURL('image/jpeg',0.75);
+    };
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(f)
 });
 fr.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();clearFile()});
 
