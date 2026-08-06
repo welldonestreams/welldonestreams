@@ -183,7 +183,7 @@ function renderPoll(){
     return '<div class="color-card'+(voted?' voted':'')+(isLead?' lead':'')+(!canVote?' disabled':'')+'" data-color="'+ea(c.name)+'" '+(canVote?'title="Tap to vote"':'')+'>'+
       (isLead?'<span class="lead-badge">#1</span>':'')+
       '<div class="swatch'+(hasImg?' has-img':'')+'" style="'+sw+'"></div>'+th+
-      '<div class="color-info"><div class="color-name">'+e(c.name)+'</div><div class="color-meta">by '+e(c.suggestedBy)+(hasImg?' <span class="img-tag">ref img</span>':'')+'</div>'+
+      '<div class="color-info"><div class="color-name">'+e(c.name)+'</div><div class="color-meta">by '+e(c.suggestedBy)+(c.votes.length?' — '+c.votes.join(', '):'')+(hasImg?' <span class="img-tag">ref img</span>':'')+'</div>'+
       '<div class="vote-bar-wrap"><div class="vote-bar" style="width:'+pct+'%"></div></div></div>'+
       '<div class="vote-count">'+c.votes.length+'</div></div>';
   }).join('');
