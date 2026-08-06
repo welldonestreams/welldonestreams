@@ -58,6 +58,9 @@ h1{font-size:1.4rem;text-align:center;margin-bottom:2px;color:#fff}
 .roster-table th,.roster-table td{padding:8px 6px;text-align:left;border-bottom:1px solid #222}
 .roster-table th{font-size:.7rem;text-transform:uppercase;color:#777;font-weight:600}
 .roster-table td{font-size:.85rem}
+.roster-table td.edit-cell{width:40px;text-align:center}
+.roster-edit-btn{background:none;border:1px solid #444;color:#777;border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer}
+.roster-edit-btn:hover{background:#2a2a2a;color:#fff}
 .roster-table tr:hover{background:#1a1a1a}
 .num{font-weight:700;color:#7aa2f7}
 .size-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:.7rem;font-weight:600;background:#2a2a2a;color:#aaa}
@@ -102,7 +105,7 @@ h1{font-size:1.4rem;text-align:center;margin-bottom:2px;color:#fff}
 </div>
 <div class="panel" id="panel-roster">
   <table class="roster-table">
-    <thead><tr><th>Player</th><th>#</th><th>Size</th></tr></thead>
+    <thead><tr><th>Player</th><th>#</th><th>Size</th><th></th></tr></thead>
     <tbody id="roster-tbody"></tbody>
   </table>
   <div class="roster-form">
@@ -245,8 +248,17 @@ async function refreshPoll(){
 
 function renderRoster(){
   var tb=document.getElementById('roster-tbody');
-  if(!roster.length){tb.innerHTML='<tr><td colspan="3" style="text-align:center;color:#555;padding:16px">No players yet</td></tr>';return}
-  tb.innerHTML=roster.map(function(p){return '<tr><td>'+e(p.name)+'</td><td class="num">'+e(p.number)+'</td><td><span class="size-badge">'+e(p.size||'')+'</span></td></tr>'}).join('')
+  if(!roster.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:#555;padding:16px">No players yet</td></tr>';return}
+  tb.innerHTML=roster.map(function(p){return '<tr><td>'+e(p.name)+'</td><td class="num">'+e(p.number)+'</td><td><span class="size-badge">'+e(p.size||'')+'</span></td><td class="edit-cell"><button class="roster-edit-btn" data-name="'+ea(p.name)+'" data-number="'+ea(p.number)+'" data-size="'+ea(p.size||'')+'">Edit</button></td></tr>'}).join('')
+  // Edit button clicks — fill the form with that player's data
+  tb.querySelectorAll('.roster-edit-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var form=document.querySelector('.roster-form');
+      form.querySelector('[name=name]').value=btn.dataset.name;
+      form.querySelector('[name=number]').value=btn.dataset.number;
+      form.querySelector('[name=size]').value=btn.dataset.size;
+    })
+  })
 }
 async function refreshRoster(){
   try{var r=await fetch(API+'/roster');roster=await r.json();if(!Array.isArray(roster))roster=[];roster.sort(function(a,b){return a.name.localeCompare(b.name)});renderRoster()}catch(e){}
