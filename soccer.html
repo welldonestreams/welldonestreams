@@ -105,7 +105,7 @@ h1{font-size:1.4rem;text-align:center;margin-bottom:2px;color:#fff}
 </div>
 <div class="panel" id="panel-roster">
   <table class="roster-table">
-    <thead><tr><th>Player</th><th>#</th><th>Size</th><th></th></tr></thead>
+    <thead><tr><th>Player</th><th>#</th><th>Size</th><th></th><th></th></tr></thead>
     <tbody id="roster-tbody"></tbody>
   </table>
   <div class="roster-form">
@@ -113,6 +113,7 @@ h1{font-size:1.4rem;text-align:center;margin-bottom:2px;color:#fff}
     <input type="text" name="number" placeholder="#" maxlength="10" inputmode="numeric">
     <select name="size"><option value="">Size?</option><option>XS</option><option>Small</option><option>Medium</option><option>Large</option><option>XL</option><option>XXL</option></select>
     <button id="roster-add">Add / Update</button>
+    <button id="roster-delete" class="delete-btn">Delete</button>
   </div>
   <div class="msg" id="roster-msg"></div>
 </div>
@@ -260,6 +261,18 @@ function renderRoster(){
     })
   })
 }
+// Delete button with confirmation
+document.getElementById('roster-delete').addEventListener('click',function(){
+  var form=document.querySelector('.roster-form');
+  var n=form.querySelector('[name=name]').value.trim();
+  if(!n)return;
+  if(!confirm('Are you sure you want to delete '+n+'?'))return;
+  fetch(API+'/roster?name='+encodeURIComponent(n),{method:'DELETE'}).then(function(r){
+    if(r.ok){refreshRoster();form.querySelector('[name=name]').value='';form.querySelector('[name=number]').value='';form.querySelector('[name=size]').value='';document.getElementById('roster-delete').classList.remove('show');msg('roster','Deleted '+n+'.',0)}
+    else{r.json().then(function(d){msg('roster',d.error||'Error',1)})}
+  }).catch(function(){msg('roster','Network error.',1)})
+});
+
 async function refreshRoster(){
   try{var r=await fetch(API+'/roster');roster=await r.json();if(!Array.isArray(roster))roster=[];roster.sort(function(a,b){return a.name.localeCompare(b.name)});renderRoster()}catch(e){}
 }
