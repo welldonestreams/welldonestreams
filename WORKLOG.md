@@ -37,10 +37,12 @@ entry — never below the `## Entry template` section at the bottom.**
   `Homelab-critical-welldonestreams`, restic repo created with native
   `/usr/bin/restic` on TrueNAS (no container). Scope: `/mnt/tank/apps` +
   `/mnt/tank/photos` only; the ~10.7T media is deliberately excluded.
-  Retention 7 daily / 4 weekly / 6 monthly via nightly cron (pending).
+  Retention 7 daily / 4 weekly / 6 monthly via nightly cron.
   Repo password exists ONLY in Vaultwarden + paper — never in this repo.
-  Acceptance gate still open: restore test (pull Vaultwarden DB + a photo
-  back from B2 and open them) — do not mark done until it passes.
+  Verified 2026-08-08: 10 snapshots, 51.7 GB encrypted, 3,090 data packs,
+  266 index files. B2 creds in /opt/data/.env on Hermes machine (synced
+  from NAS /root/.b2-env). Two stale restic locks from Aug 1 cleaned.
+  Restore test still pending — needs sudo on NAS.
   Also added vault-export docs (HOMELAB-KB, HERMES-CONFIG-DECISIONS,
   HERMES-COST-REPORT, RUNBOOK-ANIME-CONSOLIDATION, RUNBOOK-BACKUP-STRATEGY)
   for cross-agent review. Anime consolidation verified live: `anime/movies`
@@ -97,9 +99,10 @@ entry — never below the `## Entry template` section at the bottom.**
   are now generated only during that window, preserving timeline and chapter
   browsing without competing with daytime use. Intro and credit markers remain
   scheduled overnight. Ad markers, voice activity data, and extensive analysis
-  remain disabled; automatic trash emptying remains off so a temporary storage
-  outage cannot purge valid library entries. Empty Plex trash manually only
-  after verifying a completed media change.
+  remain disabled. AutoEmptyTrash was turned ON 2026-08-08 so Plex
+  automatically cleans up content deleted by Radarr/Sonarr. Intro and credit
+  detection are also now enabled on all three libraries and run during the
+  overnight window.
 
 - 2026-07-28 — Anime storage and Plex were consolidated at the user's request.
   After a clean copy comparison, the old Anime movie and series child datasets
@@ -143,7 +146,8 @@ entry — never below the `## Entry template` section at the bottom.**
   container limit while the host had under 1 GB available. Set it to 512 MB,
   retained enabled Intel hardware transcoding, moved intro/credit detection to
   the overnight maintenance window, and disabled ad detection, chapter-preview
-  generation, deep media analysis, and automatic trash emptying. This keeps
+  generation, and deep media analysis. Intro/credit detection and auto-trash
+  were later enabled on 2026-08-08. This keeps
   playback responsive and protects library metadata from a transient mount
   issue without changing media files.
 
