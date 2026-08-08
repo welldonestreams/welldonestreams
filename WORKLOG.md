@@ -9,6 +9,30 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-08-08 — Massive Radarr/Sonarr import-list cleanup. Replaced three
+  unfiltered lists (IMDb Popular, IMDb Top 250, StevenLu) that were pulling
+  pre-1975 junk and foreign films with four filtered lists: TMDb Popular,
+  TMDb Trending (6.0+/100 votes), Trakt Popular Movies, and Trakt Popular
+  Animation — all gated to 1975+. In Sonarr, deleted "Trakt Watched Weekly"
+  (global unfiltered garbage magnet — Russian, Chinese, Filipino kids shows)
+  and kept only Trakt Popular Shows (first season) and Trakt Anticipated
+  (first season). Added 62 curated shows from an MDBList high-ratings list
+  with 3-episode monitoring. 241 Sonarr exclusions from the bad list were
+  removed after the list was deleted. Radarr went from 341→389, Sonarr
+  stabilized at 151 series. Gotchas documented below; if a list has no
+  language/genre filter, it WILL import non-English content. Plex Intro/Credit
+  detection enabled on all libraries. AutoEmptyTrash ON. Resend newsletter
+  ready to send from noreply@welldonestreams.com to 12 users.
+
+  Key gotchas for future agents:
+  - TMDb ListImport (listId mode, e.g. top-rated) ignores year filters and
+    will dump every Best Picture winner from 1927. Use Popular/Trending instead.
+  - Trakt "Watched Weekly" has NO language filter — avoid entirely.
+  - Exclusions survive list deletion; remove them after deleting a bad list.
+  - MDBList is blocked by Cloudflare from the NAS IP; use Trakt/TMDb lists.
+  - MDBList API key st2lpcxbd5h1gvsmhfgpoedyv (free 1000/day) — only usable
+    from outside the NAS.
+
 - 2026-07-31 — Off-box backup is now live: Backblaze B2 bucket
   `Homelab-critical-welldonestreams`, restic repo created with native
   `/usr/bin/restic` on TrueNAS (no container). Scope: `/mnt/tank/apps` +

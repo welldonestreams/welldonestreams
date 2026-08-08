@@ -990,5 +990,37 @@ plain browser hitting the direct port did not: local broadcast discovery.
   `https://beszel.welldonestreams.com`, add the TrueNAS system, put the
   real token/key in the compose file's two `PASTE_..._FROM_HUB_ADD_SYSTEM`
   placeholders, then `docker compose up -d --force-recreate beszel-agent`.
-  Also add `HOMEPAGE_VAR_BESZEL_USER`/`_PASS` to Homepage once the account
+  also add `HOMEPAGE_VAR_BESZEL_USER`/`_PASS` to Homepage once the account
   exists — the tile's widget is already wired to those variable names.
+
+## 2026-08-08 — Library & import-list overhaul (Hermes session)
+
+**Current counts:**
+| Library | Plex | Backend |
+|---------|------|---------|
+| Movies | 343 | 389 Radarr |
+| TV Shows | 81 | 151 Sonarr |
+| Anime | 10 | — |
+
+**Radarr lists (4, all auto-add ON, year 1975+):**
+- TMDb Popular + TMDb Trending (6.0+/100 votes)
+- Trakt Popular Movies + Trakt Popular Animation
+
+**Sonarr lists (2, both auto-add ON):**
+- Trakt Popular Shows (first season, year 2000+)
+- Trakt Anticipated (first season, 2024+)
+
+**Automation:**
+- `auto_next_season.py` (cron, 15 min): prefetches next season when 4 eps remain
+- `pilot-to-full-season.py`: triggers full season download when ep1 gets watched
+- Plex: Intro/Credit detection ON, autoEmptyTrash ON
+
+**Requests:** overseerr via welldonestreams.com. Plex invites via admin panel at
+welldonestreams.com/admin.html (token-gated, uses Cloudflare Worker KV).
+
+**Newsletter:** Resend from noreply@welldonestreams.com. 12 recipients queued.
+
+**DO NOT:**
+- Use Trakt "Watched Weekly" or IMDb lists — no language filter, imports foreign junk
+- Use TMDb ListImport with listId — ignores year filters, dumps 1927 Best Picture winners
+- Use MDBList from the NAS — Cloudflare blocks it. API key: st2lpcxbd5h1gvsmhfgpoedyv
