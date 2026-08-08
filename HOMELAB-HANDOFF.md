@@ -1020,6 +1020,12 @@ welldonestreams.com/admin.html (token-gated, uses Cloudflare Worker KV).
 
 **Newsletter:** Resend from noreply@welldonestreams.com. 12 recipients queued.
 
+**Homepage 2.0 editor:** Built and deployed as a separate TrueNAS custom app
+(homepage-editor, port 30601) but NOT yet live. The editor launcher in custom.js
+is ready, NPM proxy host 29 created for homepage-editor.welldonestreams.com,
+but no DNS record exists yet. The worker.js `/api/admin/all` endpoint was
+temporarily added to extract Plex invite emails from KV, then reverted.
+
 **DO NOT:**
 - Use Trakt "Watched Weekly" or IMDb lists — no language filter, imports foreign junk
 - Use TMDb ListImport with listId — ignores year filters, dumps 1927 Best Picture winners
