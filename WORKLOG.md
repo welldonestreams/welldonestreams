@@ -9,6 +9,21 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-08-14 — Homelab: built + deployed `plaid-bridge` (self-hosted Plaid
+  finance bridge). Repo `/opt/data/workspace/plaid-bridge`; live TrueNAS custom
+  app on 10.0.0.162:31013; Hermes read-only client `/opt/data/finance/fb.sh`.
+  Security boundary: Hermes → read-only `/v1/finance/*` (X-Finance-Token) →
+  bridge → Plaid; access tokens Fernet-encrypted at rest (master key in
+  secrets dir, never in DB); `/admin/*` owner-only; webhooks JWT-verified.
+  Blocked on Phase 1: Plaid dashboard `client_id` + sandbox secret
+  (Vaultwarden-only handoff; mounted 0600 secrets). Two sandbox tests defined
+  in SPEC.md: TEST A First Platypus `user_good`/`pass_good`/2FA 1234; TEST B
+  returning-user seeded phone 415-555-0011 / OTP 123456 (real phone numbers do
+  NOT work in sandbox; real phone → `user.phone_number` in Trial/Production).
+  Ownership: Homelab thread only — the Finance profile must not modify this
+  repo (handoff 2026-08-14). Full spec:
+  `private-homelab/PLAID-BRIDGE-SPEC-2026-08-14.md` (+ vault `homelab/`).
+
 - 2026-08-08 — Massive Radarr/Sonarr import-list cleanup. Replaced three
   unfiltered lists (IMDb Popular, IMDb Top 250, StevenLu) that were pulling
   pre-1975 junk and foreign films with four filtered lists: TMDb Popular,
