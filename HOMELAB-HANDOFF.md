@@ -8,6 +8,14 @@ The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
 
 ## 2026-07-29 — Hermes Agent and local-model deployment
 
+- Added a private, local-only homelab operating context to the existing
+  `gpt-oss-hermes` Ollama derivative. Both Hermes surfaces receive the same
+  topology, service roles, storage mappings, media policy, safety rules, and
+  recovery context whenever the manual `local` route is selected. No topology
+  was added to a cloud prompt and no credential was embedded. The complete
+  sanitized architecture and maintenance procedure is in
+  `HERMES-AI-SETUP.md`; the private source remains outside Git.
+
 - Windows Hermes Desktop now uses the authenticated TrueNAS Hermes gateway as
   its default remote backend. The desktop and web dashboard therefore show the
   same TrueNAS sessions and built-in memory instead of maintaining two writable

@@ -48,6 +48,44 @@ entry — never below the `## Entry template` section at the bottom.**
   - MDBList API key st2lpcxbd5h1gvsmhfgpoedyv (free 1000/day) — only usable
     from outside the NAS.
 
+- 2026-08-08 — **Unresolved conflict with the Sonarr entry directly above.**
+  That entry records deleting the Trakt "Watched Weekly" list outright ("avoid
+  entirely"); the entry directly below records keeping chart lists 1/4/7 and
+  constraining them with a genre whitelist. Both were written on 2026-08-08 by
+  different agents and their relative order is not recorded. Do not act on
+  either account without first reading the live Sonarr import-list state
+  (`GET /api/v3/importlist`) and then amending whichever entry is wrong in
+  place.
+
+- 2026-08-08 — Root-caused and fixed a Sonarr reality-TV/foreign junk flood in
+  the queue. The junk (Cake Toppers, I'm a Celebrity…Unpacked, Saving Lives in
+  Cardiff, Wildfire 2025, Sunset Grove, Nian Lun, etc., each pulling full
+  seasons) came from loose Trakt chart import lists, not from the user's
+  curated MDBList. Key trap: a genre filter set on the MDBList website has **no
+  effect** — Sonarr imports from Trakt's built-in Popular/Watched charts
+  (`TraktPopularImport`), which only honor a genre whitelist set in the
+  Sonarr list's own `genres` field. Fix applied via the Sonarr API: set a
+  scripted+documentary+anime genre whitelist
+  (`drama,comedy,crime,thriller,mystery,science-fiction,fantasy,horror,action,adventure,animation,anime,documentary,history,war,romance,superhero,family,biography`)
+  on the three chart lists (ids 1 Popular, 4 Top-Watched-Monthly, 7
+  Top-Watched-Weekly); this whitelist excludes reality/game-show/talk-show/news
+  and is validated against Trakt on save (works on Watched charts too, despite
+  the "Only for Popular Lists" help text). Deleted duplicate list id 8 (it was a
+  second copy of id 7's Top-Watched-Weekly chart); could not retype it to a real
+  Recommended list because Trakt's `/shows/recommended/weekly` endpoint returns
+  500 for this account. The user's curated list is now wired in properly as a
+  `TraktListImport` user list (id 6, `chanceweldon/top-tv-stricter-trakt`) and
+  needs no genre field. Left `monitor` blank + the pilot-3 automation intact:
+  verified the live queue is all legitimate pilot-3 grabs (≈35 curated shows ×3
+  episodes, series-level unmonitored) plus intentionally full shows (Ted Lasso,
+  One Piece) and a Hunter x Hunter auto-expand. **Security:** reading the Sonarr
+  config over SSH is blocked by the agent safety classifier, so the user pasted
+  the Sonarr API key into the session, and the Trakt OAuth access/refresh tokens
+  surfaced in an import-list API response — recommend rotating the Sonarr API
+  key (Settings → General) and re-authing Trakt. No credentials were written to
+  Git. Radarr's queue was reviewed from a user paste (all 1080p, clean); its
+  import lists were not audited (no Radarr key this session).
+
 - 2026-07-31 — Off-box backup is now live: Backblaze B2 bucket
   `Homelab-critical-welldonestreams`, restic repo created with native
   `/usr/bin/restic` on TrueNAS (no container). Scope: `/mnt/tank/apps` +
@@ -63,6 +101,16 @@ entry — never below the `## Entry template` section at the bottom.**
   for cross-agent review. Anime consolidation verified live: `anime/movies`
   and `anime/series` subdirs are gone; Sonarr root re-point + Plex trash
   still pending desk-side.
+
+- 2026-07-29 — Built a private homelab knowledge layer into the existing
+  `gpt-oss-hermes` Ollama derivative instead of fine-tuning or copying private
+  topology into a cloud model. The local source records verified network flow,
+  canonical services, storage mappings, media policy, monitoring, recovery
+  gaps, and strict read-only/security rules without credentials. Because both
+  Hermes surfaces already use the same Windows Ollama model through the
+  `local` route, they receive the same knowledge with no extra TrueNAS RAM
+  cost. Added `HERMES-AI-SETUP.md` as the sanitized cross-agent deployment,
+  routing, validation, update, and recovery guide.
 
 - 2026-07-29 — Made TrueNAS the canonical Hermes backend and attached Windows
   Hermes Desktop to it through the authenticated remote-gateway flow. The
