@@ -9,6 +9,17 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-08-25 — DNS architecture hardened after TrueNAS reboot outage. Root
+  causes: (1) TrueNAS host DNS pointed at AdGuard (app on the same host) →
+  circular boot dependency, several apps failed to start; (2) DHCP Option 6
+  supplied only 10.0.0.162 → no client DNS redundancy; (3) Windows PC accepted
+  the Tailscale 10.0.0.0/24 subnet route → LAN traffic to the NAS went via
+  Tailscale (looked like a NAS network failure; NAS was healthy). Fixes: host
+  DNS → 1.1.1.1/9.9.9.9 (permanent), DHCP Option 6 → 10.0.0.162,9.9.9.9, PC
+  `tailscale set --accept-routes=false`. Unbound stays on 5353, Dnsmasq on
+  5354. All 26 apps running; claims live-verified by Hermes. Prevention rules
+  in HOMELAB-HANDOFF.md.
+
 - 2026-08-14 — Homelab: built + deployed `plaid-bridge` (self-hosted Plaid
   finance bridge). Repo `/opt/data/workspace/plaid-bridge`; live TrueNAS custom
   app on 10.0.0.162:31013; Hermes read-only client `/opt/data/finance/fb.sh`.

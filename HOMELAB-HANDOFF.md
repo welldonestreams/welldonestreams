@@ -1,10 +1,43 @@
 # Homelab handoff
 
-Last verified: 2026-07-29 (America/Los_Angeles)
+Last verified: 2026-08-25 (America/Los_Angeles)
 
 This file records durable homelab state for Codex and Claude. It intentionally
 contains no passwords, API keys, tokens, cookies, or certificate credentials.
 The prioritized remaining work is maintained in `HOMELAB-GAMEPLAN.md`.
+
+## 2026-08-25 — DNS architecture + TrueNAS reboot outage (resolved)
+
+A TrueNAS update/reboot exposed three pre-existing design flaws. The update was
+the trigger, not the root cause. Full incident write-up lives in the session;
+durable state and prevention rules below.
+
+**Current DNS architecture (known-good):**
+- TrueNAS host DNS: **1.1.1.1 + 9.9.9.9** — never point the host at its own
+  app-hosted DNS (AdGuard-on-TrueNAS = circular boot dependency: host boots →
+  needs DNS → AdGuard app not up yet → app startup fails).
+- DHCP Option 6 (OPNsense Dnsmasq): **10.0.0.162, 9.9.9.9** (was AdGuard-only;
+  a TrueNAS reboot used to kill all client DNS).
+- Chain: LAN clients → AdGuard `10.0.0.162:53` → OPNsense Unbound `10.0.0.1:5353`.
+- OPNsense Unbound: port **5353** — do NOT move to 53; placement is intentional
+  (AdGuard forwards to it).
+- OPNsense Dnsmasq: port **5354** (DHCP).
+- OPNsense Web UI: `https://10.0.0.1:4444/`; TrueNAS UI `:81`/`:444`.
+- Windows PC Tailscale: **`tailscale set --accept-routes=false`** — the PC is
+  physically on 10.0.0.0/24; accepting the advertised subnet route sent LAN
+  traffic via Tailscale (100.127.203.86) and made the NAS look unreachable
+  (ARP was fine; `Test-NetConnection` showed `InterfaceAlias: Tailscale`).
+
+**Post-reboot verification order:** host networking (`ip -br addr`, route,
+ping gateway) → host DNS (`cat /etc/resolv.conf`, `getent hosts
+registry-1.docker.io`) → UI curls → AdGuard (`Resolve-DnsName google.com
+-Server 10.0.0.162`) → local rewrite (`truenas.welldonestreams.com`) → client
+routing (TCP test shows Ethernet, not Tailscale) → all apps Running.
+
+**Symptom cheat-sheet:** ping 1.1.1.1 works but google.com fails → DNS, not
+WAN. ARP shows correct NAS MAC but TCP tests route via Tailscale → subnet-route
+conflict. Do not roll back a TrueNAS update until these checks are done.
+
 
 ## 2026-07-29 — Hermes Agent and local-model deployment
 
