@@ -9,6 +9,17 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-08-29 — Sonarr authentication reset (Codex). After the Sonarr upgrade, the
+  UI demanded login but no credentials were recoverable (password = one-way hash
+  in `sonarr.db` Users table; config.xml had `AuthenticationMethod=Basic` and no
+  Username/Password — Sonarr v4 moved credentials to SQLite). Codex reset via the
+  authenticated `/api/v3/config/host` API: username `chanceweldon`, new password,
+  `authenticationMethod=forms`, `authenticationRequired=enabled` (the old
+  DisabledForLocalAddresses mode now requires an AllowedHosts entry post-upgrade;
+  Enabled avoids a wildcard). Login verified 302 → session cookie → 200. Recovery
+  backups: `config.xml.auth-reset-20260829-154610`, `sonarr.db.auth-reset-20260829-154610`
+  in the app config dir. Do not change auth settings again unless Chance asks.
+
 - 2026-08-25 — DNS architecture hardened after TrueNAS reboot outage. Root
   causes: (1) TrueNAS host DNS pointed at AdGuard (app on the same host) →
   circular boot dependency, several apps failed to start; (2) DHCP Option 6
