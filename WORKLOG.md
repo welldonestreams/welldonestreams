@@ -9,6 +9,8 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-08-30 — Plex collection curation + media repairs (another agent; Hermes verified live). Removed 9 discovery collections (Newly Released, IMDb Top 250, TMDb Popular, Top Rated, Trending) and disabled recreation via Kometa `use_released/use_top/use_popular/use_trending: false`. Added Fast & Furious (2009) only. Franchise collections (Matrix, John Wick, Hunger Games, Spider-Man split, Bourne, Die Hard, Mad Max, Predator, X-Men, LEGO Marvel, Evil Dead, Enola Holmes, Ice Age, PAW Patrol) with franchise overrides so future titles auto-join. 19–20 Radarr downloads queued (Bourne Ultimatum .iso → 1080p replacement; Matrix Reloaded re-matched to TMDb 604). Live-verified: 176 collections (87/48/41), zero same-library duplicates, all discovery toggles off, Matrix trio matched, recovery snapshots present. Recovery: `apps/ix-apps/app_mounts/plex/config@pre-curation-20260830`, `tank/data/media/movies@pre-bourne-replace-20260830`, `/mnt/tank/apps/kometa/config.yml.bak-pre-curation-20260830`.
+
 - 2026-08-29 — Sonarr authentication reset (Codex). After the Sonarr upgrade, the
   UI demanded login but no credentials were recoverable (password = one-way hash
   in `sonarr.db` Users table; config.xml had `AuthenticationMethod=Basic` and no
