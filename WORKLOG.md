@@ -9,6 +9,23 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-08-31 — plaid-bridge: update-mode re-link + item removal (AFCU re-auth
+  incident). The owner's AFCU item went `attention` (~30-day token expiry;
+  Plaid+institution-side, cannot be prevented). The re-link via plain
+  connect/start created a NEW item (duplicate + 5th Trial slot — deleting items
+  does NOT free slots). Fixes shipped (bridge `20260831-update-mode`, 180
+  checks green): (1) `/admin/connect/start` now accepts `item_id` → true Plaid
+  update-mode → re-auth refreshes the SAME item in place, no new slot; (2) new
+  `POST /admin/items/remove` (revokes at Plaid + cascades item/account-keyed
+  tables — holdings/investment_transactions/liabilities/recurring key on
+  account_id, NOT item_id). Deployed on NAS (no git remote; container is the
+  artifact; rollback `plaid-bridge-rollback-20260831`). Stale duplicate AFCU
+  item removed via the new endpoint; 4 items live, one AFCU set, balances
+  fresh. Watchdog: Hermes cron `plaid item attention monitor` (every 6h,
+  `no_agent`, script `plaid-attention-check.sh`) pings the chat ONLY when an
+  item flips to attention — catch expirations early; re-link via
+  connect/start with item_id (update-mode).
+
 - 2026-08-30 — Plex collection curation + media repairs (another agent; Hermes verified live). Removed 9 discovery collections (Newly Released, IMDb Top 250, TMDb Popular, Top Rated, Trending) and disabled recreation via Kometa `use_released/use_top/use_popular/use_trending: false`. Added Fast & Furious (2009) only. Franchise collections (Matrix, John Wick, Hunger Games, Spider-Man split, Bourne, Die Hard, Mad Max, Predator, X-Men, LEGO Marvel, Evil Dead, Enola Holmes, Ice Age, PAW Patrol) with franchise overrides so future titles auto-join. 19–20 Radarr downloads queued (Bourne Ultimatum .iso → 1080p replacement; Matrix Reloaded re-matched to TMDb 604). Live-verified: 176 collections (87/48/41), zero same-library duplicates, all discovery toggles off, Matrix trio matched, recovery snapshots present. Recovery: `apps/ix-apps/app_mounts/plex/config@pre-curation-20260830`, `tank/data/media/movies@pre-bourne-replace-20260830`, `/mnt/tank/apps/kometa/config.yml.bak-pre-curation-20260830`.
 
 - 2026-08-29 — Sonarr authentication reset (Codex). After the Sonarr upgrade, the
