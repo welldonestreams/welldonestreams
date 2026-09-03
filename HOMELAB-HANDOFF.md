@@ -1070,4 +1070,4 @@ temporarily added to extract Plex invite emails from KV, then reverted.
 **DO NOT:**
 - Use Trakt "Watched Weekly" or IMDb lists — no language filter, imports foreign junk
 - Use TMDb ListImport with listId — ignores year filters, dumps 1927 Best Picture winners
-- Use MDBList from the NAS — Cloudflare blocks it. API key: st2lpcxbd5h1gvsmhfgpoedyv
+- Use MDBList from the NAS — Cloudflare blocks it. Any API key belongs only in the private secret store and must never be committed.
