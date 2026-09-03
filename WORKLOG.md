@@ -86,7 +86,7 @@ entry — never below the `## Entry template` section at the bottom.**
   - Trakt "Watched Weekly" has NO language filter — avoid entirely.
   - Exclusions survive list deletion; remove them after deleting a bad list.
   - MDBList is blocked by Cloudflare from the NAS IP; use Trakt/TMDb lists.
-  - MDBList API key st2lpcxbd5h1gvsmhfgpoedyv (free 1000/day) — only usable
+  - MDBList API key (redacted; rotate if still active) — only usable
     from outside the NAS.
 
 - 2026-08-08 — **Unresolved conflict with the Sonarr entry directly above.**
