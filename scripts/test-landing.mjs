@@ -86,13 +86,42 @@ test('continuous shelf wraps smoothly and caps resume jumps',()=>{
   assert.equal(context.scrollPosition(0,5000,100),1.6);
   assert.equal(context.scrollPosition(20,50,0),20);
 });
-test('scrolling has explicit pause, visibility and reduced-motion guards',()=>{
-  assert.match(html,/id="recent-pause"/);
-  assert.match(script,/!manuallyPaused&&!document.hidden&&!pauses.size&&shelfCycle/);
+test('scrolling has interaction, visibility and reduced-motion guards without a pause button',()=>{
+  assert.doesNotMatch(html,/id="recent-pause"/);
+  assert.match(script,/!motionPreference.matches&&!document.hidden&&!pauses.size&&shelfCycle/);
   assert.match(script,/cancelAnimationFrame\(shelfFrame\)/);
-  assert.match(script,/manuallyPaused=motionPreference.matches/);
+  assert.match(script,/motionPreference.addEventListener\('change',updateShelfMotion\)/);
   assert.match(script,/copy.setAttribute\('aria-hidden','true'\);copy.tabIndex=-1/);
   assert.match(script,/IntersectionObserver/);
+});
+function shelfHarness(){
+  const events=new Map(),windowEvents=new Map(),timers=new Map(),frames=new Map();let id=0;
+  const shelf={scrollLeft:0,clientWidth:320,addEventListener:(name,fn)=>events.set(name,fn),contains:()=>false};
+  const context=vm.createContext({matchMedia:()=>({matches:false,addEventListener(){}}),
+    document:{hidden:false,querySelector:()=>shelf,getElementById:()=>({addEventListener(){}}),addEventListener(){}},
+    window:{addEventListener:(name,fn)=>windowEvents.set(name,fn)},
+    setTimeout:fn=>{timers.set(++id,fn);return id},clearTimeout:i=>timers.delete(i),
+    requestAnimationFrame:fn=>{frames.set(++id,fn);return id},cancelAnimationFrame:i=>frames.delete(i)});
+  vm.runInContext(script.slice(script.indexOf('const shelf='),script.indexOf('let recentLoading=')),context);
+  vm.runInContext('shelfCycle=1000;updateShelfMotion()',context);
+  return {events,windowEvents,timers,frames,context,shelf};
+}
+test('native touch pointer cancellation does not restart automatic scrolling',()=>{
+  const h=shelfHarness();assert.equal(h.frames.size,1);
+  h.events.get('touchstart')();assert.equal(h.frames.size,0);
+  h.events.get('pointerdown')({pointerType:'touch'});
+  h.windowEvents.get('pointercancel')();assert.equal(h.frames.size,0);
+  assert.equal(vm.runInContext("pauses.has('touch')",h.context),true);
+});
+test('mobile momentum extends quiet period and resumes from actual position',()=>{
+  const h=shelfHarness();h.events.get('touchstart')();
+  h.events.get('touchend')({touches:[]});assert.equal(h.frames.size,0);
+  const timer=[...h.timers.keys()][0];h.shelf.scrollLeft=240;
+  h.events.get('scroll')();assert.equal(h.timers.has(timer),false);
+  assert.equal(h.frames.size,0);assert.equal(h.timers.size,1);
+  [...h.timers.values()][0]();assert.equal(h.frames.size,1);
+  assert.equal(vm.runInContext('shelfPosition',h.context),240);
+  h.timers.clear();h.events.get('scroll')();assert.equal(h.timers.size,0);
 });
 test('preview is explicitly labeled and cannot silently replace production failures',()=>{
   assert.match(script,/new URLSearchParams\(location.search\)\.get\('preview'\) === '1'/);
