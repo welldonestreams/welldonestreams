@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Well Done Streams</title>
   <meta name="description" content="Get access to Well Done Streams, set up Plex on your device, request movies and shows, and check your requests." />
-  <link rel="stylesheet" href="css/landing.css?v=20260905" />
+  <link rel="stylesheet" href="css/landing.css?v=20260905-scroll" />
   <style>
     :root {
       --radius: 16px;
@@ -175,7 +175,7 @@
       <div class="hero-actions"><a class="btn" href="https://app.plex.tv" target="_blank" rel="noopener">Open Plex <span aria-hidden="true">↗</span></a><a class="btn secondary" href="#stage1">New here? Get access</a></div>
       <div class="scroll-label">Recently Added &mdash; tap a title to request more like it</div>
       <div class="recent-scroll-container" tabindex="0" role="region" aria-label="Recently added titles"><div class="recent-scroll-track" id="recent-scroll-track"><span class="scroll-item">Loading recent additions&hellip;</span></div></div>
-      <div class="shelf-controls"><button class="pill" type="button" id="recent-prev" aria-label="Previous recent titles">←</button><button class="pill" type="button" id="recent-next" aria-label="Next recent titles">→</button><button class="pill" type="button" id="recent-retry" hidden>Retry loading</button></div>
+      <div class="shelf-controls"><button class="pill" type="button" id="recent-prev" aria-label="Previous recent titles">←</button><button class="pill" type="button" id="recent-next" aria-label="Next recent titles">→</button><button class="pill" type="button" id="recent-pause" aria-pressed="false">Pause scrolling</button><button class="pill" type="button" id="recent-retry" hidden>Retry loading</button></div>
       <div class="request-next-row"><a class="btn" href="https://requests.welldonestreams.com" target="_blank" rel="noopener" style="flex-direction:column;gap:2px;line-height:1.25"><span>Request what's next &rarr;</span><small style="font-weight:500;font-size:.72rem;opacity:.85">Sign in with Plex after getting access.</small></a></div>
       <p>Welcome! Here's everything you need to start watching &mdash; and how to request anything you want added.</p>
     </div>
@@ -277,15 +277,64 @@
     finally{btn.disabled=false;btn.textContent='Request Access'}
   });
 
-  // A user-controlled shelf: no perpetual timer, duplicate links, or motion to fight.
+  // Continuous motion, but no animation work while paused, hidden or off screen.
   const shelf=document.querySelector('.recent-scroll-container');
+  const motionPreference=matchMedia('(prefers-reduced-motion:reduce)');
+  const pauseButton=document.getElementById('recent-pause');
+  const pauses=new Set();
+  let shelfFrame=0,lastFrame=0,shelfCycle=0,shelfPosition=0,resumeShelfTimer=0;
+  let manuallyPaused=motionPreference.matches;
+  function scrollPosition(position,elapsed,cycle){return cycle>0?(position+Math.min(elapsed,50)*.032)%cycle:position}
+  function updateShelfMotion(){
+    cancelAnimationFrame(shelfFrame);shelfFrame=0;lastFrame=0;
+    pauseButton.textContent=manuallyPaused?'Resume scrolling':'Pause scrolling';
+    pauseButton.setAttribute('aria-pressed',String(manuallyPaused));
+    if(!manuallyPaused&&!document.hidden&&!pauses.size&&shelfCycle){shelfPosition=shelf.scrollLeft;shelfFrame=requestAnimationFrame(animateShelf)}
+  }
+  function animateShelf(now){
+    if(lastFrame){shelfPosition=scrollPosition(shelfPosition,now-lastFrame,shelfCycle);shelf.scrollLeft=shelfPosition}
+    lastFrame=now;shelfFrame=requestAnimationFrame(animateShelf);
+  }
+  function setShelfPause(reason,paused){paused?pauses.add(reason):pauses.delete(reason);updateShelfMotion()}
+  function pauseForInteraction(){
+    setShelfPause('interaction',true);clearTimeout(resumeShelfTimer);
+    resumeShelfTimer=setTimeout(()=>setShelfPause('interaction',false),2500);
+  }
+  function prepareShelf(){
+    const track=document.getElementById('recent-scroll-track');
+    track.querySelectorAll('[data-loop-copy]').forEach(el=>el.remove());
+    shelfCycle=0;
+    const originals=[...track.querySelectorAll('a.scroll-item')];
+    if(originals.length&&track.scrollWidth>shelf.clientWidth){
+      for(const item of originals){const copy=item.cloneNode(true);copy.dataset.loopCopy='true';copy.setAttribute('aria-hidden','true');copy.tabIndex=-1;track.append(copy)}
+      shelfCycle=track.querySelector('[data-loop-copy]').offsetLeft-originals[0].offsetLeft;
+      shelf.scrollLeft=shelf.scrollLeft%shelfCycle;
+    }
+    updateShelfMotion();
+  }
+  pauseButton.addEventListener('click',()=>{manuallyPaused=!manuallyPaused;updateShelfMotion()});
+  motionPreference.addEventListener('change',e=>{manuallyPaused=e.matches;updateShelfMotion()});
+  shelf.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')setShelfPause('hover',true)});
+  shelf.addEventListener('pointerleave',()=>setShelfPause('hover',false));
+  shelf.addEventListener('focusin',()=>setShelfPause('focus',true));
+  shelf.addEventListener('focusout',e=>{if(!shelf.contains(e.relatedTarget))setShelfPause('focus',false)});
+  shelf.addEventListener('pointerdown',()=>setShelfPause('touch',true));
+  window.addEventListener('pointerup',()=>{if(pauses.has('touch')){pauseForInteraction();setShelfPause('touch',false)}});
+  window.addEventListener('pointercancel',()=>setShelfPause('touch',false));
+  shelf.addEventListener('wheel',pauseForInteraction,{passive:true});
+  document.addEventListener('visibilitychange',updateShelfMotion);
+  window.addEventListener('pagehide',()=>{setShelfPause('page',true);clearTimeout(resumeShelfTimer);pauses.delete('interaction');pauses.delete('touch')});
+  window.addEventListener('pageshow',()=>setShelfPause('page',false));
+  if('IntersectionObserver' in window)new IntersectionObserver(entries=>setShelfPause('offscreen',!entries[0].isIntersecting)).observe(shelf);
+  if('ResizeObserver' in window)new ResizeObserver(prepareShelf).observe(shelf);
   for(const [id,direction] of [['recent-prev',-1],['recent-next',1]]) {
-    document.getElementById(id).addEventListener('click',()=>shelf.scrollBy({left:direction*shelf.clientWidth*.8,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'}));
+    document.getElementById(id).addEventListener('click',()=>{pauseForInteraction();shelf.scrollBy({left:direction*shelf.clientWidth*.8,behavior:motionPreference.matches?'auto':'smooth'})});
   }
   let recentLoading=false;
   async function initRecentScroll(){
     if(recentLoading)return;
     recentLoading=true;
+    shelfCycle=0;updateShelfMotion();
     const track=document.getElementById('recent-scroll-track'),retry=document.getElementById('recent-retry');
     retry.hidden=true;track.textContent='Loading recent additions…';
     try {
@@ -298,6 +347,7 @@
         const poster=url?`<img class="scroll-poster" src="${escapeHtml(url)}" alt="" width="114" height="171" loading="lazy" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'"><span class="scroll-poster-fallback" style="display:none">🎬</span>`:'<span class="scroll-poster-fallback">🎬</span>';
         return `<a class="scroll-item" href="https://requests.welldonestreams.com/search?query=${encodeURIComponent(item.title)}" target="_blank" rel="noopener">${poster}<span>${escapeHtml(item.title)}</span></a>`;
       }).join('');
+      requestAnimationFrame(prepareShelf);
     } catch {track.textContent='Could not load recent additions. You can still open Plex or request a title.';retry.hidden=false}
     finally{recentLoading=false}
   }

@@ -79,6 +79,21 @@ test('native accessible controls and responsive safeguards remain present',()=>{
   assert.match(css,/grid-template-columns:minmax\(0,1fr\)/);
   assert.doesNotMatch(script,/setInterval\(|html\+html/);
 });
+test('continuous shelf wraps smoothly and caps resume jumps',()=>{
+  const source=script.match(/function scrollPosition\([^\n]+/)[0];
+  const context=vm.createContext({});vm.runInContext(source,context);
+  assert.equal(context.scrollPosition(99,50,100),.5999999999999943);
+  assert.equal(context.scrollPosition(0,5000,100),1.6);
+  assert.equal(context.scrollPosition(20,50,0),20);
+});
+test('scrolling has explicit pause, visibility and reduced-motion guards',()=>{
+  assert.match(html,/id="recent-pause"/);
+  assert.match(script,/!manuallyPaused&&!document.hidden&&!pauses.size&&shelfCycle/);
+  assert.match(script,/cancelAnimationFrame\(shelfFrame\)/);
+  assert.match(script,/manuallyPaused=motionPreference.matches/);
+  assert.match(script,/copy.setAttribute\('aria-hidden','true'\);copy.tabIndex=-1/);
+  assert.match(script,/IntersectionObserver/);
+});
 test('preview is explicitly labeled and cannot silently replace production failures',()=>{
   assert.match(script,/new URLSearchParams\(location.search\)\.get\('preview'\) === '1'/);
   assert.doesNotMatch(script,/location.hostname !== 'welldonestreams.com'/);

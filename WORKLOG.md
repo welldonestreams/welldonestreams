@@ -9,6 +9,13 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-09-05 — Owner explicitly prefers the continuously scrolling recent-title
+  shelf. Restored it with a time-based animation loop, hover/focus/touch pauses,
+  a persistent pause control for the current page, reduced-motion support,
+  and hidden-tab/off-screen suspension. Loop copies are excluded from keyboard
+  navigation and the accessibility tree. This supersedes the manual-only shelf
+  decision below; retain the motion feature in future design passes.
+
 - 2026-09-05 — Landing-page usability and reliability: added direct Plex access
   and setup shortcuts; labeled forms and keyboard-native voting; native theme
   dialog with focus restoration; contrast-aware palettes and narrow-layout
