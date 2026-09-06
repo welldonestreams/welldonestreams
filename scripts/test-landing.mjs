@@ -9,6 +9,7 @@ import assert from 'node:assert/strict';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const html=readFileSync(resolve(root,'index.html'),'utf8');
 const css=readFileSync(resolve(root,'css/landing.css'),'utf8');
+const admin=readFileSync(resolve(root,'admin.html'),'utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const helpers=script.slice(script.indexOf('async function requestJSON'),script.indexOf("document.getElementById('preview-notice')"));
 function harness(fetch) {
@@ -20,6 +21,20 @@ function harness(fetch) {
   return {context,timers};
 }
 test('complete inline script parses',()=>{new vm.Script(script)});
+test('admin script parses and allows clearing every option',()=>{
+  new vm.Script(admin.match(/<script>([\s\S]*?)<\/script>/)[1]);
+  assert.doesNotMatch(admin,/Add at least one option|if\s*\(!built.length\)/);
+  assert.match(admin,/options: merged/);
+});
+test('empty poll hides entire card and restores layout when re-enabled',()=>{
+  const card={hidden:false};const state={};
+  const context=vm.createContext({document:{getElementById:()=>card,querySelector:()=>({classList:{toggle:(key,value)=>state[key]=value}})}});
+  vm.runInContext(script.match(/function setPollVisible[^\n]+/)[0],context);
+  context.setPollVisible(false);assert.equal(card.hidden,true);assert.equal(state['poll-empty'],true);
+  context.setPollVisible(true);assert.equal(card.hidden,false);assert.equal(state['poll-empty'],false);
+  assert.match(script,/setPollVisible\(options.length>0\)/);
+  assert.match(script,/catch\{setPollVisible\(true\)/);
+});
 test('all local landing-page assets exist',()=>{
   for(const [,url] of html.matchAll(/(?:src|href)="([^"$]+)"/g)) {
     if(/^(?:https?:|#)/.test(url))continue;

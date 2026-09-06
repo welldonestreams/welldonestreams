@@ -41,6 +41,7 @@ body .form-msg.err { color:#b91c1c; }
 body[data-mode="dark"] .form-msg.ok { color:#6ee7b7; }
 body[data-mode="dark"] .form-msg.err { color:#fda4af; }
 body .widget-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); align-items:start; }
+body .widget-row.poll-empty { grid-template-columns:minmax(0,1fr); }
 .widget-card { min-width:0; }
 .widget-card > p { color:var(--text-dim); margin-bottom:16px; }
 .status-card button { width:100%; }

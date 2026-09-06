@@ -9,6 +9,13 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-09-05 — Empty-poll support: zero saved options deliberately disables the
+  landing voting card; restoring options shows it again. Empty and unavailable
+  remain distinct (an API error shows retry, not a disabled poll). The admin no
+  longer injects a blank row or rejects zero options. Requires the corresponding
+  Worker array-validation change; frontend alone cannot enable empty saves.
+  Tested offline with mocked KV, without clearing or voting in the live poll.
+
 - 2026-09-05 — Fixed automatic scrolling fighting mobile native pan: mobile
   pointercancel no longer resumes motion mid-swipe, and momentum scroll events
   extend the quiet period before resuming. Width-only resize handling avoids

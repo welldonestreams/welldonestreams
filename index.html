@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Well Done Streams</title>
   <meta name="description" content="Get access to Well Done Streams, set up Plex on your device, request movies and shows, and check your requests." />
-  <link rel="stylesheet" href="css/landing.css?v=20260905-scroll" />
+  <link rel="stylesheet" href="css/landing.css?v=20260905-empty-poll" />
   <style>
     :root {
       --radius: 16px;
@@ -207,9 +207,9 @@
     <section id="stage3">
       <h2>3. Request Content <small style="font-weight:500;color:var(--text-dim);font-size:.9rem">(added within 24 hrs or upon release)</small></h2>
       <p><a class="btn" href="https://requests.welldonestreams.com" target="_blank" rel="noopener">Request new content to be added</a></p>
-      <div class="widget-row">
+      <div class="widget-row poll-empty">
         <div class="widget-card status-card"><h3>Request Status</h3><p>See the status of requests associated with your Plex email.</p><form id="status-form"><label for="status-email">Plex account email</label><input type="email" id="status-email" autocomplete="email" maxlength="254" placeholder="you@example.com" required><button class="btn secondary" id="status-lookup" type="submit">Check Status</button></form><div id="status-result" role="status" aria-live="polite"></div></div>
-        <div class="widget-card poll-card"><h3>Vote for what's next</h3><p>Choose a title to cast your vote.</p><div id="poll-options"></div><div id="poll-message" role="status" aria-live="polite"></div><button class="pill" type="button" id="poll-retry" hidden>Retry loading poll</button></div>
+        <div class="widget-card poll-card" id="poll-card" hidden><h3>Vote for what's next</h3><p>Choose a title to cast your vote.</p><div id="poll-options"></div><div id="poll-message" role="status" aria-live="polite"></div><button class="pill" type="button" id="poll-retry" hidden>Retry loading poll</button></div>
       </div>
     </section>
 
@@ -363,6 +363,7 @@
   let voted=false,myPick=null;
   const readVote=v=>{try{const prefix='pollvote_v'+v+'=';const cookie=document.cookie.split(';').map(x=>x.trim()).find(x=>x.startsWith(prefix));return cookie?decodeURIComponent(cookie.slice(prefix.length)):null}catch{return null}};
   let pollLoading=false,votePending=false;
+  function setPollVisible(visible){document.getElementById('poll-card').hidden=!visible;document.querySelector('.widget-row').classList.toggle('poll-empty',!visible)}
   async function loadPoll(){
     if(pollLoading)return;
     pollLoading=true;
@@ -372,7 +373,8 @@
       const data=IS_PREVIEW?MOCK_POLL:await requestJSON('/poll');
       if(!data||!Array.isArray(data.options))throw new Error('Poll unavailable.');
       const options=data.options.filter(opt=>typeof opt==='string'||(opt&&typeof opt.name==='string'));
-      if(!options.length){container.textContent='No poll active right now.';return}
+      setPollVisible(options.length>0);
+      if(!options.length){container.textContent='';msg.textContent='';return}
       const version=data.version||'0',counts=data.counts||{};
       const count=name=>Math.max(0,Number(counts[name])||0);
       const total=options.reduce((sum,opt)=>sum+count(typeof opt==='string'?opt:opt.name),0);
@@ -391,10 +393,11 @@
         catch(err){msg.className='form-msg err';msg.textContent=err.message;retry.hidden=false}
         finally{votePending=false;/* On an uncertain write, reload before enabling another vote. */}
       }));
-    }catch{container.textContent='The poll could not be loaded.';retry.hidden=false}
+    }catch{setPollVisible(true);container.textContent='The poll could not be loaded.';retry.hidden=false}
     finally{pollLoading=false}
   }
   document.getElementById('poll-retry').addEventListener('click',loadPoll);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!votePending)loadPoll()});
 
   document.getElementById('status-form').addEventListener('submit',async e=>{
     e.preventDefault();const button=document.getElementById('status-lookup'),email=document.getElementById('status-email').value.trim(),result=document.getElementById('status-result');
