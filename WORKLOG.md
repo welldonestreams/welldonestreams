@@ -9,6 +9,18 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-09-05 — Landing-page usability and reliability: added direct Plex access
+  and setup shortcuts; labeled forms and keyboard-native voting; native theme
+  dialog with focus restoration; contrast-aware palettes and narrow-layout
+  fixes. Replaced the perpetual duplicated poster ticker with a manual shelf.
+  API calls time out without automatically retrying writes, preserve the
+  Worker's text/plain submit/vote responses, and reject HTML fallback pages.
+  Preview data is explicitly labeled and never simulates a production success.
+  Backend and casino behavior are unchanged. Run `node --test
+  scripts/test-landing.mjs` plus `node scripts/check-landing-page.mjs` before
+  publishing. Browser visual acceptance is not claimed by these static/unit
+  checks.
+
 - 2026-08-31 — plaid-bridge: update-mode re-link + item removal (AFCU re-auth
   incident). The owner's AFCU item went `attention` (~30-day token expiry;
   Plaid+institution-side, cannot be prevented). The re-link via plain
