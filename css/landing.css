@@ -49,7 +49,7 @@ body .poll-choice { font:inherit; color:var(--text); text-align:left; padding:0;
 body .poll-choice:disabled { opacity:1; }
 body .poll-choice .p-chose { color:var(--accent-text-on); }
 body .p-title { background:linear-gradient(#000e,#0009); }
-body .recent-scroll-container { scrollbar-width:thin; scroll-snap-type:x proximity; }
+body .recent-scroll-container { scrollbar-width:thin; scroll-behavior:auto; }
 body .recent-scroll-container::-webkit-scrollbar { display:block; height:6px; }
 .scroll-item { scroll-snap-align:start; }
 .shelf-controls { display:flex; justify-content:flex-end; gap:8px; }
