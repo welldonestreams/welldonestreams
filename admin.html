@@ -91,6 +91,7 @@
       <div id="pollOpts"></div>
       <button class="addopt" id="addOpt">+ Add plain option</button>
       <button class="btn" id="savePoll">Save Poll (resets votes)</button>
+      <p class="sub">Remove every option and save to hide the poll on the main page.</p>
       <div class="msg" id="pollMsg"></div>
     </div>
 
@@ -234,7 +235,6 @@
       currentOptions.push(o);
       c.appendChild(pollRow(o));
     });
-    if (!currentOptions.length) { c.appendChild(pollRow('')); currentOptions.push({name:''}); }
   }
 
   $('addOpt').addEventListener('click', () => {
@@ -285,7 +285,6 @@
       return { name, poster, votes };
     }).filter(o => o.name);
     
-    if (!built.length) { $('pollMsg').className='msg err'; $('pollMsg').textContent='Add at least one option.'; return; }
 
     // 1) Save options (this resets counts to 0 on the server)
     const merged = built.map(o => ({ name: o.name, poster: o.poster }));
@@ -299,7 +298,7 @@
       }
     }
     
-    $('pollMsg').className='msg ok'; $('pollMsg').textContent='Poll saved.'; 
+    $('pollMsg').className='msg ok'; $('pollMsg').textContent=built.length?'Poll saved.':'Poll hidden. Add options and save to show it again.';
     
     // UPGRADED: Wait 500ms before reloading to give the backend time to actually write the file
     setTimeout(() => loadPoll(), 500); 
