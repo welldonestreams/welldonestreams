@@ -175,7 +175,7 @@
       <div class="hero-actions"><a class="btn" href="https://app.plex.tv" target="_blank" rel="noopener">Open Plex <span aria-hidden="true">↗</span></a><a class="btn secondary" href="#stage1">New here? Get access</a></div>
       <div class="scroll-label">Recently Added &mdash; tap a title to request more like it</div>
       <div class="recent-scroll-container" tabindex="0" role="region" aria-label="Recently added titles"><div class="recent-scroll-track" id="recent-scroll-track"><span class="scroll-item">Loading recent additions&hellip;</span></div></div>
-      <div class="shelf-controls"><button class="pill" type="button" id="recent-prev" aria-label="Previous recent titles">←</button><button class="pill" type="button" id="recent-next" aria-label="Next recent titles">→</button><button class="pill" type="button" id="recent-pause" aria-pressed="false">Pause scrolling</button><button class="pill" type="button" id="recent-retry" hidden>Retry loading</button></div>
+      <div class="shelf-controls"><button class="pill" type="button" id="recent-prev" aria-label="Previous recent titles">←</button><button class="pill" type="button" id="recent-next" aria-label="Next recent titles">→</button><button class="pill" type="button" id="recent-retry" hidden>Retry loading</button></div>
       <div class="request-next-row"><a class="btn" href="https://requests.welldonestreams.com" target="_blank" rel="noopener" style="flex-direction:column;gap:2px;line-height:1.25"><span>Request what's next &rarr;</span><small style="font-weight:500;font-size:.72rem;opacity:.85">Sign in with Plex after getting access.</small></a></div>
       <p>Welcome! Here's everything you need to start watching &mdash; and how to request anything you want added.</p>
     </div>
@@ -280,16 +280,12 @@
   // Continuous motion, but no animation work while paused, hidden or off screen.
   const shelf=document.querySelector('.recent-scroll-container');
   const motionPreference=matchMedia('(prefers-reduced-motion:reduce)');
-  const pauseButton=document.getElementById('recent-pause');
   const pauses=new Set();
   let shelfFrame=0,lastFrame=0,shelfCycle=0,shelfPosition=0,resumeShelfTimer=0;
-  let manuallyPaused=motionPreference.matches;
   function scrollPosition(position,elapsed,cycle){return cycle>0?(position+Math.min(elapsed,50)*.032)%cycle:position}
   function updateShelfMotion(){
     cancelAnimationFrame(shelfFrame);shelfFrame=0;lastFrame=0;
-    pauseButton.textContent=manuallyPaused?'Resume scrolling':'Pause scrolling';
-    pauseButton.setAttribute('aria-pressed',String(manuallyPaused));
-    if(!manuallyPaused&&!document.hidden&&!pauses.size&&shelfCycle){shelfPosition=shelf.scrollLeft;shelfFrame=requestAnimationFrame(animateShelf)}
+    if(!motionPreference.matches&&!document.hidden&&!pauses.size&&shelfCycle){shelfPosition=shelf.scrollLeft;shelfFrame=requestAnimationFrame(animateShelf)}
   }
   function animateShelf(now){
     if(lastFrame){shelfPosition=scrollPosition(shelfPosition,now-lastFrame,shelfCycle);shelf.scrollLeft=shelfPosition}
@@ -302,31 +298,42 @@
   }
   function prepareShelf(){
     const track=document.getElementById('recent-scroll-track');
+    const previousPosition=shelfCycle?shelf.scrollLeft%shelfCycle:shelf.scrollLeft;
     track.querySelectorAll('[data-loop-copy]').forEach(el=>el.remove());
     shelfCycle=0;
     const originals=[...track.querySelectorAll('a.scroll-item')];
     if(originals.length&&track.scrollWidth>shelf.clientWidth){
       for(const item of originals){const copy=item.cloneNode(true);copy.dataset.loopCopy='true';copy.setAttribute('aria-hidden','true');copy.tabIndex=-1;track.append(copy)}
       shelfCycle=track.querySelector('[data-loop-copy]').offsetLeft-originals[0].offsetLeft;
-      shelf.scrollLeft=shelf.scrollLeft%shelfCycle;
+      shelf.scrollLeft=previousPosition%shelfCycle;
     }
     updateShelfMotion();
   }
-  pauseButton.addEventListener('click',()=>{manuallyPaused=!manuallyPaused;updateShelfMotion()});
-  motionPreference.addEventListener('change',e=>{manuallyPaused=e.matches;updateShelfMotion()});
+  motionPreference.addEventListener('change',updateShelfMotion);
   shelf.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')setShelfPause('hover',true)});
   shelf.addEventListener('pointerleave',()=>setShelfPause('hover',false));
   shelf.addEventListener('focusin',()=>setShelfPause('focus',true));
   shelf.addEventListener('focusout',e=>{if(!shelf.contains(e.relatedTarget))setShelfPause('focus',false)});
-  shelf.addEventListener('pointerdown',()=>setShelfPause('touch',true));
-  window.addEventListener('pointerup',()=>{if(pauses.has('touch')){pauseForInteraction();setShelfPause('touch',false)}});
-  window.addEventListener('pointercancel',()=>setShelfPause('touch',false));
+  // Native mobile panning emits pointercancel when the browser takes over.
+  // Touch lifecycle, not pointercancel, owns the pause through that gesture.
+  shelf.addEventListener('touchstart',()=>setShelfPause('touch',true),{passive:true});
+  const finishTouch=e=>{if(e.touches.length)return;pauseForInteraction();setShelfPause('touch',false)};
+  shelf.addEventListener('touchend',finishTouch,{passive:true});
+  shelf.addEventListener('touchcancel',finishTouch,{passive:true});
+  shelf.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')setShelfPause('pointer',true)});
+  const finishPointer=()=>{if(pauses.has('pointer')){pauseForInteraction();setShelfPause('pointer',false)}};
+  window.addEventListener('pointerup',finishPointer);
+  window.addEventListener('pointercancel',finishPointer);
+  // Inertial scrolling can continue well after finger-up. Resume only after
+  // the shelf has been quiet; animation-generated scroll events do not reset it.
+  shelf.addEventListener('scroll',()=>{if(pauses.has('touch')||pauses.has('interaction'))pauseForInteraction()},{passive:true});
   shelf.addEventListener('wheel',pauseForInteraction,{passive:true});
   document.addEventListener('visibilitychange',updateShelfMotion);
-  window.addEventListener('pagehide',()=>{setShelfPause('page',true);clearTimeout(resumeShelfTimer);pauses.delete('interaction');pauses.delete('touch')});
+  window.addEventListener('pagehide',()=>{setShelfPause('page',true);clearTimeout(resumeShelfTimer);pauses.delete('interaction');pauses.delete('touch');pauses.delete('pointer')});
   window.addEventListener('pageshow',()=>setShelfPause('page',false));
   if('IntersectionObserver' in window)new IntersectionObserver(entries=>setShelfPause('offscreen',!entries[0].isIntersecting)).observe(shelf);
-  if('ResizeObserver' in window)new ResizeObserver(prepareShelf).observe(shelf);
+  let shelfWidth=0;
+  if('ResizeObserver' in window)new ResizeObserver(entries=>{const width=entries[0].contentRect.width;if(Math.abs(width-shelfWidth)>1){shelfWidth=width;prepareShelf()}}).observe(shelf);
   for(const [id,direction] of [['recent-prev',-1],['recent-next',1]]) {
     document.getElementById(id).addEventListener('click',()=>{pauseForInteraction();shelf.scrollBy({left:direction*shelf.clientWidth*.8,behavior:motionPreference.matches?'auto':'smooth'})});
   }

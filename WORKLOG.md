@@ -9,6 +9,13 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-09-05 — Fixed automatic scrolling fighting mobile native pan: mobile
+  pointercancel no longer resumes motion mid-swipe, and momentum scroll events
+  extend the quiet period before resuming. Width-only resize handling avoids
+  rebuilding the loop on height changes. Removed the pause button at the
+  owner's request; hover/focus, hidden-tab and reduced-motion pauses remain.
+  Added gesture-lifecycle regression tests (not a physical-device QA claim).
+
 - 2026-09-05 — Owner explicitly prefers the continuously scrolling recent-title
   shelf. Restored it with a time-based animation loop, hover/focus/touch pauses,
   a persistent pause control for the current page, reduced-motion support,
