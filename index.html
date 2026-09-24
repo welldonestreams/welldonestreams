@@ -5,10 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Well Done Streams</title>
   <meta name="description" content="Get access to Well Done Streams, set up Plex on your device, request movies and shows, and check your requests." />
+  <link rel="canonical" href="https://welldonestreams.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Well Done Streams" />
+  <meta property="og:description" content="Get access, set up Plex, and request the movies and shows you want to watch." />
+  <meta property="og:url" content="https://welldonestreams.com/" />
+  <meta property="og:image" content="https://welldonestreams.com/og-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="stylesheet" href="css/landing.css?v=20260905-empty-poll" />
   <style>
     :root {
-      --radius: 16px;
+      --radius: 10px;
       --shadow-sm: 0 2px 4px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.1);
       --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.05);
       --shadow-lg: 0 12px 24px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.08);
@@ -17,14 +27,14 @@
     }
 
     [data-mode="light"] {
-      --bg:#fdfdfd; --surface:#fff; --surface-2:#f3f4f6;
-      --text:#111827; --text-dim:#6b7280; --border:#e5e7eb;
-      --accent-text-on:#fff; --shadow-base:var(--shadow-sm); --shadow-hover:var(--shadow-md);
+      --bg:#f6f4ef; --surface:#fffdf8; --surface-2:#eee9df;
+      --text:#111827; --text-dim:#6b7280; --border:#d9d3c7;
+      --accent-text-on:#fff; --shadow-base:none; --shadow-hover:none;
     }
     [data-mode="dark"] {
-      --bg:#09090b; --surface:#18181b; --surface-2:#27272a;
-      --text:#f8fafc; --text-dim:#94a3b8; --border:#334155;
-      --accent-text-on:#fff; --shadow-base:0 4px 12px rgba(0,0,0,.4); --shadow-hover:0 8px 24px rgba(0,0,0,.6);
+      --bg:#11151b; --surface:#1b2229; --surface-2:#25303a;
+      --text:#f8fafc; --text-dim:#94a3b8; --border:#394550;
+      --accent-text-on:#fff; --shadow-base:none; --shadow-hover:none;
     }
 
     [data-palette="gold"] { --accent:#eab308; --accent-hover:#ca8a04; }
@@ -53,14 +63,14 @@
     .controls { display:flex; gap:12px; align-items:center; }
 
     .pill,.btn {
-      border-radius:999px; cursor:pointer; font-weight:700; border:none;
+      border-radius:9px; cursor:pointer; font-weight:700; border:none;
       display:inline-flex; align-items:center; justify-content:center; gap:8px;
       transition:all var(--transition-fast);
     }
-    .pill { background:var(--surface); border:1px solid var(--border); color:var(--text); padding:8px 16px; font-size:.85rem; box-shadow:var(--shadow-sm); }
-    .pill:hover { background:var(--surface-2); transform:translateY(-1px); box-shadow:var(--shadow-md); }
-    .btn { background:var(--accent); color:var(--accent-text-on); font-size:1rem; padding:14px 28px; box-shadow:0 4px 14px color-mix(in srgb,var(--accent) 40%,transparent); }
-    .btn:hover { background:var(--accent-hover); color:var(--accent-text-on); text-decoration:none; transform:translateY(-2px); }
+    .pill { background:var(--surface); border:1px solid var(--border); color:var(--text); padding:8px 16px; font-size:.85rem; }
+    .pill:hover { background:var(--surface-2); }
+    .btn { background:var(--accent); color:var(--accent-text-on); font-size:1rem; padding:14px 28px; }
+    .btn:hover { background:var(--accent-hover); color:var(--accent-text-on); text-decoration:none; }
     .btn.secondary { background:var(--surface); color:var(--text); border:1px solid var(--border); box-shadow:var(--shadow-base); }
     button:disabled { opacity:.6; cursor:not-allowed; transform:none!important; }
 
@@ -77,8 +87,8 @@
     h2 { font-size:1.6rem; font-weight:800; letter-spacing:-.03em; margin-bottom:12px; display:flex; align-items:baseline; gap:10px; }
     section > p { color:var(--text-dim); margin-bottom:20px; font-size:1.05rem; }
 
-    .card,.widget-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow-base); transition:box-shadow var(--transition-smooth),transform var(--transition-smooth); }
-    .card:hover,.widget-card:hover { box-shadow:var(--shadow-hover); transform:translateY(-2px); }
+    .card,.widget-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px; }
+    .card:hover,.widget-card:hover { border-color:var(--accent); }
     .widget-card h3 { font-size:1.15rem; margin-bottom:8px; }
     .widget-row { display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
 
@@ -111,9 +121,9 @@
     .scroll-item { display:inline-flex; flex-direction:column; align-items:center; gap:8px; padding:0 8px; color:var(--text); font-weight:600; font-size:.85rem; width:130px; text-align:center; text-decoration:none; }
     .scroll-item span { display:block; max-width:120px; line-height:1.2; }
     .scroll-poster,.scroll-poster-fallback { width:114px; height:171px; border-radius:10px; flex-shrink:0; border:2px solid transparent; }
-    .scroll-poster { object-fit:cover; background:var(--border); transition:all .2s; box-shadow:var(--shadow-md); }
-    .scroll-poster-fallback { background:var(--surface-2); display:inline-flex; align-items:center; justify-content:center; color:var(--text-dim); font-size:2.5rem; }
-    .scroll-item:hover .scroll-poster { transform:scale(1.08) translateY(-4px); border-color:var(--accent); }
+    .scroll-poster { object-fit:cover; background:var(--border); transition:border-color .2s; }
+    .scroll-poster-fallback { background:var(--surface-2); display:inline-flex; align-items:center; justify-content:center; color:var(--text-dim); font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:12px; }
+    .scroll-item:hover .scroll-poster { border-color:var(--accent); }
     .request-next-row { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:12px 0 8px; }
 
     .platform-grid { display:grid; grid-template-columns:1fr; gap:10px; margin:1.5rem 0; }
@@ -126,7 +136,8 @@
 
     .poll-grid { display:grid; gap:16px; margin-top:16px; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
     .poll-choice { position:relative; border-radius:12px; overflow:hidden; cursor:pointer; aspect-ratio:2/3; background:var(--surface-2); border:2px solid transparent; box-shadow:var(--shadow-base); }
-    .poll-choice img,.poll-choice .noimg { width:100%; height:100%; object-fit:cover; display:flex; align-items:center; justify-content:center; font-size:2.5rem; }
+    .poll-choice img,.poll-choice .noimg { width:100%; height:100%; object-fit:cover; display:flex; align-items:center; justify-content:center; }
+    .poll-choice .noimg { color:var(--text-dim); font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
     .poll-choice.locked { cursor:default; }
     .poll-choice:not(.locked):hover { transform:translateY(-4px); border-color:var(--accent); }
     .p-title { position:absolute; inset:0 0 auto; padding:10px; z-index:3; color:#fff; font-size:.85rem; font-weight:700; text-shadow:0 1px 4px #000; background:linear-gradient(to bottom,rgba(0,0,0,.8),transparent); }
@@ -213,7 +224,7 @@
       </div>
     </section>
 
-    <footer><p style="text-align:center;color:var(--text-dim);font-size:.9rem;font-weight:500"><a href="/admin.html" style="color:inherit" title="Admin">Well Done Streams</a> &middot; <a href="/privacy.html" style="color:inherit">Privacy</a> &middot; est. 2026 &middot; v2.2</p></footer>
+    <footer><p style="text-align:center;color:var(--text-dim);font-size:.9rem;font-weight:500"><a href="/admin.html" style="color:inherit" title="Admin">Well Done Streams</a> &middot; <a href="/privacy.html" style="color:inherit">Privacy</a> &middot; <a href="/terms.html" style="color:inherit">Terms</a> &middot; <a href="mailto:support@welldonestreams.com" style="color:inherit">Contact</a> &middot; est. 2026 &middot; v2.2</p></footer>
   </main>
 
 <script>
@@ -351,7 +362,7 @@
       if(!valid.length){track.textContent='Nothing new right now — check back soon.';return}
       track.innerHTML=valid.map(item=>{
         const url=safePoster(item.poster);
-        const poster=url?`<img class="scroll-poster" src="${escapeHtml(url)}" alt="" width="114" height="171" loading="lazy" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'"><span class="scroll-poster-fallback" style="display:none">🎬</span>`:'<span class="scroll-poster-fallback">🎬</span>';
+        const poster=url?`<img class="scroll-poster" src="${escapeHtml(url)}" alt="" width="114" height="171" loading="lazy" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'"><span class="scroll-poster-fallback" style="display:none">No poster</span>`:'<span class="scroll-poster-fallback">No poster</span>';
         return `<a class="scroll-item" href="https://requests.welldonestreams.com/search?query=${encodeURIComponent(item.title)}" target="_blank" rel="noopener">${poster}<span>${escapeHtml(item.title)}</span></a>`;
       }).join('');
       requestAnimationFrame(prepareShelf);
@@ -382,7 +393,7 @@
       container.className='poll-grid'+(voted?' poll-results':'');
       container.innerHTML=options.map(opt=>{
         const name=typeof opt==='string'?opt:opt.name,poster=safePoster(opt.poster),pct=total?Math.round(count(name)/total*100):0,mine=myPick===name;
-        return `<button type="button" class="poll-choice${mine?' mine':''}${voted?' locked':''}" data-option="${escapeHtml(name)}" data-pct="${pct}" aria-label="${escapeHtml(voted?name+': '+pct+'%'+(mine?', your vote':''):'Vote for '+name)}" ${voted?'disabled':''}><span class="p-title">${escapeHtml(name)}</span>${poster?`<img src="${escapeHtml(poster)}" alt="" loading="lazy" onerror="this.style.display='none'">`:'<span class="noimg" aria-hidden="true">🎬</span>'}<span class="poll-bar"></span><span class="p-pct">${pct}%</span>${mine?'<span class="p-chose">✓ You chose</span>':''}</button>`;
+        return `<button type="button" class="poll-choice${mine?' mine':''}${voted?' locked':''}" data-option="${escapeHtml(name)}" data-pct="${pct}" aria-label="${escapeHtml(voted?name+': '+pct+'%'+(mine?', your vote':''):'Vote for '+name)}" ${voted?'disabled':''}><span class="p-title">${escapeHtml(name)}</span>${poster?`<img src="${escapeHtml(poster)}" alt="" loading="lazy" onerror="this.style.display='none'">`:'<span class="noimg" aria-hidden="true">No poster</span>'}<span class="poll-bar"></span><span class="p-pct">${pct}%</span>${mine?'<span class="p-chose">✓ You chose</span>':''}</button>`;
       }).join('');
       if(voted){requestAnimationFrame(()=>requestAnimationFrame(()=>container.querySelectorAll('.poll-choice').forEach(el=>el.querySelector('.poll-bar').style.height=el.dataset.pct+'%')));return}
       container.querySelectorAll('.poll-choice').forEach(el=>el.addEventListener('click',async()=>{

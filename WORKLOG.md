@@ -9,6 +9,13 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-09-24 — Public-site readiness: added a custom missing-page response,
+  page-specific metadata, a sitemap, and plain-language terms. Static response
+  headers now block framing and object embeds while retaining the site's
+  existing inline scripts and styles; a stricter script/style CSP requires
+  moving those assets out of HTML first. WellDoneBets terms describe points
+  as non-redeemable, without assuming a legal entity or jurisdiction.
+
 - 2026-09-05 — Empty-poll support: zero saved options deliberately disables the
   landing voting card; restoring options shows it again. Empty and unavailable
   remain distinct (an API error shows retry, not a disabled poll). The admin no

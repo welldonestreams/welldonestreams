@@ -37,7 +37,7 @@ test('empty poll hides entire card and restores layout when re-enabled',()=>{
 });
 test('all local landing-page assets exist',()=>{
   for(const [,url] of html.matchAll(/(?:src|href)="([^"$]+)"/g)) {
-    if(/^(?:https?:|#)/.test(url))continue;
+    if(/^(?:https?:|mailto:|tel:|#)/.test(url))continue;
     assert.ok(existsSync(resolve(root,url.replace(/^\//,'').split('?')[0]||'index.html')),url);
   }
 });
