@@ -10,8 +10,18 @@
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store
 
+/admin
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
 /soccer.html
   X-Robots-Tag: noindex, nofollow
 
+/soccer
+  X-Robots-Tag: noindex, nofollow
+
 /404.html
+  X-Robots-Tag: noindex
+
+/404
   X-Robots-Tag: noindex
