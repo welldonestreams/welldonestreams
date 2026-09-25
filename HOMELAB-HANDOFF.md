@@ -956,7 +956,7 @@ plain browser hitting the direct port did not: local broadcast discovery.
   was actually used.
 - A pre-work recursive snapshot `apps@pre-tailscale-20260725` was taken before
   any of this. `net.ipv4.ip_forward` was already `1`; no sysctl change needed.
-- The container is authenticated (`support@welldonestreams.com`) and running with
+- The container is authenticated with the owner's account and running with
   `--advertise-routes=10.0.0.0/24 --accept-dns=false`. Tailscale IP
   `100.88.96.116`, hostname `truenas-subnet-router`.
 - `truenas_admin` was granted passwordless sudo (`/etc/sudoers`, appended via
