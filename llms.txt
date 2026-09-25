@@ -1,0 +1,10 @@
+# Well Done Streams
+
+Public pages for the Well Done Streams media-request service:
+
+- https://welldonestreams.com/ — access, setup, and request instructions
+- https://welldonestreams.com/casino.html — WellDoneBets points games
+- https://welldonestreams.com/privacy.html — privacy policy
+- https://welldonestreams.com/terms.html — terms of use
+
+Private account, admin, and API data are not documented here.
