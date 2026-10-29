@@ -9,6 +9,12 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-10-29 — `/waps/` bank expanded to 949 items (849 knowledge + 100 situational
+  judgment), +415 from a second self-verifying generation pass (25 new per chapter,
+  40 new scenarios). All new items were machine-validated: unique ids/questions, no
+  duplicates vs the existing bank, balanced answer keys, and every knowledge
+  citation resolving to the exact AFH 1 paragraph supporting the answer.
+
 - 2026-10-29 — `/waps/` citation audit: all 534 answer keys verified correct
   against AFH 1 (0 wrong, 0 ambiguous), then corrected 76 legacy-item section
   references that pointed at wrong/renumbered sections (one item, the E-8/E-9
