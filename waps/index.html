@@ -280,12 +280,12 @@ function streak(){
 
 /* ---------------- router ---------------- */
 let view="home", session=null;
-const NAVS=[["home","Today","1"],["drill","Drill","2"],["study","Study","3"],["mock","Mock PFE","4"],["stats","Stats","5"],["data","Data","6"]];
+const NAVS=[["home","Today","1"],["drill","Drill","2"],["study","Study","3"],["read","Read","4"],["mock","Mock PFE","5"],["stats","Stats","6"],["data","Data","7"]];
 function nav(html){return html}
 function setView(v){view=v;session=null;render();window.scrollTo(0,0)}
 function renderNav(){
-  const SHORT={home:"Today",drill:"Drill",study:"Study",mock:"Mock",stats:"Stats",data:"Data"};
-  const ICO={home:"◧",drill:"✎",study:"↻",mock:"⏱",stats:"▤",data:"⚙"};
+  const SHORT={home:"Today",drill:"Drill",study:"Study",read:"Read",mock:"Mock",stats:"Stats",data:"Data"};
+  const ICO={home:"◧",drill:"✎",study:"↻",read:"❏",mock:"⏱",stats:"▤",data:"⚙"};
   $("#nav").innerHTML=NAVS.map(([k,l,n])=>`<button data-nav="${k}" class="${view===k?"on":""}">${l}<span class="k">${n}</span></button>`).join("");
   $("#mob").innerHTML=NAVS.map(([k,l])=>`<button data-nav="${k}" class="${view===k?"on":""}">
      <span class="ico">${ICO[k]}</span>${SHORT[k]}</button>`).join("");
@@ -295,7 +295,7 @@ function render(){
   const v=$("#view");
   if(session && session.mode==="run") v.innerHTML=renderRun();
   else if(session && session.mode==="result") v.innerHTML=renderResult();
-  else v.innerHTML = ({home:vHome,drill:vDrill,study:vStudy,mock:vMock,stats:vStats,data:vData})[view]();
+  else v.innerHTML = ({home:vHome,drill:vDrill,study:vStudy,read:vRead,mock:vMock,stats:vStats,data:vData})[view]();
   bind();
   renderProfile();
 }
@@ -367,7 +367,7 @@ function vDrill(){
   ${Object.keys(CH).map(c=>{const st=chapterStats()[c];
     return `<button class="panel" style="text-align:left;display:block" data-drill="${c}">
       <div class="spread" style="margin-bottom:8px">
-        <span class="mini">CH ${c}</span><span class="mini">${Math.round(st.acc*100)}%</span></div>
+        <span class="mini">CH ${c} · ${st.total} items</span><span class="mini">${Math.round(st.acc*100)}%</span></div>
       <div style="font-size:14px;margin-bottom:10px">${esc(CH[c])}</div>
       <div class="bar"><i style="width:${Math.round(st.acc*100)}%;background:var(--acc)"></i></div>
     </button>`}).join("")}
@@ -393,8 +393,27 @@ function vStudy(){
   <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
     <button class="btn primary" data-study="due" ${due.length?"":"disabled"}>Review ${due.length?due.length:""} due</button>
     <button class="btn" data-study="ahead">Study 20 ahead</button>
+    <button class="btn" data-study="weakest">Drill 20 weakest</button>
   </div>
   <p class="hint" style="margin-top:20px">Keyboard: <b class="num">1–4</b> rate · <b class="num">Space</b> next.</p>`;
+}
+
+/* ---------------- READ ---------------- */
+function vRead(){
+  const total=BANK.length+S.custom.length;
+  return `<h1>Read</h1><p class="sub">Flip through the whole bank as a study guide — question, answer, and explanation shown together. Nothing is scored or tracked. Good for a first pass or a quick refresh.</p>
+  <div class="grid g2">
+    <button class="btn" data-read="all">Read all ${total} items</button>
+    <button class="btn" data-read="sjt">Read ${SJT.length} scenarios</button>
+  </div>
+  <h2>By chapter</h2>
+  <div class="grid g2">
+  ${Object.keys(CH).map(c=>{const n=chapterStats()[c].total;
+    return `<button class="panel" style="text-align:left;display:block" data-read-ch="${c}">
+      <div class="spread" style="margin-bottom:8px"><span class="mini">CH ${c}</span><span class="mini">${n} items</span></div>
+      <div style="font-size:14px">${esc(CH[c])}</div>
+    </button>`}).join("")}
+  </div>`;
 }
 
 /* ---------------- MOCK ---------------- */
@@ -538,8 +557,21 @@ function startStudy(mode){
   const now=Date.now();
   let pool=allCards().filter(q=>{const c=S.cards[q.id];return !c||c.due<=now});
   if(mode==="ahead") pool=shuffle(allCards()).slice(0,20);
+  if(mode==="weakest"){
+    const seen=allCards().filter(q=>{const c=S.cards[q.id];return c&&c.n>0});
+    const unseen=allCards().filter(q=>{const c=S.cards[q.id];return !c||c.n===0});
+    seen.sort((p,q)=>{const cp=S.cards[p.id],cq=S.cards[q.id];return (cp.r/(cp.r+cp.w))-(cq.r/(cq.r+cq.w));});
+    pool=seen.concat(shuffle(unseen));
+  }
   pool=prepareQuestions(pool.slice(0,20));
   session={mode:"run",kind:"srs",list:pool,i:0,answers:[],start:Date.now()};
+  render();
+}
+function startRead(ch, only){
+  let pool = only==="sjt" ? SJT.slice()
+           : (ch? BANK.filter(q=>String(q.ch)===String(ch)) : BANK.concat(S.custom||[]));
+  pool=prepareQuestions(pool);
+  session={mode:"run",kind:"read",list:pool,i:0,answers:[],start:Date.now(),ch};
   render();
 }
 function tick(){
@@ -558,6 +590,23 @@ function renderRun(){
   const isMock=s.kind==="mock", isLearning=s.kind==="drill"||s.kind==="srs";
   const locked=a!==undefined&&isLearning;
   const pct=Math.round(s.i/s.list.length*100);
+  if(s.kind==="read"){
+    return `
+  <div class="qhead">
+    <div class="l"><span class="tag">${q.ch==="sjt"?"Scenario":("CH "+q.ch)}</span><span>${esc(chName(q.ch))}</span></div>
+    <div class="l"><span>${s.i+1} / ${s.list.length}</span><button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="quit">Exit</button></div>
+  </div>
+  <div class="progressline"><i style="width:${pct}%"></i></div>
+  <p class="qtext">${esc(q.q)}</p>
+  <div class="opts">
+    ${q.o.map((o,idx)=>`<div class="opt locked ${idx===q.a?"correct":""}"><span class="k">${"ABCD"[idx]}</span><span>${esc(o)}</span></div>`).join("")}
+  </div>
+  <div class="explain"><b>Why</b>${esc(q.why||"")}<div class="ref">${esc(q.ref||"")}</div></div>
+  <div class="qfoot">
+    <button class="btn" data-run="prev" ${s.i===0?"disabled":""}>Prev</button>
+    <button class="btn primary" data-run="next">${s.i===s.list.length-1?"Done":"Next"}</button>
+  </div>`;
+  }
   return `
   <div class="qhead">
     <div class="l">
@@ -609,7 +658,7 @@ function answer(idx){
 function nextQ(){
   const s=session; if(!s)return;
   if(s.i<s.list.length-1){ s.i++; render(); if(s.kind==="mock")tick(); }
-  else finishRun();
+  else { if(s.kind==="read"){ session=null; setView("read"); } else finishRun(); }
 }
 function finishRun(){
   const s=session;
@@ -679,10 +728,13 @@ function bind(){
     const mode=b.dataset.study; if(mode==="due"&&studyKey()===0){toast("Nothing due — study ahead instead");return}
     startStudy(mode)});
   document.querySelectorAll("[data-mock]").forEach(b=>b.onclick=()=>startMock());
+  document.querySelectorAll("[data-read]").forEach(b=>b.onclick=()=>startRead(null,b.dataset.read==="sjt"?"sjt":null));
+  document.querySelectorAll("[data-read-ch]").forEach(b=>b.onclick=()=>startRead(b.dataset.readCh));
   document.querySelectorAll("[data-ans]").forEach(b=>b.onclick=()=>answer(+b.dataset.ans));
   document.querySelectorAll("[data-run]").forEach(b=>b.onclick=()=>{
     const a=b.dataset.run;
     if(a==="next")nextQ();
+    else if(a==="prev"){ if(session&&session.i>0){session.i--;render();} }
     else if(a==="quit"){ session=null; render(); }
     else if(a==="againwrong"){
       const wrong=session.list.filter((q,i)=>session.answers[i]!==q.a);
@@ -746,9 +798,13 @@ function dataAction(a){
 /* ---------------- keys ---------------- */
 document.addEventListener("keydown",e=>{
   if(!session||session.mode!=="run")return;
-  if(["1","2","3","4"].includes(e.key)){ answer(+e.key-1) }
+  if(session.kind!=="read" && ["1","2","3","4"].includes(e.key)){ answer(+e.key-1) }
+  if(session.kind==="read"){
+    if(e.key==="ArrowRight") nextQ();
+    else if(e.key==="ArrowLeft"){ if(session.i>0){session.i--;render();} }
+  }
   if(e.key==="Enter"||e.key===" "){ e.preventDefault();
-    if(session.kind==="mock"||session.answers[session.i]!==undefined) nextQ() }
+    if(session.kind==="read"||session.kind==="mock"||session.answers[session.i]!==undefined) nextQ() }
   if(e.key==="Escape"){ session=null; render() }
 });
 

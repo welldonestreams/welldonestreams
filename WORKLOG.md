@@ -9,6 +9,10 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-10-29 — `/waps/` UX additions: a Read/browse mode (flip the whole bank as
+  a study guide with answer+explanation shown, untracked), a "Drill 20 weakest"
+  spaced-review shortcut, and per-chapter item counts. Nav grew to 7 tabs.
+
 - 2026-10-29 — `/waps/` bank expanded to 949 items (849 knowledge + 100 situational
   judgment), +415 from a second self-verifying generation pass (25 new per chapter,
   40 new scenarios). All new items were machine-validated: unique ids/questions, no
