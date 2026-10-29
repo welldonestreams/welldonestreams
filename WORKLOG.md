@@ -16,6 +16,10 @@ entry — never below the `## Entry template` section at the bottom.**
   localStorage, with explicit export/import. The mock reproduces the published
   60+20/100-point format, while drill and spaced repetition provide cited
   explanations. Re-check chapter scope when the 27E5 catalog publishes.
+- 2026-10-29 — `/waps/` multi-user support: per-person profiles (create/switch/
+  rename/delete) with isolated localStorage namespaces, so a whole shop can
+  share the trainer without mixing progress. No backend or accounts; data
+  remains on-device. Export/import stays per profile.
 
 - 2026-09-24 — Public-site readiness: added a custom missing-page response,
   page-specific metadata, a sitemap, and plain-language terms. Static response

@@ -170,6 +170,7 @@ select{background:#0f1215;border:1px solid var(--line);border-radius:8px;color:v
     <nav class="nav" id="nav"></nav>
     <div class="railfoot">
       <span id="bankCount">Loading question bank…</span><br>
+      <span id="profileLabel" style="color:var(--acc);cursor:pointer"></span><br>
       Offline-ready · saved on this device<br>
       <span style="color:var(--dim)">Unofficial · Source: AFH 1</span>
     </div>
@@ -190,14 +191,48 @@ const CH = {
 const KNOWN = BANK.filter(b=>b.ch!=="sjt");
 const SJT = BANK.filter(b=>b.ch==="sjt");
 const KEY="pfe_trainer_v1";
+const PROFILES_KEY="pfe_trainer_profiles";
 
-/* ---------------- state ---------------- */
-let S = load();
-function load(){
-  try{const raw=localStorage.getItem(KEY); if(raw){const p=JSON.parse(raw); p.cards=p.cards||{}; p.hist=p.hist||[]; p.custom=p.custom||[]; p.days=p.days||[]; return p;}}catch(e){}
+/* ---------------- profiles & state ---------------- */
+function listProfiles(){try{const a=JSON.parse(localStorage.getItem(PROFILES_KEY));return Array.isArray(a)?a:[]}catch(e){return []}}
+function writeProfiles(a){localStorage.setItem(PROFILES_KEY,JSON.stringify(a))}
+function activeProfile(){const n=localStorage.getItem("pfe_trainer_profile"); if(n)return n; const pl=listProfiles(); return pl[0]||"default";}
+function keyOf(name){return KEY+":"+name}
+let profile=activeProfile();
+let S=load(profile);
+function load(name){
+  try{const raw=localStorage.getItem(keyOf(name)); if(raw){const p=JSON.parse(raw); p.cards=p.cards||{}; p.hist=p.hist||[]; p.custom=p.custom||[]; p.days=p.days||[]; return p;}}catch(e){}
   return {cards:{},hist:[],custom:[],days:[],goal:20};
 }
-function save(){localStorage.setItem(KEY,JSON.stringify(S))}
+function save(){localStorage.setItem(keyOf(profile),JSON.stringify(S))}
+function setProfile(name){
+  const pl=listProfiles(); if(!pl.includes(name)){pl.push(name);writeProfiles(pl);}
+  localStorage.setItem("pfe_trainer_profile",name); profile=name; S=load(name); render(); toast("Profile: "+name);
+}
+function renameProfile(from,to){
+  const pl=listProfiles(); if(to===from||pl.includes(to)){toast(to===from?"Same name":"Name already used");return;}
+  const i=pl.indexOf(from); if(i<0)return; pl[i]=to; writeProfiles(pl);
+  localStorage.setItem(keyOf(to),localStorage.getItem(keyOf(from))||JSON.stringify(load(from))); localStorage.removeItem(keyOf(from));
+  if(profile===from){localStorage.setItem("pfe_trainer_profile",to); profile=to;}
+  render(); toast("Renamed to "+to);
+}
+function deleteProfile(name){
+  const pl=listProfiles(); if(pl.length<=1){toast("Keep at least one profile");return;}
+  const i=pl.indexOf(name); if(i<0)return; pl.splice(i,1); writeProfiles(pl); localStorage.removeItem(keyOf(name));
+  if(profile===name){profile=pl[0]; localStorage.setItem("pfe_trainer_profile",profile); S=load(profile);}
+  render(); toast("Deleted "+name);
+}
+function renderProfile(){
+  const el=document.getElementById("profileLabel"); if(el) el.textContent="▣ "+profile;
+  const sel=document.getElementById("profileSelect");
+  if(sel) sel.innerHTML=listProfiles().map(n=>`<option value="${esc(n)}" ${n===profile?"selected":""}>${esc(n)}</option>`).join("");
+}
+function profileAction(a){
+  if(a==="use"){const sel=document.getElementById("profileSelect"); if(sel&&sel.value)setProfile(sel.value);}
+  else if(a==="new"){const n=(prompt("Profile name for this person:","")||"").trim(); if(!n)return; if(listProfiles().includes(n)){toast("Name already used");return;} setProfile(n);}
+  else if(a==="rename"){const n=(document.getElementById("profileName").value||"").trim(); if(!n)return toast("Enter a name"); renameProfile(profile,n);}
+  else if(a==="delete"){if(confirm('Delete profile "'+profile+'" and its progress?'))deleteProfile(profile);}
+}
 function allCards(){ return KNOWN.concat(S.custom||[]) }
 function cardOf(id){ if(!S.cards[id]) S.cards[id]={e:2.5,i:0,due:0,n:0,r:0,w:0}; return S.cards[id] }
 
@@ -262,6 +297,7 @@ function render(){
   else if(session && session.mode==="result") v.innerHTML=renderResult();
   else v.innerHTML = ({home:vHome,drill:vDrill,study:vStudy,mock:vMock,stats:vStats,data:vData})[view]();
   bind();
+  renderProfile();
 }
 
 /* ---------------- HOME ---------------- */
@@ -423,7 +459,22 @@ function vStats(){
 
 /* ---------------- DATA ---------------- */
 function vData(){
-  return `<h1>Data</h1><p class="sub">Everything is stored in this browser only. Nothing leaves the device. Export before you clear your browser or switch phones.</p>
+  return `<h1>Data</h1><p class="sub">Everything is stored in this browser only, one profile per person. Nothing leaves the device. Export before you clear your browser or switch phones.</p>
+  <h2>Profiles</h2>
+  <div class="panel">
+    <p class="hint">Each profile keeps its own progress and custom questions. Use one name per person so the shop can share this device — or each use their own — without mixing results.</p>
+    <div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap">
+      <select id="profileSelect" style="flex:1;min-width:150px"></select>
+      <button class="btn" data-profile="use">Switch</button>
+      <button class="btn" data-profile="new">New profile</button>
+    </div>
+    <div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap">
+      <input id="profileName" placeholder="Rename current profile" style="flex:1;min-width:150px">
+      <button class="btn" data-profile="rename">Rename</button>
+      <button class="btn danger" data-profile="delete">Delete</button>
+    </div>
+  </div>
+
   <div class="grid g2">
     <div class="panel">
       <h2 style="margin-top:0">Backup</h2>
@@ -640,6 +691,7 @@ function bind(){
     }
   });
   document.querySelectorAll("[data-data]").forEach(b=>b.onclick=()=>dataAction(b.dataset.data));
+  document.querySelectorAll("[data-profile]").forEach(b=>b.onclick=()=>profileAction(b.dataset.profile));
   const fi=$("#fileIn"); if(fi) fi.onchange=e=>{
     const f=e.target.files[0]; if(!f)return; const rd=new FileReader();
     rd.onload=()=>{try{const p=JSON.parse(rd.result); S=p; save(); render(); toast("Progress imported")}catch(err){toast("Bad file")}};
@@ -650,7 +702,7 @@ function dataAction(a){
   if(a==="export"){
     const blob=new Blob([JSON.stringify(S,null,1)],{type:"application/json"});
     const url=URL.createObjectURL(blob); const el=document.createElement("a");
-    el.href=url; el.download="pfe-progress-"+today()+".json"; el.click(); URL.revokeObjectURL(url);
+    el.href=url; el.download="pfe-progress-"+(profile.replace(/[^\w-]+/g,"_")||"default")+"-"+today()+".json"; el.click(); URL.revokeObjectURL(url);
     toast("Exported");
   }
   else if(a==="import"){ $("#fileIn").click() }
@@ -701,9 +753,12 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ---------------- boot ---------------- */
+if(!listProfiles().length){writeProfiles(["default"]); if(profile!=="default"){profile="default"; localStorage.setItem("pfe_trainer_profile","default"); S=load("default");}}
 if(!S.days) S.days=[];
 const countEl=document.getElementById("bankCount");
 if(countEl) countEl.textContent=`${KNOWN.length} knowledge · ${SJT.length} scenarios`;
+renderProfile();
+const plEl=document.getElementById("profileLabel"); if(plEl) plEl.addEventListener("click",()=>setView("data"));
 if("serviceWorker" in navigator){
   window.addEventListener("load",()=>navigator.serviceWorker.register("/waps/sw.js").catch(()=>{}));
 }
