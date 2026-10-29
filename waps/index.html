@@ -201,8 +201,8 @@ function keyOf(name){return KEY+":"+name}
 let profile=activeProfile();
 let S=load(profile);
 function load(name){
-  try{const raw=localStorage.getItem(keyOf(name)); if(raw){const p=JSON.parse(raw); p.cards=p.cards||{}; p.hist=p.hist||[]; p.custom=p.custom||[]; p.days=p.days||[]; return p;}}catch(e){}
-  return {cards:{},hist:[],custom:[],days:[],goal:20};
+  try{const raw=localStorage.getItem(keyOf(name)); if(raw){const p=JSON.parse(raw); p.cards=p.cards||{}; p.hist=p.hist||[]; p.custom=p.custom||[]; p.days=p.days||[]; p.flagged=p.flagged||[]; return p;}}catch(e){}
+  return {cards:{},hist:[],custom:[],days:[],goal:20,flagged:[]};
 }
 function save(){localStorage.setItem(keyOf(profile),JSON.stringify(S))}
 function setProfile(name){
@@ -235,6 +235,8 @@ function profileAction(a){
 }
 function allCards(){ return KNOWN.concat(S.custom||[]) }
 function cardOf(id){ if(!S.cards[id]) S.cards[id]={e:2.5,i:0,due:0,n:0,r:0,w:0}; return S.cards[id] }
+function isFlagged(id){ return (S.flagged||[]).includes(id) }
+function toggleFlag(id){ S.flagged=S.flagged||[]; const i=S.flagged.indexOf(id); if(i>=0)S.flagged.splice(i,1); else S.flagged.push(id); save(); render(); }
 
 /* ---------------- helpers ---------------- */
 const $=s=>document.querySelector(s);
@@ -394,7 +396,9 @@ function vStudy(){
     <button class="btn primary" data-study="due" ${due.length?"":"disabled"}>Review ${due.length?due.length:""} due</button>
     <button class="btn" data-study="ahead">Study 20 ahead</button>
     <button class="btn" data-study="weakest">Drill 20 weakest</button>
+    <button class="btn" data-study="flagged" ${(S.flagged||[]).length?"":"disabled"}>☆ Review ${(S.flagged||[]).length} flagged</button>
   </div>
+  <p class="hint" style="margin-top:14px">Flag any question with ☆ to keep it in your review folder. Unflag it when it's solid.</p>
   <p class="hint" style="margin-top:20px">Keyboard: <b class="num">1–4</b> rate · <b class="num">Space</b> next.</p>`;
 }
 
@@ -555,6 +559,13 @@ function startMock(){
 }
 function startStudy(mode){
   const now=Date.now();
+  if(mode==="flagged"){
+    const full=BANK.concat(S.custom||[]);
+    const fl=full.filter(q=>isFlagged(q.id));
+    if(!fl.length){ toast("Nothing flagged — tap ☆ on a question to add it"); return; }
+    session={mode:"run",kind:"drill",list:prepareQuestions(shuffle(fl)),i:0,answers:[],start:Date.now()};
+    render(); return;
+  }
   let pool=allCards().filter(q=>{const c=S.cards[q.id];return !c||c.due<=now});
   if(mode==="ahead") pool=shuffle(allCards()).slice(0,20);
   if(mode==="weakest"){
@@ -594,7 +605,7 @@ function renderRun(){
     return `
   <div class="qhead">
     <div class="l"><span class="tag">${q.ch==="sjt"?"Scenario":("CH "+q.ch)}</span><span>${esc(chName(q.ch))}</span></div>
-    <div class="l"><span>${s.i+1} / ${s.list.length}</span><button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="quit">Exit</button></div>
+    <div class="l"><span>${s.i+1} / ${s.list.length}</span><button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="flag">${isFlagged(q.id)?"★ Flagged":"☆ Flag"}</button><button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="quit">Exit</button></div>
   </div>
   <div class="progressline"><i style="width:${pct}%"></i></div>
   <p class="qtext">${esc(q.q)}</p>
@@ -615,6 +626,7 @@ function renderRun(){
       <span>${esc(isMock?(q.ch==="sjt"?"Scenario":chName(q.ch)):chName(q.ch))}</span>
     </div>
     <div class="l"><span>${s.i+1} / ${s.list.length}</span>
+      <button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="flag">${isFlagged(q.id)?"★ Flagged":"☆ Flag"}</button>
       <button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="quit">Exit</button></div>
   </div>
   <div class="progressline"><i style="width:${pct}%"></i></div>
@@ -735,6 +747,7 @@ function bind(){
     const a=b.dataset.run;
     if(a==="next")nextQ();
     else if(a==="prev"){ if(session&&session.i>0){session.i--;render();} }
+    else if(a==="flag"){ if(session&&session.list[session.i]) toggleFlag(session.list[session.i].id); }
     else if(a==="quit"){ session=null; render(); }
     else if(a==="againwrong"){
       const wrong=session.list.filter((q,i)=>session.answers[i]!==q.a);
@@ -760,7 +773,7 @@ function dataAction(a){
   else if(a==="import"){ $("#fileIn").click() }
   else if(a==="reset"){
     if(confirm("Clear all answers, scheduling, and history?")){
-      S={cards:{},hist:[],custom:S.custom,days:[],goal:20}; save(); render(); toast("Progress reset")}
+      S={cards:{},hist:[],custom:S.custom,days:[],goal:20,flagged:S.flagged||[]}; save(); render(); toast("Progress reset")}
   }
   else if(a==="add"){
     try{

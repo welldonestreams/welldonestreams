@@ -9,6 +9,11 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-10-29 — `/waps/` flag-for-review: a ☆ button on every question (drill,
+  study, mock, read) toggles it into a per-profile "flagged" folder, reviewed
+  together from Study and unflagged one by one. Flag state exports/imports with
+  the profile and survives progress reset.
+
 - 2026-10-29 — `/waps/` UX additions: a Read/browse mode (flip the whole bank as
   a study guide with answer+explanation shown, untracked), a "Drill 20 weakest"
   spaced-review shortcut, and per-chapter item counts. Nav grew to 7 tabs.
