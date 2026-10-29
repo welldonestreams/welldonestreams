@@ -9,6 +9,13 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-10-29 — `/waps/` citation audit: all 534 answer keys verified correct
+  against AFH 1 (0 wrong, 0 ambiguous), then corrected 76 legacy-item section
+  references that pointed at wrong/renumbered sections (one item, the E-8/E-9
+  grade ceiling, re-filed from ch 8 to ch 9 §9.2 where it actually lives; two
+  glossary items given descriptive refs). Every knowledge citation now resolves
+  to the exact paragraph that supports the answer.
+
 - 2026-10-29 — Added the public `/waps/` SSgt PFE trainer as an offline-ready
   static PWA. Its 534-item bank is independently written from the public 1 Nov
   2024 AFH 1 and latest published SSgt catalog (474 knowledge, 60 situational

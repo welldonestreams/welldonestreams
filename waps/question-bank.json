@@ -86,7 +86,7 @@
   {
     "id": "1-7",
     "ch": 1,
-    "ref": "AFH 1, 1.4.2",
+    "ref": "AFH 1, 1.4",
     "q": "Which regulation establishes the basic ethical principles and guidelines that must be followed by every government employee?",
     "o": [
       "Title 5, CFR, Part 2635, Standards of Ethical Conduct for Employees of the Executive Branch",
@@ -128,7 +128,7 @@
   {
     "id": "5-3",
     "ch": 5,
-    "ref": "AFH 1, 5.16",
+    "ref": "AFH 1, 5.15",
     "q": "What is a Component MAJCOM (C-MAJCOM)?",
     "o": [
       "The type of MAJCOM that is the USAF Component to a unified combatant command",
@@ -170,7 +170,7 @@
   {
     "id": "5-6",
     "ch": 5,
-    "ref": "AFH 1, 5.16",
+    "ref": "AFH 1, 5.15",
     "q": "Where is Air Combat Command (ACC) headquartered, and when was it activated as a MAJCOM?",
     "o": [
       "Joint Base Langley-Eustis, Virginia; 1 June 1992",
@@ -184,7 +184,7 @@
   {
     "id": "5-7",
     "ch": 5,
-    "ref": "AFH 1, 5.16",
+    "ref": "AFH 1, 5.15",
     "q": "Air Force Materiel Command (AFMC) is headquartered at which location?",
     "o": [
       "Wright-Patterson Air Force Base, Ohio",
@@ -198,7 +198,7 @@
   {
     "id": "5-8",
     "ch": 5,
-    "ref": "AFH 1, 5.16",
+    "ref": "AFH 1, 5.15",
     "q": "Air Mobility Command (AMC) is headquartered at which installation?",
     "o": [
       "Scott Air Force Base, Illinois",
@@ -309,8 +309,8 @@
   },
   {
     "id": "8-1",
-    "ch": 8,
-    "ref": "AFH 1, 8.19 / 9.4 table",
+    "ch": 9,
+    "ref": "AFH 1, 9.2",
     "q": "What is the authorized average percentage of RegAF enlisted members in pay grades E-8 and E-9 in a fiscal year?",
     "o": [
       "No more than 2.5 percent and 1.25 percent, respectively",
@@ -324,7 +324,7 @@
   {
     "id": "8-2",
     "ch": 8,
-    "ref": "AFH 1, 8.19",
+    "ref": "AFH 1, 8.21",
     "q": "The Combat Action Medal is awarded to military members in which grades?",
     "o": [
       "E-1 through O-6 who actively participated in ground or air combat on or after 11 September 2001",
@@ -338,7 +338,7 @@
   {
     "id": "8-3",
     "ch": 8,
-    "ref": "AFH 1, 8.19",
+    "ref": "AFH 1, 8.20",
     "q": "The Gallant Unit Citation was approved by the Secretary of the Air Force in which year?",
     "o": [
       "March 2004",
@@ -366,7 +366,7 @@
   {
     "id": "8-5",
     "ch": 8,
-    "ref": "AFH 1, 8.19",
+    "ref": "AFH 1, 8.21",
     "q": "The Air Reserve Forces Meritorious Service Medal is awarded for what service?",
     "o": [
       "4 continuous years on or after 1 April 1965, or 3 continuous years on or after 1 July 1975",
@@ -380,7 +380,7 @@
   {
     "id": "8-6",
     "ch": 8,
-    "ref": "AFH 1, 8.25",
+    "ref": "AFH 1, 8.18",
     "q": "Which publication outlines the Department of the Air Force Military Awards and Decorations Program?",
     "o": [
       "DAFMAN 36-2806, Military Awards: Criteria and Procedures",
@@ -394,7 +394,7 @@
   {
     "id": "9-1",
     "ch": 9,
-    "ref": "AFH 1, 9.10",
+    "ref": "AFH 1, 9.12",
     "q": "According to DAFMAN 36-2664, how far in advance of the scheduled test date must promotion eligible Airmen have access to reference materials?",
     "o": [
       "At least 60 days",
@@ -492,7 +492,7 @@
   {
     "id": "9-8",
     "ch": 9,
-    "ref": "AFH 1, 9.13",
+    "ref": "AFH 1, 9.10",
     "q": "A member who will be unavailable during the entire testing cycle must do what?",
     "o": [
       "Be prepared to test prior to departure, even if that is before the first day of the testing cycle",
@@ -506,7 +506,7 @@
   {
     "id": "11-1",
     "ch": 11,
-    "ref": "AFH 1, 11.5 (retirement table)",
+    "ref": "AFH 1, 11.8",
     "q": "Under the Blended Retirement System (BRS), how is retired pay calculated?",
     "o": [
       "2.0% times years of service times the average of the highest 36 months of base pay",
@@ -520,7 +520,7 @@
   {
     "id": "11-2",
     "ch": 11,
-    "ref": "AFH 1, 11.5 (retirement table)",
+    "ref": "AFH 1, 11.8",
     "q": "Which retirement plan applies to members who entered service prior to 8 September 1980?",
     "o": [
       "Final Basic Pay — 2.5% times years of service times basic pay",
@@ -534,7 +534,7 @@
   {
     "id": "11-3",
     "ch": 11,
-    "ref": "AFH 1, 11.5 notes",
+    "ref": "AFH 1, 11.8",
     "q": "A 30-year career is computed as 2% times 20 years plus 3.5% for the 10 years beyond 20. What is the maximum multiplier at 30 years?",
     "o": [
       "75%",
@@ -548,7 +548,7 @@
   {
     "id": "11-4",
     "ch": 11,
-    "ref": "AFH 1, 11.5",
+    "ref": "AFH 1, 11.3",
     "q": "What are the maximum SGLI and FSGLI coverages described in AFH 1?",
     "o": [
       "SGLI up to $500,000; FSGLI up to $100,000 for spouse and $10,000 for dependent children",
@@ -562,7 +562,7 @@
   {
     "id": "11-5",
     "ch": 11,
-    "ref": "AFH 1, 11.6",
+    "ref": "AFH 1, 11.8",
     "q": "Enlisted members are eligible to retire with how much service?",
     "o": [
       "20 years of Total Active Federal Military Service, with no restrictions per DAFI 36-3203",
@@ -576,7 +576,7 @@
   {
     "id": "11-6",
     "ch": 11,
-    "ref": "AFH 1, 11.4",
+    "ref": "AFH 1, 11.3",
     "q": "Where are legal services performed on an installation?",
     "o": [
       "By the Office of the Staff Judge Advocate — not within Military & Family Readiness Centers",
@@ -590,7 +590,7 @@
   {
     "id": "11-7",
     "ch": 11,
-    "ref": "AFH 1, 11.4",
+    "ref": "AFH 1, 11.5",
     "q": "When personal status or family circumstances change requiring a DAF Form 357, members must notify their commander or first sergeant within what timeframe?",
     "o": [
       "Immediately, or within 30 days (60 days for Selected Reserve)",
@@ -604,7 +604,7 @@
   {
     "id": "11-8",
     "ch": 11,
-    "ref": "AFH 1, 11.4",
+    "ref": "AFH 1, 11.10",
     "q": "What is the Red Cross toll free number for service members and families in the United States?",
     "o": [
       "1-800-733-2767",
@@ -618,7 +618,7 @@
   {
     "id": "12-1",
     "ch": 12,
-    "ref": "AFH 1, 12.32",
+    "ref": "AFH 1, 12.27",
     "q": "The DoD budget program operates on a fiscal year basis covering which period?",
     "o": [
       "1 October through the following 30 September",
@@ -632,7 +632,7 @@
   {
     "id": "12-2",
     "ch": 12,
-    "ref": "AFH 1, 12.30",
+    "ref": "AFH 1, 12.29",
     "q": "The Future Years Defense Program (FYDP) is composed of how many major force programs?",
     "o": [
       "11 major force programs and over 3,600 active program elements",
@@ -646,7 +646,7 @@
   {
     "id": "12-3",
     "ch": 12,
-    "ref": "AFH 1, 12.28",
+    "ref": "AFH 1, 12.32",
     "q": "Which form is required documentation for investigating the loss, damage, destruction, or theft of government property?",
     "o": [
       "DD Form 200, Financial Liability Investigation of Property Loss",
@@ -660,7 +660,7 @@
   {
     "id": "12-4",
     "ch": 12,
-    "ref": "AFH 1, 12.28",
+    "ref": "AFH 1, 12.30",
     "q": "Who appoints a property custodian?",
     "o": [
       "An accountable property officer, commander, or chief of staff agency",
@@ -674,7 +674,7 @@
   {
     "id": "12-5",
     "ch": 12,
-    "ref": "AFH 1, 12.30",
+    "ref": "AFH 1, 12.28",
     "q": "USAF program execution is reviewed during budget execution reviews in which months?",
     "o": [
       "February, April (with the internal mid-year review), and July",
@@ -688,7 +688,7 @@
   {
     "id": "12-6",
     "ch": 12,
-    "ref": "AFH 1, 12.28",
+    "ref": "AFH 1, 12.30",
     "q": "How should emergency work requests be requested and accomplished?",
     "o": [
       "By the quickest means possible, to include verbal or phone communication",
@@ -702,7 +702,7 @@
   {
     "id": "14-1",
     "ch": 14,
-    "ref": "AFH 1, 14.24",
+    "ref": "AFH 1, 14.25",
     "q": "How is transformational leadership defined?",
     "o": [
       "A style of leadership defined by offering followers a vision and inspiring their mission",
@@ -716,7 +716,7 @@
   {
     "id": "14-2",
     "ch": 14,
-    "ref": "AFH 1, 14.24",
+    "ref": "AFH 1, 14.25",
     "q": "What is inspirational motivation?",
     "o": [
       "Leaders develop and articulate visions that paint an optimistic, enthusiastic, and inspiring picture of the future",
@@ -730,7 +730,7 @@
   {
     "id": "14-3",
     "ch": 14,
-    "ref": "AFH 1, 14.22",
+    "ref": "AFH 1, 14.23",
     "q": "What is task power?",
     "o": [
       "Power that stems from being good at a particular task and being able to help others with a process they are responsible for",
@@ -744,7 +744,7 @@
   {
     "id": "14-4",
     "ch": 14,
-    "ref": "AFH 1, 14.22",
+    "ref": "AFH 1, 14.19",
     "q": "Why does AFH 1 emphasize self-awareness in leaders?",
     "o": [
       "Self-aware leaders act consistently with their own values and are less likely to project their biases onto Airmen",
@@ -758,7 +758,7 @@
   {
     "id": "14-5",
     "ch": 14,
-    "ref": "AFH 1, 14.22",
+    "ref": "AFH 1, 14.26",
     "q": "How does AFH 1 describe charisma?",
     "o": [
       "An energy emitted by leaders to inspire Airmen to perform a task when aspects of the mission are not intrinsically motivating",
@@ -786,7 +786,7 @@
   {
     "id": "15-1",
     "ch": 15,
-    "ref": "AFH 1, 15.25",
+    "ref": "AFH 1, 15.31",
     "q": "Critical listening is best described as the sum of which two elements?",
     "o": [
       "Informative listening and critical thinking",
@@ -800,7 +800,7 @@
   {
     "id": "15-2",
     "ch": 15,
-    "ref": "AFH 1, 15.25",
+    "ref": "AFH 1, 15.31",
     "q": "When is empathic listening most appropriate?",
     "o": [
       "When communication is emotional, or when the relationship matters as much as the message",
@@ -814,7 +814,7 @@
   {
     "id": "15-3",
     "ch": 15,
-    "ref": "AFH 1, 15.27",
+    "ref": "AFH 1, 15.26",
     "q": "Which type of speech often includes humor and wit, such as a speech to entertain at a dining-out?",
     "o": [
       "Entertaining speech",
@@ -828,7 +828,7 @@
   {
     "id": "15-4",
     "ch": 15,
-    "ref": "AFH 1, 15.29",
+    "ref": "AFH 1, 15.28",
     "q": "How does AFH 1 define gestures?",
     "o": [
       "The purposeful use of the hands, arms, shoulders, and head to reinforce what is being said",
@@ -842,7 +842,7 @@
   {
     "id": "15-5",
     "ch": 15,
-    "ref": "AFH 1, 15.29",
+    "ref": "AFH 1, 15.28",
     "q": "Purposeful, effective body movement during a speech is best described as which of the following?",
     "o": [
       "Free, yet deliberate movement",
@@ -856,7 +856,7 @@
   {
     "id": "17-1",
     "ch": 17,
-    "ref": "AFH 1, 17.20",
+    "ref": "AFH 1, 17.21",
     "q": "What is Step 3 of the Five-Step Risk Management Process?",
     "o": [
       "Develop controls and make decisions",
@@ -870,7 +870,7 @@
   {
     "id": "17-2",
     "ch": 17,
-    "ref": "AFH 1, 17.20",
+    "ref": "AFH 1, 17.21",
     "q": "The risk assessment matrix associated with Step 2 forms a risk assessment for each hazard by combining which two factors?",
     "o": [
       "Probability of occurrence and severity",
@@ -884,7 +884,7 @@
   {
     "id": "17-3",
     "ch": 17,
-    "ref": "AFH 1, 17.21",
+    "ref": "AFH 1, 17.20",
     "q": "In-depth risk management planning is normally reserved for which situations?",
     "o": [
       "Complex operations and systems, and high priority or high visibility situations where hazards are not well understood or easily predictable",
@@ -898,7 +898,7 @@
   {
     "id": "17-4",
     "ch": 17,
-    "ref": "AFH 1, 17.19",
+    "ref": "AFH 1, 17.18",
     "q": "A job safety analysis is used in which situation?",
     "o": [
       "To evaluate each work task not governed by a technical order or other definitive guidance, or when a new task or process is introduced",
@@ -954,7 +954,7 @@
   {
     "id": "18-1",
     "ch": 18,
-    "ref": "AFH 1, 18.13",
+    "ref": "AFH 1, 18.11",
     "q": "Before granting access to classified information, a person must have which three things?",
     "o": [
       "Security clearance eligibility, a signed SF 312, and a need-to-know",
@@ -968,7 +968,7 @@
   {
     "id": "18-2",
     "ch": 18,
-    "ref": "AFH 1, 18.11",
+    "ref": "AFH 1, 18.10",
     "q": "Unauthorized disclosure of which level of classified information could reasonably be expected to cause exceptionally grave damage to national security?",
     "o": [
       "Top Secret",
@@ -982,7 +982,7 @@
   {
     "id": "18-3",
     "ch": 18,
-    "ref": "AFH 1, 18.11",
+    "ref": "AFH 1, 18.10",
     "q": "Unauthorized disclosure of Secret information could reasonably be expected to cause what?",
     "o": [
       "Serious damage to national security",
@@ -996,7 +996,7 @@
   {
     "id": "18-4",
     "ch": 18,
-    "ref": "AFH 1, 18.15",
+    "ref": "AFH 1, 18.11",
     "q": "Which cover sheet is used for Top Secret information outside of storage?",
     "o": [
       "SF 703",
@@ -1010,7 +1010,7 @@
   {
     "id": "18-5",
     "ch": 18,
-    "ref": "AFH 1, 18.12",
+    "ref": "AFH 1, 18.11",
     "q": "To be authorized to derivatively classify information within DoD, personnel must meet which training requirements?",
     "o": [
       "Receive initial training before making derivative classification decisions and refresher training every year",
@@ -1024,7 +1024,7 @@
   {
     "id": "18-6",
     "ch": 18,
-    "ref": "AFH 1, 18.14",
+    "ref": "AFH 1, 18.12",
     "q": "What is a compromise in the security context?",
     "o": [
       "A security incident (a violation) involving unauthorized disclosure of classified information to a person without valid clearance, access, or need to know",
@@ -1038,7 +1038,7 @@
   {
     "id": "18-7",
     "ch": 18,
-    "ref": "AFH 1, 18.15",
+    "ref": "AFH 1, 18.11",
     "q": "An authorized person who removes classified material from storage must do what?",
     "o": [
       "Keep it under constant surveillance",
@@ -1052,7 +1052,7 @@
   {
     "id": "19-1",
     "ch": 19,
-    "ref": "AFH 1, 19.13",
+    "ref": "AFH 1, 19.12",
     "q": "When questioned, what information is a prisoner of war required by the Geneva Conventions to give?",
     "o": [
       "Name, rank, service number, and date of birth",
@@ -1066,7 +1066,7 @@
   {
     "id": "19-2",
     "ch": 19,
-    "ref": "AFH 1, 19.13",
+    "ref": "AFH 1, 19.12",
     "q": "Under the Code of Conduct, what is required of the senior prisoner of war?",
     "o": [
       "Represent prisoners of war in matters of camp administration, health, welfare, and grievances",
@@ -1080,7 +1080,7 @@
   {
     "id": "19-3",
     "ch": 19,
-    "ref": "AFH 1, 19.13",
+    "ref": "AFH 1, 19.12",
     "q": "AFH 1 distinguishes capture from evasion. Capture occurs when which conditions exist?",
     "o": [
       "The member has no means to resist, evasion is impossible, and further fighting would lead to death with no significant loss to the enemy",
@@ -1094,7 +1094,7 @@
   {
     "id": "19-4",
     "ch": 19,
-    "ref": "AFH 1, 19.13",
+    "ref": "AFH 1, 19.12",
     "q": "A prisoner of war who voluntarily informs or collaborates with the captor is subject to what?",
     "o": [
       "Punishment under the UCMJ after repatriation as a traitor to the United States and fellow POWs",
@@ -1108,7 +1108,7 @@
   {
     "id": "19-5",
     "ch": 19,
-    "ref": "AFH 1, 19.13",
+    "ref": "AFH 1, 19.11",
     "q": "AFH 1 describes the Code of Conduct as which of the following?",
     "o": [
       "A moral code providing a standard of conduct that all members are expected to measure up to",
@@ -1122,7 +1122,7 @@
   {
     "id": "20-1",
     "ch": 20,
-    "ref": "AFH 1, 20.22",
+    "ref": "AFH 1, 20.21",
     "q": "The Equal Opportunity office must complete the informal complaint process within how many calendar days of filing?",
     "o": [
       "30 calendar days, unless the complainant grants an extension not to exceed 60 additional days",
@@ -1136,7 +1136,7 @@
   {
     "id": "20-2",
     "ch": 20,
-    "ref": "AFH 1, 20.22",
+    "ref": "AFH 1, 20.21",
     "q": "For a civilian formal EO complaint, initial contact must occur within how many calendar days of the alleged discriminatory matter?",
     "o": [
       "45 calendar days",
@@ -1164,7 +1164,7 @@
   {
     "id": "20-4",
     "ch": 20,
-    "ref": "AFH 1, 20.23",
+    "ref": "AFH 1, 20.17",
     "q": "How does AFH 1 define fraternization?",
     "o": [
       "An unprofessional relationship between an officer and enlisted member specifically prohibited by Article 134, UCMJ",
@@ -1178,7 +1178,7 @@
   {
     "id": "20-5",
     "ch": 20,
-    "ref": "AFH 1, 20.21",
+    "ref": "AFH 1, 20.20",
     "q": "Formal complaints of sexual harassment are referred to which agency for an independent investigation?",
     "o": [
       "Security forces, pursuant to 10 USC § 1561",
@@ -1192,7 +1192,7 @@
   {
     "id": "20-6",
     "ch": 20,
-    "ref": "AFH 1, 20.23",
+    "ref": "AFH 1, 20.22",
     "q": "Who is the Victims' Counsel?",
     "o": [
       "A military attorney authorized to provide independent legal representation to eligible victims of sexual assault, sexual misconduct, stalking, and similar crimes",
@@ -1206,7 +1206,7 @@
   {
     "id": "20-7",
     "ch": 20,
-    "ref": "AFH 1, 20.23",
+    "ref": "AFH 1, 20.22",
     "q": "Sexual assault encompasses offenses prohibited by which UCMJ articles?",
     "o": [
       "Articles 120, 120b, and 80",
@@ -1220,7 +1220,7 @@
   {
     "id": "22-1",
     "ch": 22,
-    "ref": "AFH 1, 22.35",
+    "ref": "AFH 1, 22.34",
     "q": "Under DoDI 6490.08, mental health providers are required to disclose which information to commanders?",
     "o": [
       "Safety issues (suicidal or violent thoughts or self-injurious behavior) and fitness for duty issues",
@@ -1262,7 +1262,7 @@
   {
     "id": "22-4",
     "ch": 22,
-    "ref": "AFH 1, 22.30",
+    "ref": "AFH 1, 22.29",
     "q": "Which of the following are listed as signs of physical stress?",
     "o": [
       "Frequent illness, headaches, high blood pressure, increased heart rate, physical exhaustion, sleep disturbances, or weight gain or loss",
@@ -1276,7 +1276,7 @@
   {
     "id": "22-5",
     "ch": 22,
-    "ref": "AFH 1, 22.33",
+    "ref": "AFH 1, 22.32",
     "q": "The redeployment support timeline identifies activities at which junctures?",
     "o": [
       "Critical redeployment, recovery, reintegration, and reconstitution",
@@ -1290,7 +1290,7 @@
   {
     "id": "22-6",
     "ch": 22,
-    "ref": "AFH 1, 22.33",
+    "ref": "AFH 1, 22.32",
     "q": "Which aspect of readiness does AFH 1 emphasize in the deployment cycle?",
     "o": [
       "Receiving continued support upon return from deployment",
@@ -1304,7 +1304,7 @@
   {
     "id": "24-1",
     "ch": 24,
-    "ref": "AFH 1, 24.5",
+    "ref": "AFH 1, ch. 24 Drill Glossary",
     "q": "In drill, what is an element?",
     "o": [
       "The basic formation; the smallest drill unit, comprised of at least 3 individuals, usually 8 to 12, one of whom is the element leader",
@@ -1318,7 +1318,7 @@
   {
     "id": "24-2",
     "ch": 24,
-    "ref": "AFH 1, 24.5",
+    "ref": "AFH 1, 24.35",
     "q": "The three asymmetrical spires of the Air Force Memorial reach what heights?",
     "o": [
       "201, 231, and 270 feet",
@@ -1332,7 +1332,7 @@
   {
     "id": "24-3",
     "ch": 24,
-    "ref": "AFH 1, 24.5",
+    "ref": "AFH 1, 24.35",
     "q": "What is central to the Air Force Memorial and who created it?",
     "o": [
       "A 16-foot bronze Honor Guard Statue created by sculptor Zenos Frudakis",
@@ -1346,7 +1346,7 @@
   {
     "id": "24-4",
     "ch": 24,
-    "ref": "AFH 1, 24.5",
+    "ref": "AFH 1, 24.20",
     "q": "Saluting recipients of the Medal of Honor is best described how?",
     "o": [
       "Encouraged as a matter of respect and courtesy, though not required by law or regulation, and rendered regardless of rank or status",
@@ -1360,7 +1360,7 @@
   {
     "id": "24-5",
     "ch": 24,
-    "ref": "AFH 1, 24.5",
+    "ref": "AFH 1, 24.34",
     "q": "The Enlisted Heritage Hall was developed in which year, and from what original structure?",
     "o": [
       "1983, from a 1942 segregated dining facility",
@@ -1374,7 +1374,7 @@
   {
     "id": "24-6",
     "ch": 24,
-    "ref": "AFH 1, 24.5",
+    "ref": "AFH 1, ch. 24 Devices Glossary",
     "q": "The Desert Storm device is awarded for support of operations during which period?",
     "o": [
       "17 January 1991 to 28 February 1991",
@@ -1398,7 +1398,7 @@
     ],
     "a": 0,
     "why": "Effective supervision corrects the standard while addressing the real cause. AFH 1 emphasizes knowing your Airmen, using support resources (M&FRC, first sergeant, Military & Family Life Counselors), and keeping documentation and follow-up on the standard.",
-    "ref": "AFH 1, 14.22; 11.4"
+    "ref": "AFH 1, 11.3; 14.22"
   },
   {
     "id": "sjt-2",
@@ -1428,7 +1428,7 @@
     ],
     "a": 0,
     "why": "Commanders and supervisors must take immediate and appropriate action once aware of inappropriate behavior or allegations, and are encouraged to consult the EO office before acting. You cannot promise silence that leaves a hostile environment unaddressed.",
-    "ref": "AFH 1, 20.21"
+    "ref": "AFH 1, 20.18"
   },
   {
     "id": "sjt-4",
@@ -1443,7 +1443,7 @@
     ],
     "a": 0,
     "why": "Each individual is responsible for safeguarding classified information and reporting security incidents. The person with authorized possession must maintain control and keep classified material under constant surveillance.",
-    "ref": "AFH 1, 18.15"
+    "ref": "AFH 1, 18.12"
   },
   {
     "id": "sjt-5",
@@ -1503,7 +1503,7 @@
     ],
     "a": 0,
     "why": "Enforcing standards means addressing the deficiency early, understanding the barrier, and following up — not ignoring it because other performance is good, nor escalating before supervising.",
-    "ref": "AFH 1, 20.23"
+    "ref": "AFH 1, 20.9"
   },
   {
     "id": "sjt-9",
@@ -1578,7 +1578,7 @@
     ],
     "a": 0,
     "why": "Task power and effective development come from knowing who is good at what. Seeking references and early review, rather than guessing or stalling, is how you protect quality against a short suspense.",
-    "ref": "AFH 1, 14.22"
+    "ref": "AFH 1, 14.23"
   },
   {
     "id": "sjt-14",
@@ -1593,7 +1593,7 @@
     ],
     "a": 0,
     "why": "Everyone who works with classified information is personally responsible for ensuring unauthorized persons do not gain access, and each individual must report security incidents. Secure it, correct it, and escalate if it repeats.",
-    "ref": "AFH 1, 18.15"
+    "ref": "AFH 1, 18.10"
   },
   {
     "id": "sjt-15",
@@ -1638,7 +1638,7 @@
     ],
     "a": 0,
     "why": "Maintaining good order and professional relationships means handling the dispute privately while never undermining authority in front of Airmen. Self-aware leaders manage their own reactions rather than projecting them.",
-    "ref": "AFH 1, 20.23"
+    "ref": "AFH 1, 20.17"
   },
   {
     "id": "sjt-18",
@@ -1653,7 +1653,7 @@
     ],
     "a": 0,
     "why": "A property custodian is directly responsible for physical custody, inventory, accounting, and reconciliation. Signing for property you have not verified creates liability under the financial liability investigation process (DD Form 200).",
-    "ref": "AFH 1, 12.28"
+    "ref": "AFH 1, 12.30"
   },
   {
     "id": "sjt-19",
