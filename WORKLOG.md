@@ -9,6 +9,14 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-10-29 — Added the public `/waps/` SSgt PFE trainer as an offline-ready
+  static PWA. Its 534-item bank is independently written from the public 1 Nov
+  2024 AFH 1 and latest published SSgt catalog (474 knowledge, 60 situational
+  judgment); it contains no recalled test content. Progress stays in browser
+  localStorage, with explicit export/import. The mock reproduces the published
+  60+20/100-point format, while drill and spaced repetition provide cited
+  explanations. Re-check chapter scope when the 27E5 catalog publishes.
+
 - 2026-09-24 — Public-site readiness: added a custom missing-page response,
   page-specific metadata, a sitemap, and plain-language terms. Static response
   headers now block framing and object embeds while retaining the site's

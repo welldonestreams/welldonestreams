@@ -20,6 +20,9 @@
 /soccer
   X-Robots-Tag: noindex, nofollow
 
+/waps/sw.js
+  Cache-Control: no-cache
+
 /404.html
   X-Robots-Tag: noindex
 

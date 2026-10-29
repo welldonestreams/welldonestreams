@@ -1,0 +1,14 @@
+{
+  "name": "WAPS PFE Trainer",
+  "short_name": "PFE Trainer",
+  "description": "Free, unofficial SSgt PFE practice based on AFH 1.",
+  "start_url": "/waps/",
+  "scope": "/waps/",
+  "display": "standalone",
+  "background_color": "#0d0f11",
+  "theme_color": "#0d0f11",
+  "icons": [
+    {"src": "/waps/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "/waps/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
