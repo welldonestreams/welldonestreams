@@ -9,6 +9,11 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-10-29 — `/waps/` back navigation + flag repositioning: a Back button in
+  drill/study/mock (read already had Prev) revisits answered questions — drill
+  shows the graded state, mock lets you change the saved answer. The flag star
+  moved next to the Next button with a "mark for review" caption beneath it.
+
 - 2026-10-29 — `/waps/` flag-for-review: a ☆ button on every question (drill,
   study, mock, read) toggles it into a per-profile "flagged" folder, reviewed
   together from Study and unflagged one by one. Flag state exports/imports with

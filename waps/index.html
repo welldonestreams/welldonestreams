@@ -605,7 +605,7 @@ function renderRun(){
     return `
   <div class="qhead">
     <div class="l"><span class="tag">${q.ch==="sjt"?"Scenario":("CH "+q.ch)}</span><span>${esc(chName(q.ch))}</span></div>
-    <div class="l"><span>${s.i+1} / ${s.list.length}</span><button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="flag">${isFlagged(q.id)?"★ Flagged":"☆ Flag"}</button><button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="quit">Exit</button></div>
+    <div class="l"><span>${s.i+1} / ${s.list.length}</span><button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="quit">Exit</button></div>
   </div>
   <div class="progressline"><i style="width:${pct}%"></i></div>
   <p class="qtext">${esc(q.q)}</p>
@@ -614,8 +614,14 @@ function renderRun(){
   </div>
   <div class="explain"><b>Why</b>${esc(q.why||"")}<div class="ref">${esc(q.ref||"")}</div></div>
   <div class="qfoot">
-    <button class="btn" data-run="prev" ${s.i===0?"disabled":""}>Prev</button>
-    <button class="btn primary" data-run="next">${s.i===s.list.length-1?"Done":"Next"}</button>
+    <button class="btn" data-run="prev" ${s.i===0?"disabled":""}>Back</button>
+    <span style="display:flex;align-items:center;gap:8px">
+      <span style="display:flex;flex-direction:column;align-items:center;line-height:1">
+        <button class="btn ghost" data-run="flag" style="min-height:30px;padding:2px 10px;font-size:16px;${isFlagged(q.id)?"color:var(--acc)":"color:var(--dim)"}">${isFlagged(q.id)?"★":"☆"}</button>
+        <span style="font-size:10px;color:var(--dim);margin-top:2px">mark for review</span>
+      </span>
+      <button class="btn primary" data-run="next">${s.i===s.list.length-1?"Done":"Next"}</button>
+    </span>
   </div>`;
   }
   return `
@@ -626,7 +632,6 @@ function renderRun(){
       <span>${esc(isMock?(q.ch==="sjt"?"Scenario":chName(q.ch)):chName(q.ch))}</span>
     </div>
     <div class="l"><span>${s.i+1} / ${s.list.length}</span>
-      <button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="flag">${isFlagged(q.id)?"★ Flagged":"☆ Flag"}</button>
       <button class="btn ghost" style="min-height:32px;padding:4px 10px;font-size:12px" data-run="quit">Exit</button></div>
   </div>
   <div class="progressline"><i style="width:${pct}%"></i></div>
@@ -643,9 +648,16 @@ function renderRun(){
   ${locked ? `<div class="explain"><b>Why</b>${esc(q.why||"")}
       <div class="ref">${esc(q.ref||"")}</div></div>` : ""}
   <div class="qfoot">
+    <button class="btn" data-run="prev" ${s.i===0?"disabled":""}>Back</button>
     <span class="hint">${isMock?(a===undefined?"Choose an answer; you can change it before moving on.":"Answer saved. Tap another choice to change it."):(locked?`${a===q.a?"Correct":"Missed — answer was "+"ABCD"[q.a]}`:"")}</span>
-    <button class="btn ${locked||isMock?"primary":""}" data-run="next" ${(!locked&&!isMock)?"disabled":""}>
-      ${s.i===s.list.length-1?(isMock?"Submit exam":"Finish"):"Next"}</button>
+    <span style="display:flex;align-items:center;gap:8px">
+      <span style="display:flex;flex-direction:column;align-items:center;line-height:1">
+        <button class="btn ghost" data-run="flag" style="min-height:30px;padding:2px 10px;font-size:16px;${isFlagged(q.id)?"color:var(--acc)":"color:var(--dim)"}">${isFlagged(q.id)?"★":"☆"}</button>
+        <span style="font-size:10px;color:var(--dim);margin-top:2px">mark for review</span>
+      </span>
+      <button class="btn ${locked||isMock?"primary":""}" data-run="next" ${(!locked&&!isMock)?"disabled":""}>
+        ${s.i===s.list.length-1?(isMock?"Submit exam":"Finish"):"Next"}</button>
+    </span>
   </div>`;
 }
 function answer(idx){
