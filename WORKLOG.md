@@ -9,6 +9,12 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-11-12 — Added `/deck-converter/`, an offline-ready, client-only converter
+  from OPlay deck links/codes to OPTCGSim's `<quantity>x<card ID>` text format.
+  It implements OPlay's current bit-packed v2 codec and legacy v1 imports, checks
+  v2 checksums before output, and keeps deck data on-device. The Rocks.D.Xebec
+  OPlay/OPTCGSim pair is the primary regression fixture.
+
 - 2026-10-29 — `/waps/` back navigation + flag repositioning: a Back button in
   drill/study/mock (read already had Prev) revisits answered questions — drill
   shows the graded state, mock lets you change the saved answer. The flag star

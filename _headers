@@ -23,6 +23,9 @@
 /waps/sw.js
   Cache-Control: no-cache
 
+/deck-converter/sw.js
+  Cache-Control: no-cache
+
 /404.html
   X-Robots-Tag: noindex
 

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="Convert OPlay TCG deck links and codes into OPTCGSim deck text in one tap.">
+  <title>OPlay → OPTCGSim Deck Converter</title>
+  <link rel="canonical" href="https://welldonestreams.com/deck-converter/">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <script src="converter.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="brand-mark" aria-hidden="true">
+        <span class="card card-back"></span>
+        <span class="card card-front">→</span>
+      </div>
+      <div>
+        <p class="eyebrow">ONE PIECE CARD GAME</p>
+        <h1>OPlay <span aria-hidden="true">→</span><span class="sr-only">to</span> OPTCGSim</h1>
+        <p class="subtitle">Paste a deck link. Get simulator-ready text.</p>
+      </div>
+    </header>
+
+    <section class="panel input-panel" aria-labelledby="input-title">
+      <div class="panel-heading">
+        <div>
+          <span class="step">01</span>
+          <h2 id="input-title">OPlay deck</h2>
+        </div>
+        <button class="text-button" id="paste-button" type="button">Paste</button>
+      </div>
+
+      <label class="sr-only" for="deck-input">OPlay deck-builder link or deck code</label>
+      <textarea id="deck-input" rows="4" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste an OPlay deck link or raw d code"></textarea>
+      <p class="field-hint">Works with full deck-builder URLs and raw <code>d</code> codes.</p>
+      <div id="error" class="error" role="alert" aria-live="polite" hidden></div>
+      <button class="primary-button" id="convert-button" type="button">
+        <span>Convert deck</span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </section>
+
+    <section class="panel output-panel" id="result" aria-labelledby="output-title" hidden>
+      <div class="panel-heading">
+        <div>
+          <span class="step">02</span>
+          <h2 id="output-title">OPTCGSim deck</h2>
+        </div>
+        <span class="status-pill" id="deck-status">Ready</span>
+      </div>
+
+      <div class="stats" aria-label="Deck totals">
+        <div><strong id="leader-count">1</strong><span>Leader</span></div>
+        <div><strong id="deck-count">50</strong><span>Deck</span></div>
+        <div><strong id="entry-count">0</strong><span>Lines</span></div>
+      </div>
+
+      <label class="sr-only" for="deck-output">Converted OPTCGSim deck text</label>
+      <textarea id="deck-output" rows="16" readonly spellcheck="false"></textarea>
+      <button class="primary-button copy-button" id="copy-button" type="button">
+        <span id="copy-label">Copy for OPTCGSim</span>
+        <span aria-hidden="true">⧉</span>
+      </button>
+    </section>
+
+    <footer>
+      <p>Conversion happens entirely on your device.</p>
+      <button class="sample-button" id="sample-button" type="button">Try the Rocks.D.Xebec example</button>
+    </footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
