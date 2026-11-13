@@ -4,14 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#07111f">
-  <meta name="description" content="Convert OPlay TCG deck links and codes into OPTCGSim deck text in one tap.">
-  <title>OPlay → OPTCGSim Deck Converter</title>
+  <meta name="description" content="Convert OPlay TCG deck links and codes into OPTCGSim or TCGplayer Mass Entry text in one tap.">
+  <title>OPlay → OPTCGSim & TCGplayer Deck Converter</title>
   <link rel="canonical" href="https://welldonestreams.com/deck-converter/">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css">
   <script src="converter.js" defer></script>
+  <script src="card-names.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -23,8 +24,8 @@
       </div>
       <div>
         <p class="eyebrow">ONE PIECE CARD GAME</p>
-        <h1>OPlay <span aria-hidden="true">→</span><span class="sr-only">to</span> OPTCGSim</h1>
-        <p class="subtitle">Paste a deck link. Get simulator-ready text.</p>
+        <h1>OPlay <span aria-hidden="true">→</span><span class="sr-only">to</span> OPTCGSim <span class="hero-plus">+ TCGplayer</span></h1>
+        <p class="subtitle">Paste a deck link. Copy for your simulator or shopping list.</p>
       </div>
     </header>
 
@@ -68,6 +69,20 @@
         <span id="copy-label">Copy for OPTCGSim</span>
         <span aria-hidden="true">⧉</span>
       </button>
+      <div class="mass-entry-actions">
+        <button class="secondary-button" id="tcgplayer-button" type="button">
+          <span id="tcgplayer-label">Copy for TCGplayer Mass Entry</span>
+          <span aria-hidden="true">⧉</span>
+        </button>
+        <a href="https://www.tcgplayer.com/massentry" target="_blank" rel="noopener noreferrer">Open Mass Entry ↗</a>
+      </div>
+      <p class="field-hint" id="tcgplayer-hint">Copy the list, select One Piece Card Game on TCGplayer, then paste it. Check printing and matches before buying.</p>
+      <p class="mass-entry-warning" id="tcgplayer-warning" role="status" hidden></p>
+      <details class="mass-entry-preview" id="tcgplayer-preview">
+        <summary>Preview TCGplayer list</summary>
+        <label class="sr-only" for="tcgplayer-output">TCGplayer Mass Entry card list</label>
+        <textarea id="tcgplayer-output" rows="12" readonly spellcheck="false"></textarea>
+      </details>
     </section>
 
     <footer>

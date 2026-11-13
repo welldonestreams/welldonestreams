@@ -1,8 +1,10 @@
-const CACHE = 'deck-converter-v1';
-const ASSETS = ['./', 'index.html', 'styles.css', 'converter.js', 'app.js', 'manifest.webmanifest', 'icon.svg'];
+const CACHE = 'deck-converter-v5';
+const ASSETS = ['./', 'index.html', 'styles.css', 'converter.js', 'card-names.js', 'app.js', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(
+    ASSETS.map((asset) => new Request(asset, { cache: 'reload' }))
+  )));
   self.skipWaiting();
 });
 

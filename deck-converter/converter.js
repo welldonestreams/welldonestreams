@@ -190,6 +190,27 @@
       .join('\n');
   }
 
+  function toTcgplayerMassEntry(decoded, cardNames) {
+    const unresolved = [];
+    const text = [decoded.leader, ...decoded.deck]
+      .filter(Boolean)
+      .map(({ code, quantity }) => {
+        const name = cardNames[code];
+        if (!name) {
+          if (!unresolved.includes(code)) unresolved.push(code);
+          return `${quantity} ${code}`;
+        }
+        const match = code.match(/^(OP|ST|EB|PRB)(\d{2})-(\d{3})$/);
+        if (!match) return `${quantity} ${name} ${code}`;
+        const [, prefix, set, number] = match;
+        const setCode = prefix === 'OP' && set === '14' ? 'OP14-EB04'
+          : prefix === 'ST' || prefix === 'PRB' ? `${prefix}-${set}`
+            : `${prefix}${set}`;
+        return `${quantity} ${name} [${setCode}] ${number}`;
+      }).join('\n');
+    return { text, unresolved };
+  }
+
   function convertDeckInput(input) {
     const code = extractDeckCode(input);
     const decoded = decodeDeckCode(code);
@@ -206,5 +227,5 @@
     };
   }
 
-  return { extractDeckCode, checksum, decodeDeckCode, toOptcgSim, convertDeckInput };
+  return { extractDeckCode, checksum, decodeDeckCode, toOptcgSim, toTcgplayerMassEntry, convertDeckInput };
 });

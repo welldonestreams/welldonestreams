@@ -72,6 +72,7 @@ button { touch-action: manipulation; }
 
 .eyebrow { margin: 0 0 5px; color: var(--cyan); font-size: 11px; font-weight: 800; letter-spacing: .16em; }
 h1 { margin: 0; font-size: clamp(27px, 7vw, 42px); line-height: 1.05; letter-spacing: -.045em; }
+.hero-plus { color: var(--cyan); font-size: .55em; letter-spacing: -.02em; white-space: nowrap; }
 .subtitle { margin: 9px 0 0; color: var(--muted); font-size: 15px; }
 
 .panel {
@@ -129,6 +130,17 @@ code { color: #b5dfff; }
 }
 .primary-button:hover { filter: brightness(1.06); }
 .primary-button:active { transform: translateY(1px); }
+
+.mass-entry-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 10px; }
+.secondary-button { display: flex; flex: 1 1 240px; justify-content: space-between; align-items: center; min-height: 52px; padding: 0 18px; border: 1px solid rgba(110,231,242,.45); border-radius: 12px; color: var(--cyan); background: rgba(32,103,134,.16); font-weight: 800; cursor: pointer; }
+.secondary-button:hover { background: rgba(32,103,134,.3); }
+.secondary-button:active { transform: translateY(1px); }
+.mass-entry-actions a { padding: 12px 2px; color: #9dd5ff; font-size: 13px; font-weight: 700; text-decoration: none; }
+.mass-entry-actions a:hover { text-decoration: underline; }
+.mass-entry-warning { margin: 10px 2px 0; color: #ffd479; font-size: 12px; }
+.mass-entry-preview { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 14px; }
+.mass-entry-preview summary { width: max-content; color: #9dd5ff; font-size: 13px; font-weight: 700; cursor: pointer; }
+.mass-entry-preview textarea { margin-top: 12px; min-height: 210px; }
 
 .text-button, .sample-button {
   border: 0;

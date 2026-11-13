@@ -9,6 +9,15 @@ entry — never below the `## Entry template` section at the bottom.**
 
 ## Entries
 
+- 2026-11-13 — `/deck-converter/` also prepares a One Piece TCGplayer Mass Entry
+  list with quantities, English card names and set codes, while retaining the
+  OPTCGSim output. The offline card-name snapshot comes from OPlay's public
+  English `/api/deck/cards` catalog (2,371 IDs at collection); it is not a live
+  inventory feed. Unknown newer IDs remain visible with a warning, and users
+  must confirm TCGplayer's matches and printings before buying. A collapsible
+  preview helps inspect the shopping list before copying it. The PWA install
+  cache now uses reload requests to avoid recaching old browser HTTP assets.
+
 - 2026-11-12 — Added `/deck-converter/`, an offline-ready, client-only converter
   from OPlay deck links/codes to OPTCGSim's `<quantity>x<card ID>` text format.
   It implements OPlay's current bit-packed v2 codec and legacy v1 imports, checks
