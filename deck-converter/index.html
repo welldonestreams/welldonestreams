@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#07111f">
-  <meta name="description" content="Convert OPlay TCG deck links and codes into OPTCGSim or TCGplayer Mass Entry text in one tap.">
-  <title>OPlay → OPTCGSim & TCGplayer Deck Converter</title>
+  <meta name="description" content="Browse an owned One Piece Card Game collection or convert OPlay decks for OPTCGSim and TCGplayer.">
+  <title>One Piece Card Lab</title>
   <link rel="canonical" href="https://welldonestreams.com/deck-converter/">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
@@ -13,83 +13,183 @@
   <link rel="stylesheet" href="styles.css">
   <script src="converter.js" defer></script>
   <script src="card-names.js" defer></script>
+  <script src="collection-model.js" defer></script>
+  <script src="collection-data.js" defer></script>
   <script src="app.js" defer></script>
+  <script src="collection-app.js" defer></script>
 </head>
 <body>
   <main class="shell">
     <header class="hero">
       <div class="brand-mark" aria-hidden="true">
         <span class="card card-back"></span>
-        <span class="card card-front">→</span>
+        <span class="card card-front">×</span>
       </div>
       <div>
         <p class="eyebrow">ONE PIECE CARD GAME</p>
-        <h1>OPlay <span aria-hidden="true">→</span><span class="sr-only">to</span> OPTCGSim <span class="hero-plus">+ TCGplayer</span></h1>
-        <p class="subtitle">Paste a deck link. Copy for your simulator or shopping list.</p>
+        <h1>Card <span class="hero-accent">Lab</span></h1>
+        <p class="subtitle">Owned collection and deck tools in one place.</p>
       </div>
     </header>
 
-    <section class="panel input-panel" aria-labelledby="input-title">
-      <div class="panel-heading">
-        <div>
-          <span class="step">01</span>
-          <h2 id="input-title">OPlay deck</h2>
-        </div>
-        <button class="text-button" id="paste-button" type="button">Paste</button>
-      </div>
-
-      <label class="sr-only" for="deck-input">OPlay deck-builder link or deck code</label>
-      <textarea id="deck-input" rows="4" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste an OPlay deck link or raw d code"></textarea>
-      <p class="field-hint">Works with full deck-builder URLs and raw <code>d</code> codes.</p>
-      <div id="error" class="error" role="alert" aria-live="polite" hidden></div>
-      <button class="primary-button" id="convert-button" type="button">
-        <span>Convert deck</span>
-        <span aria-hidden="true">→</span>
+    <nav class="view-tabs" aria-label="Card tools">
+      <button type="button" class="view-tab" data-view="collection" aria-controls="collection-view" aria-pressed="false">
+        <span>Collection</span><strong id="collection-tab-total">456</strong>
       </button>
-    </section>
-
-    <section class="panel output-panel" id="result" aria-labelledby="output-title" hidden>
-      <div class="panel-heading">
-        <div>
-          <span class="step">02</span>
-          <h2 id="output-title">OPTCGSim deck</h2>
-        </div>
-        <span class="status-pill" id="deck-status">Ready</span>
-      </div>
-
-      <div class="stats" aria-label="Deck totals">
-        <div><strong id="leader-count">1</strong><span>Leader</span></div>
-        <div><strong id="deck-count">50</strong><span>Deck</span></div>
-        <div><strong id="entry-count">0</strong><span>Lines</span></div>
-      </div>
-
-      <label class="sr-only" for="deck-output">Converted OPTCGSim deck text</label>
-      <textarea id="deck-output" rows="16" readonly spellcheck="false"></textarea>
-      <button class="primary-button copy-button" id="copy-button" type="button">
-        <span id="copy-label">Copy for OPTCGSim</span>
-        <span aria-hidden="true">⧉</span>
+      <button type="button" class="view-tab" data-view="converter" aria-controls="converter-view" aria-pressed="true">
+        <span>Deck converter</span><strong>→</strong>
       </button>
-      <div class="mass-entry-actions">
-        <button class="secondary-button" id="tcgplayer-button" type="button">
-          <span id="tcgplayer-label">Copy for TCGplayer Mass Entry</span>
+    </nav>
+
+    <div id="converter-view" data-view-panel="converter">
+      <section class="panel input-panel" aria-labelledby="input-title">
+        <div class="panel-heading">
+          <div>
+            <span class="step">01</span>
+            <h2 id="input-title">OPlay deck</h2>
+          </div>
+          <button class="text-button" id="paste-button" type="button">Paste</button>
+        </div>
+
+        <label class="sr-only" for="deck-input">OPlay deck-builder link or deck code</label>
+        <textarea id="deck-input" rows="4" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste an OPlay deck link or raw d code"></textarea>
+        <p class="field-hint">Works with full deck-builder URLs and raw <code>d</code> codes.</p>
+        <div id="error" class="error" role="alert" aria-live="polite" hidden></div>
+        <button class="primary-button" id="convert-button" type="button">
+          <span>Convert deck</span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </section>
+
+      <section class="panel output-panel" id="result" aria-labelledby="output-title" hidden>
+        <div class="panel-heading">
+          <div>
+            <span class="step">02</span>
+            <h2 id="output-title">OPTCGSim deck</h2>
+          </div>
+          <span class="status-pill" id="deck-status">Ready</span>
+        </div>
+
+        <div class="stats" aria-label="Deck totals">
+          <div><strong id="leader-count">1</strong><span>Leader</span></div>
+          <div><strong id="deck-count">50</strong><span>Deck</span></div>
+          <div><strong id="entry-count">0</strong><span>Lines</span></div>
+        </div>
+
+        <label class="sr-only" for="deck-output">Converted OPTCGSim deck text</label>
+        <textarea id="deck-output" rows="16" readonly spellcheck="false"></textarea>
+        <button class="primary-button copy-button" id="copy-button" type="button">
+          <span id="copy-label">Copy for OPTCGSim</span>
           <span aria-hidden="true">⧉</span>
         </button>
-        <a href="https://www.tcgplayer.com/massentry" target="_blank" rel="noopener noreferrer">Open Mass Entry ↗</a>
-      </div>
-      <p class="field-hint" id="tcgplayer-hint">Copy the list, select One Piece Card Game on TCGplayer, then paste it. Check printing and matches before buying.</p>
-      <p class="mass-entry-warning" id="tcgplayer-warning" role="status" hidden></p>
-      <details class="mass-entry-preview" id="tcgplayer-preview">
-        <summary>Preview TCGplayer list</summary>
-        <label class="sr-only" for="tcgplayer-output">TCGplayer Mass Entry card list</label>
-        <textarea id="tcgplayer-output" rows="12" readonly spellcheck="false"></textarea>
-      </details>
-    </section>
+        <div class="mass-entry-actions">
+          <button class="secondary-button" id="tcgplayer-button" type="button">
+            <span id="tcgplayer-label">Copy for TCGplayer Mass Entry</span>
+            <span aria-hidden="true">⧉</span>
+          </button>
+          <a href="https://www.tcgplayer.com/massentry" target="_blank" rel="noopener noreferrer">Open Mass Entry ↗</a>
+        </div>
+        <p class="field-hint" id="tcgplayer-hint">Copy the list, select One Piece Card Game on TCGplayer, then paste it. Check printing and matches before buying.</p>
+        <p class="mass-entry-warning" id="tcgplayer-warning" role="status" hidden></p>
+        <details class="mass-entry-preview" id="tcgplayer-preview">
+          <summary>Preview TCGplayer list</summary>
+          <label class="sr-only" for="tcgplayer-output">TCGplayer Mass Entry card list</label>
+          <textarea id="tcgplayer-output" rows="12" readonly spellcheck="false"></textarea>
+        </details>
+      </section>
 
-    <footer>
-      <p>Conversion happens entirely on your device.</p>
-      <button class="sample-button" id="sample-button" type="button">Try the Rocks.D.Xebec example</button>
-    </footer>
+      <footer>
+        <p>Conversion happens entirely on your device.</p>
+        <button class="sample-button" id="sample-button" type="button">Try the Rocks.D.Xebec example</button>
+      </footer>
+    </div>
+
+    <div id="collection-view" data-view-panel="collection" hidden>
+      <section class="collection-hero" aria-labelledby="collection-title">
+        <div>
+          <p class="eyebrow">OWNED CARDS</p>
+          <h2 id="collection-title">The collection</h2>
+          <p id="collection-source">Imported from confirmed orders. Local scan imports stay on this device.</p>
+        </div>
+        <button class="primary-button compact-button" id="import-open" type="button">
+          <span>Add cards</span><span aria-hidden="true">＋</span>
+        </button>
+      </section>
+
+      <section class="collection-stats" aria-label="Collection totals">
+        <div><strong id="collection-total">456</strong><span>cards owned</span></div>
+        <div><strong id="collection-unique">132</strong><span>unique entries</span></div>
+        <button type="button" id="review-jump"><strong>4</strong><span>need review</span></button>
+      </section>
+
+      <section class="collection-controls" aria-label="Collection filters">
+        <label class="search-box" for="collection-search">
+          <span aria-hidden="true">⌕</span>
+          <span class="sr-only">Search the collection</span>
+          <input id="collection-search" type="search" placeholder="Search name or card ID" autocomplete="off">
+        </label>
+        <label class="select-box" for="set-filter">
+          <span>Set</span>
+          <select id="set-filter"><option value="All">All sets</option></select>
+        </label>
+        <div class="color-filters" id="color-filters" aria-label="Filter by color"></div>
+      </section>
+
+      <p class="results-line" id="results-line" aria-live="polite"></p>
+      <div id="collection-groups"></div>
+
+      <section class="review-panel" id="review-panel" aria-labelledby="review-title">
+        <div class="panel-heading">
+          <div>
+            <span class="step">REVIEW</span>
+            <h2 id="review-title">Purchases missing an exact card</h2>
+          </div>
+          <span class="status-pill warning">4 lines</span>
+        </div>
+        <p class="review-intro">These remain outside the totals until the selected card or bundle contents are known.</p>
+        <div id="review-list"></div>
+      </section>
+    </div>
   </main>
+
+  <dialog class="app-dialog" id="import-dialog" aria-labelledby="import-title">
+    <form method="dialog" class="dialog-shell" id="import-form">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">SCAN IMPORT</p>
+          <h2 id="import-title">Add identified cards</h2>
+        </div>
+        <button class="icon-button" id="import-close" type="button" aria-label="Close">×</button>
+      </div>
+      <p class="dialog-copy">Paste one card ID per line. Quantity-first lines such as <code>4 OP01-001</code> also work. Re-importing the same batch will not double-count it.</p>
+      <label class="sr-only" for="import-input">Card IDs and quantities</label>
+      <textarea id="import-input" rows="9" placeholder="OP01-001&#10;2 OP02-089" spellcheck="false" autocapitalize="characters"></textarea>
+      <div class="error" id="import-error" role="alert" hidden></div>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="import-paste" type="button">Paste</button>
+        <button class="primary-button compact-button" value="default" id="import-save" type="submit"><span>Add to collection</span><span>→</span></button>
+      </div>
+      <details class="import-history">
+        <summary>Imported scan batches</summary>
+        <div id="import-history"></div>
+        <button class="danger-button" id="import-clear" type="button">Clear local scan imports</button>
+      </details>
+    </form>
+  </dialog>
+
+  <dialog class="app-dialog card-dialog" id="card-dialog" aria-labelledby="card-dialog-title">
+    <div class="dialog-shell">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow" id="card-dialog-code"></p>
+          <h2 id="card-dialog-title"></h2>
+        </div>
+        <button class="icon-button" id="card-dialog-close" aria-label="Close">×</button>
+      </div>
+      <div id="card-dialog-body"></div>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </body>
 </html>

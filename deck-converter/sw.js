@@ -1,5 +1,17 @@
-const CACHE = 'deck-converter-v5';
-const ASSETS = ['./', 'index.html', 'styles.css', 'converter.js', 'card-names.js', 'app.js', 'manifest.webmanifest', 'icon.svg'];
+const CACHE = 'deck-converter-v7';
+const ASSETS = [
+  './',
+  'index.html',
+  'styles.css',
+  'converter.js',
+  'card-names.js',
+  'collection-model.js',
+  'collection-data.js',
+  'collection-app.js',
+  'app.js',
+  'manifest.webmanifest',
+  'icon.svg',
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(
